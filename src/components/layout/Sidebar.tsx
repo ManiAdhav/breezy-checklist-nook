@@ -80,12 +80,12 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <aside className="w-60 border-r border-border h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
+    <aside className="w-60 border-r border-border h-[calc(100vh-4rem)] flex flex-col overflow-hidden bg-background">
       <div className="flex-1 overflow-y-auto py-2 px-2">
         <div className="mb-2 space-y-0.5">
           {/* Goals Section */}
           <div 
-            className="flex items-center px-2 py-1 text-xs font-medium text-foreground cursor-pointer mt-2" 
+            className="flex items-center px-2 py-1 text-xs font-medium text-foreground cursor-pointer mt-2 hover:bg-accent/30 rounded-md" 
             onClick={() => setShowGoals(!showGoals)}
           >
             {showGoals ? <ChevronDown className="h-3 w-3 mr-0.5" /> : <ChevronRight className="h-3 w-3 mr-0.5" />}
@@ -97,27 +97,27 @@ const Sidebar: React.FC = () => {
               <Link to="/goals" className="block">
                 <Button 
                   variant="ghost" 
-                  className={`w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/goals' ? 'sidebar-item-active' : ''}`}
+                  className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/goals' ? 'sidebar-item-active' : ''}`}
                 >
-                  <Goal className="h-3 w-3 mr-1" />
+                  <Goal className="h-3.5 w-3.5 mr-1" />
                   <span>Yearly Goals</span>
                 </Button>
               </Link>
               <Link to="/targets" className="block">
                 <Button 
                   variant="ghost" 
-                  className={`w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/targets' ? 'sidebar-item-active' : ''}`}
+                  className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/targets' ? 'sidebar-item-active' : ''}`}
                 >
-                  <Target className="h-3 w-3 mr-1" />
+                  <Target className="h-3.5 w-3.5 mr-1" />
                   <span>90-Day Goals</span>
                 </Button>
               </Link>
               <Link to="/weekly" className="block">
                 <Button 
                   variant="ghost" 
-                  className={`w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/weekly' ? 'sidebar-item-active' : ''}`}
+                  className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/weekly' ? 'sidebar-item-active font-medium' : ''}`}
                 >
-                  <CalendarCheck className="h-3 w-3 mr-1" />
+                  <CalendarCheck className="h-3.5 w-3.5 mr-1" />
                   <span>Weekly Goals</span>
                 </Button>
               </Link>
@@ -127,9 +127,9 @@ const Sidebar: React.FC = () => {
           <Link to="/calendar" className="block mt-2">
             <Button 
               variant="ghost" 
-              className={`w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/calendar' ? 'sidebar-item-active' : ''}`}
+              className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/calendar' ? 'sidebar-item-active' : ''}`}
             >
-              <Calendar className="h-3 w-3 mr-1" />
+              <Calendar className="h-3.5 w-3.5 mr-1" />
               <span>Calendar</span>
             </Button>
           </Link>
@@ -140,13 +140,13 @@ const Sidebar: React.FC = () => {
             <Button 
               key={list.id} 
               variant="ghost" 
-              className={`w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item ${selectedListId === list.id && location.pathname === '/' ? 'sidebar-item-active' : ''}`} 
+              className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${selectedListId === list.id && location.pathname === '/' ? 'sidebar-item-active' : ''}`} 
               onClick={() => handleListClick(list.id)}
             >
               {getIconForList(list.icon)}
               <span className="ml-1 flex-1">{list.name}</span>
               {getTaskCountForList(list.id) > 0 && (
-                <span className="text-[9px] bg-secondary rounded-full px-1 py-0.5">
+                <span className="text-[9px] bg-secondary rounded-full px-1.5 py-0.5 min-w-5 text-center">
                   {getTaskCountForList(list.id)}
                 </span>
               )}
@@ -156,7 +156,7 @@ const Sidebar: React.FC = () => {
 
         <div className="mt-2">
           <div 
-            className="flex items-center px-2 py-1 text-xs font-medium text-foreground cursor-pointer" 
+            className="flex items-center px-2 py-1 text-xs font-medium text-foreground cursor-pointer hover:bg-accent/30 rounded-md" 
             onClick={() => setShowCustomLists(!showCustomLists)}
           >
             {showCustomLists ? <ChevronDown className="h-3 w-3 mr-0.5" /> : <ChevronRight className="h-3 w-3 mr-0.5" />}
@@ -169,13 +169,13 @@ const Sidebar: React.FC = () => {
                 <div key={list.id} className="group relative">
                   <Button 
                     variant="ghost" 
-                    className={`w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item ${selectedListId === list.id && location.pathname === '/' ? 'sidebar-item-active' : ''}`} 
+                    className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${selectedListId === list.id && location.pathname === '/' ? 'sidebar-item-active' : ''}`} 
                     onClick={() => handleListClick(list.id)}
                   >
                     {getIconForList(list.icon)}
                     <span className="ml-1 flex-1">{list.name}</span>
                     {getTaskCountForList(list.id) > 0 && (
-                      <span className="text-[9px] bg-secondary rounded-full px-1 py-0.5">
+                      <span className="text-[9px] bg-secondary rounded-full px-1.5 py-0.5 min-w-5 text-center">
                         {getTaskCountForList(list.id)}
                       </span>
                     )}
@@ -186,9 +186,9 @@ const Sidebar: React.FC = () => {
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        className="absolute right-1 top-1/2 -translate-y-1/2 h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
                       >
-                        <MoreHorizontal className="h-2.5 w-2.5" />
+                        <MoreHorizontal className="h-3 w-3" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-32">
@@ -203,14 +203,14 @@ const Sidebar: React.FC = () => {
 
               <Button 
                 variant="ghost" 
-                className="w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item" 
+                className="w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item hover:bg-accent/50" 
                 onClick={() => {
                   setNewListName('');
                   setEditingList(null);
                   setIsAddListOpen(true);
                 }}
               >
-                <PlusCircle className="h-3 w-3 mr-1" />
+                <PlusCircle className="h-3.5 w-3.5 mr-1" />
                 <span>Add List</span>
               </Button>
             </nav>

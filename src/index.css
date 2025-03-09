@@ -98,7 +98,7 @@
   }
 
   .sidebar-item-active {
-    @apply bg-accent/30 text-foreground font-medium;
+    @apply bg-accent/50 text-foreground font-medium;
   }
   
   .page-transition {
