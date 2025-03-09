@@ -30,6 +30,7 @@ export interface ThreeYearGoal {
   startDate: Date;
   endDate: Date;
   status: GoalStatus;
+  icon?: string; // New property for goal icon
   createdAt: Date;
   updatedAt: Date;
 }
@@ -42,6 +43,7 @@ export interface NinetyDayTarget {
   endDate: Date;
   status: GoalStatus;
   threeYearGoalId: string; // Reference to parent goal
+  icon?: string; // New property for target icon
   createdAt: Date;
   updatedAt: Date;
 }
@@ -54,6 +56,7 @@ export interface WeeklyGoal {
   endDate: Date;
   status: GoalStatus;
   ninetyDayTargetId: string; // Reference to parent target
+  icon?: string; // New property for weekly goal icon
   createdAt: Date;
   updatedAt: Date;
 }

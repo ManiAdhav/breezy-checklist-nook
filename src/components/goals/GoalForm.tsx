@@ -9,14 +9,29 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Target, Flag, Flame, Gift, Heart, Key, Layers, Lightbulb, Package, Rocket, Star } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Label } from "@/components/ui/label";
 
 interface GoalFormProps {
   isOpen: boolean;
   onClose: () => void;
   editingGoal: ThreeYearGoal | null;
 }
+
+const iconOptions = [
+  { value: 'Target', icon: Target },
+  { value: 'Flag', icon: Flag },
+  { value: 'Flame', icon: Flame },
+  { value: 'Gift', icon: Gift },
+  { value: 'Heart', icon: Heart },
+  { value: 'Key', icon: Key },
+  { value: 'Layers', icon: Layers },
+  { value: 'Lightbulb', icon: Lightbulb },
+  { value: 'Package', icon: Package },
+  { value: 'Rocket', icon: Rocket },
+  { value: 'Star', icon: Star },
+];
 
 const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => {
   const { addThreeYearGoal, updateThreeYearGoal } = useGoal();
@@ -26,8 +41,9 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
   const [startDate, setStartDate] = useState<Date>(new Date());
   const [endDate, setEndDate] = useState<Date>(new Date(Date.now() + 3 * 365 * 24 * 60 * 60 * 1000)); // 3 years from now
   const [status, setStatus] = useState<GoalStatus>('not_started');
+  const [selectedIcon, setSelectedIcon] = useState<string>('Target');
   
-  // Reset form when dialog opens/closes or editing goal changes
+  // Reset form and pick random icon when dialog opens/closes or editing goal changes
   useEffect(() => {
     if (isOpen) {
       if (editingGoal) {
@@ -36,15 +52,22 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
         setStartDate(new Date(editingGoal.startDate));
         setEndDate(new Date(editingGoal.endDate));
         setStatus(editingGoal.status);
+        setSelectedIcon(editingGoal.icon || getRandomIcon());
       } else {
         setTitle('');
         setDescription('');
         setStartDate(new Date());
         setEndDate(new Date(Date.now() + 3 * 365 * 24 * 60 * 60 * 1000));
         setStatus('not_started');
+        setSelectedIcon(getRandomIcon());
       }
     }
   }, [isOpen, editingGoal]);
+  
+  const getRandomIcon = () => {
+    const randomIndex = Math.floor(Math.random() * iconOptions.length);
+    return iconOptions[randomIndex].value;
+  };
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +79,8 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
       description: description.trim() || undefined,
       startDate,
       endDate,
-      status
+      status,
+      icon: selectedIcon
     };
     
     if (editingGoal) {
@@ -74,21 +98,26 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
     { value: 'completed', label: 'Completed' },
     { value: 'abandoned', label: 'Abandoned' }
   ];
+
+  const IconComponent = iconOptions.find(i => i.value === selectedIcon)?.icon || Target;
   
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[550px] animate-scale-in">
         <DialogHeader>
-          <DialogTitle>{editingGoal ? 'Edit Three-Year Goal' : 'Add Three-Year Goal'}</DialogTitle>
+          <DialogTitle className="flex items-center space-x-2">
+            <IconComponent className="h-5 w-5 text-primary" />
+            <span>{editingGoal ? 'Edit Goal' : 'Create Goal'}</span>
+          </DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="space-y-4">
             <Input
-              placeholder="Goal title"
+              placeholder="Goal name"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="text-lg font-medium"
+              className="text-base font-medium"
               autoFocus
             />
             
@@ -99,14 +128,14 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
               className="min-h-24 resize-none"
             />
             
-            <div className="flex flex-wrap gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <div className="text-sm font-medium">Start Date</div>
+                <Label>Start Date</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-[180px] justify-start text-left font-normal"
+                      className="w-full justify-start text-left font-normal"
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {format(startDate, 'PPP')}
@@ -118,18 +147,19 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
                       selected={startDate}
                       onSelect={(date) => date && setStartDate(date)}
                       initialFocus
+                      className="pointer-events-auto"
                     />
                   </PopoverContent>
                 </Popover>
               </div>
               
               <div className="space-y-2">
-                <div className="text-sm font-medium">End Date</div>
+                <Label>Target Date</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-[180px] justify-start text-left font-normal"
+                      className="w-full justify-start text-left font-normal"
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {format(endDate, 'PPP')}
@@ -141,18 +171,21 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
                       selected={endDate}
                       onSelect={(date) => date && setEndDate(date)}
                       initialFocus
+                      className="pointer-events-auto"
                     />
                   </PopoverContent>
                 </Popover>
               </div>
-              
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <div className="text-sm font-medium">Status</div>
+                <Label>Status</Label>
                 <Select
                   value={status}
                   onValueChange={(value) => setStatus(value as GoalStatus)}
                 >
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -164,15 +197,44 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
                   </SelectContent>
                 </Select>
               </div>
+              
+              <div className="space-y-2">
+                <Label>Icon</Label>
+                <Select
+                  value={selectedIcon}
+                  onValueChange={setSelectedIcon}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {iconOptions.map((option) => {
+                      const Icon = option.icon;
+                      return (
+                        <SelectItem 
+                          key={option.value} 
+                          value={option.value}
+                          className="flex items-center"
+                        >
+                          <div className="flex items-center">
+                            <Icon className="h-4 w-4 mr-2" />
+                            <span>{option.value}</span>
+                          </div>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
           
-          <DialogFooter>
+          <DialogFooter className="mt-6">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit">
-              {editingGoal ? 'Save' : 'Add Goal'}
+            <Button type="submit" className="bg-primary">
+              {editingGoal ? 'Save' : 'Create'}
             </Button>
           </DialogFooter>
         </form>

@@ -32,26 +32,26 @@ const GoalList: React.FC = () => {
   
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-background">
-      <div className="py-6 px-8 flex justify-between items-center border-b border-border sticky top-0 bg-white z-10">
+      <div className="py-4 px-6 flex justify-between items-center border-b border-border sticky top-0 bg-white z-10">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight">Goals Timeline</h2>
+          <h2 className="text-xl font-semibold tracking-tight">Goals</h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Define your long-term vision with these three-year goals
+            Define your vision for the future
           </p>
         </div>
         
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3">
           <div className="relative w-64">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input 
               placeholder="Search goals..." 
-              className="pl-9 h-10 w-full rounded-full bg-background"
+              className="pl-9 h-9 w-full bg-muted/40"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Button onClick={handleAddGoal} className="flex items-center rounded-full h-10 px-4 bg-primary hover:bg-primary/90">
-            <Plus className="h-4 w-4 mr-1.5" />
+          <Button onClick={handleAddGoal} className="h-9">
+            <Plus className="h-4 w-4 mr-1" />
             <span>Add Goal</span>
           </Button>
         </div>
@@ -65,10 +65,10 @@ const GoalList: React.FC = () => {
             </div>
             <h3 className="text-xl font-medium">No goals yet</h3>
             <p className="text-muted-foreground mt-2 max-w-sm">
-              {searchQuery ? 'No goals match your search criteria.' : 'Add a three-year goal to start planning your future.'}
+              {searchQuery ? 'No goals match your search criteria.' : 'Add a goal to start planning your future.'}
             </p>
             {!searchQuery && (
-              <Button onClick={handleAddGoal} className="mt-6 rounded-full">
+              <Button onClick={handleAddGoal} className="mt-6">
                 <Plus className="h-4 w-4 mr-1.5" />
                 <span>Add Goal</span>
               </Button>
