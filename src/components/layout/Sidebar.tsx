@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { 
   Inbox, Calendar, CalendarClock, ListChecks, PlusCircle, 
   ChevronDown, ChevronRight, MoreHorizontal, User, Briefcase,
-  Target, Goal
+  Target, Goal, CalendarCheck
 } from 'lucide-react';
 import { useTask } from '@/contexts/TaskContext';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const Sidebar: React.FC = () => {
+  const location = useLocation();
   const { 
     lists, 
     customLists, 
@@ -86,7 +87,7 @@ const Sidebar: React.FC = () => {
           <Link to="/goals" className="block">
             <Button 
               variant="ghost" 
-              className="w-full justify-start sidebar-item"
+              className={`w-full justify-start sidebar-item ${location.pathname === '/goals' ? 'sidebar-item-active' : ''}`}
             >
               <Goal className="h-4 w-4" />
               <span className="ml-2">Three-Year Goals</span>
@@ -95,10 +96,19 @@ const Sidebar: React.FC = () => {
           <Link to="/targets" className="block">
             <Button 
               variant="ghost" 
-              className="w-full justify-start sidebar-item"
+              className={`w-full justify-start sidebar-item ${location.pathname === '/targets' ? 'sidebar-item-active' : ''}`}
             >
               <Target className="h-4 w-4" />
               <span className="ml-2">90-Day Targets</span>
+            </Button>
+          </Link>
+          <Link to="/weekly" className="block">
+            <Button 
+              variant="ghost" 
+              className={`w-full justify-start sidebar-item ${location.pathname === '/weekly' ? 'sidebar-item-active' : ''}`}
+            >
+              <CalendarCheck className="h-4 w-4" />
+              <span className="ml-2">Weekly Goals</span>
             </Button>
           </Link>
         </div>
