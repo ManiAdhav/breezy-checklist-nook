@@ -96,19 +96,31 @@ const Sidebar: React.FC = () => {
           {showTasks && (
             <div className="ml-1 space-y-0.5">
               <Link to="/" className="block">
-                <Button variant="ghost" className={`w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/' && selectedListId === 'inbox' ? 'sidebar-item-active' : ''}`} onClick={() => setSelectedListId('inbox')}>
+                <Button 
+                  variant="ghost" 
+                  className={`w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/' && selectedListId === 'inbox' ? 'sidebar-item-active' : ''}`} 
+                  onClick={() => setSelectedListId('inbox')}
+                >
                   <Inbox className="h-3 w-3 mr-1" />
                   <span>Inbox</span>
                 </Button>
               </Link>
               <Link to="/" className="block">
-                <Button variant="ghost" className={`w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item ${selectedListId === 'today' && location.pathname === '/' ? 'sidebar-item-active' : ''}`} onClick={() => setSelectedListId('today')}>
+                <Button 
+                  variant="ghost" 
+                  className={`w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item ${selectedListId === 'today' && location.pathname === '/' ? 'sidebar-item-active' : ''}`} 
+                  onClick={() => setSelectedListId('today')}
+                >
                   <Calendar className="h-3 w-3 mr-1" />
                   <span>Today</span>
                 </Button>
               </Link>
               <Link to="/" className="block">
-                <Button variant="ghost" className={`w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item ${selectedListId === 'planned' && location.pathname === '/' ? 'sidebar-item-active' : ''}`} onClick={() => setSelectedListId('planned')}>
+                <Button 
+                  variant="ghost" 
+                  className={`w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item ${selectedListId === 'planned' && location.pathname === '/' ? 'sidebar-item-active' : ''}`} 
+                  onClick={() => setSelectedListId('planned')}
+                >
                   <CalendarClock className="h-3 w-3 mr-1" />
                   <span>Planned</span>
                 </Button>
@@ -128,19 +140,28 @@ const Sidebar: React.FC = () => {
           {showGoals && (
             <div className="ml-1 space-y-0.5">
               <Link to="/goals" className="block">
-                <Button variant="ghost" className={`w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/goals' ? 'sidebar-item-active' : ''}`}>
+                <Button 
+                  variant="ghost" 
+                  className={`w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/goals' ? 'sidebar-item-active' : ''}`}
+                >
                   <Goal className="h-3 w-3 mr-1" />
                   <span>Yearly Goals</span>
                 </Button>
               </Link>
               <Link to="/targets" className="block">
-                <Button variant="ghost" className={`w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/targets' ? 'sidebar-item-active' : ''}`}>
+                <Button 
+                  variant="ghost" 
+                  className={`w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/targets' ? 'sidebar-item-active' : ''}`}
+                >
                   <Target className="h-3 w-3 mr-1" />
                   <span>90-Day Goals</span>
                 </Button>
               </Link>
               <Link to="/weekly" className="block">
-                <Button variant="ghost" className={`w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/weekly' ? 'sidebar-item-active' : ''}`}>
+                <Button 
+                  variant="ghost" 
+                  className={`w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/weekly' ? 'sidebar-item-active' : ''}`}
+                >
                   <CalendarCheck className="h-3 w-3 mr-1" />
                   <span>Weekly Goals</span>
                 </Button>
@@ -149,7 +170,10 @@ const Sidebar: React.FC = () => {
           )}
           
           <Link to="/calendar" className="block mt-2">
-            <Button variant="ghost" className={`w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/calendar' ? 'sidebar-item-active' : ''}`}>
+            <Button 
+              variant="ghost" 
+              className={`w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/calendar' ? 'sidebar-item-active' : ''}`}
+            >
               <Calendar className="h-3 w-3 mr-1" />
               <span>Calendar</span>
             </Button>
@@ -224,7 +248,7 @@ const Sidebar: React.FC = () => {
 
               <Button 
                 variant="ghost" 
-                className="w-full justify-start h-6 px-2 py-0.5 text-xs text-muted-foreground sidebar-item" 
+                className="w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item" 
                 onClick={() => {
                   setNewListName('');
                   setEditingList(null);
