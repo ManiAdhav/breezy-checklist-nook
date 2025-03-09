@@ -5,6 +5,7 @@ import { GoalProvider } from '@/contexts/GoalContext';
 import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
 import TaskList from '@/components/tasks/TaskList';
+import FloatingActionButton from '@/components/fab/FloatingActionButton';
 
 const Index: React.FC = () => {
   return (
@@ -16,6 +17,7 @@ const Index: React.FC = () => {
             <Sidebar />
             <TaskList />
           </div>
+          <FloatingActionButton />
         </div>
       </GoalProvider>
     </TaskProvider>

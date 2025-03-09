@@ -5,6 +5,7 @@ import { TaskProvider } from '@/contexts/TaskContext';
 import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
 import GoalList from '@/components/goals/GoalList';
+import FloatingActionButton from '@/components/fab/FloatingActionButton';
 
 const GoalsPage: React.FC = () => {
   return (
@@ -16,6 +17,7 @@ const GoalsPage: React.FC = () => {
             <Sidebar />
             <GoalList />
           </div>
+          <FloatingActionButton />
         </div>
       </GoalProvider>
     </TaskProvider>
