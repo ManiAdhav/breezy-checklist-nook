@@ -8,14 +8,14 @@ interface TagProps {
   className?: string;
 }
 
-const Tag: React.FC<TagProps> = ({ text, color = '#4095EB', className }) => {
+const Tag: React.FC<TagProps> = ({ text, color = '#8B5CF6', className }) => {
   // Create a lighter version of the color for the background (20% opacity)
   const bgColor = `${color}20`;
   
   return (
     <span
       className={cn(
-        "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
+        "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
         className
       )}
       style={{ 

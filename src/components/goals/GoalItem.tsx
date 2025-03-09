@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { ThreeYearGoal, GoalStatus } from '@/types/task';
 import { useGoal } from '@/contexts/GoalContext';
-import { Pencil, Trash2, Calendar, Clock, MoreHorizontal } from 'lucide-react';
+import { Pencil, Trash2, Calendar, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Tag from '@/components/ui/Tag';
 import {
@@ -25,7 +25,7 @@ const GoalItem: React.FC<GoalItemProps> = ({ goal, onEdit }) => {
   const getStatusColor = (status: GoalStatus): string => {
     const colors = {
       not_started: '#6B7280', // gray
-      in_progress: '#60A5FA', // blue
+      in_progress: '#8B5CF6', // purple
       completed: '#34D399', // green
       abandoned: '#F87171', // red
     };
@@ -50,7 +50,7 @@ const GoalItem: React.FC<GoalItemProps> = ({ goal, onEdit }) => {
 
   return (
     <div 
-      className={`group bg-white rounded-xl border border-border p-4 transition-all duration-150 ${
+      className={`group bg-white rounded-3xl border border-border p-5 transition-all duration-150 ${
         isHovered ? 'shadow-md' : 'shadow-sm'
       } ${goal.status === 'completed' ? 'border-green-200 bg-green-50/30' : ''}`}
       onMouseEnter={() => setIsHovered(true)}
@@ -59,7 +59,7 @@ const GoalItem: React.FC<GoalItemProps> = ({ goal, onEdit }) => {
       <div className="flex items-start">
         <div className="flex-1 min-w-0 mr-2">
           <div className="flex justify-between">
-            <div className="font-medium text-base">{goal.title}</div>
+            <div className="font-medium text-lg">{goal.title}</div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
@@ -83,12 +83,12 @@ const GoalItem: React.FC<GoalItemProps> = ({ goal, onEdit }) => {
           </div>
           
           {goal.description && (
-            <div className="text-sm text-muted-foreground mt-1">
+            <div className="text-sm text-muted-foreground mt-2">
               {goal.description}
             </div>
           )}
           
-          <div className="flex flex-wrap items-center gap-3 mt-3">
+          <div className="flex flex-wrap items-center gap-3 mt-4">
             <Tag 
               text={getStatusLabel(goal.status)} 
               color={getStatusColor(goal.status)}
@@ -100,8 +100,8 @@ const GoalItem: React.FC<GoalItemProps> = ({ goal, onEdit }) => {
             </div>
           </div>
           
-          <div className="mt-4">
-            <div className="flex justify-between text-xs mb-1">
+          <div className="mt-5">
+            <div className="flex justify-between text-xs mb-1.5">
               <span className="font-medium">Progress</span>
               <span>{progressPercentage}%</span>
             </div>

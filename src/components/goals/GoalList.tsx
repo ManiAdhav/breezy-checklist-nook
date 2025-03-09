@@ -31,33 +31,33 @@ const GoalList: React.FC = () => {
   );
   
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#f9fafb]">
-      <div className="py-4 px-6 flex justify-between items-center border-b border-border sticky top-0 bg-white z-10">
+    <div className="flex-1 flex flex-col h-full overflow-hidden bg-background">
+      <div className="py-6 px-8 flex justify-between items-center border-b border-border sticky top-0 bg-white z-10">
         <div>
-          <h2 className="text-xl font-medium tracking-tight">Goals Timeline</h2>
+          <h2 className="text-2xl font-semibold tracking-tight">Goals Timeline</h2>
           <p className="text-sm text-muted-foreground mt-1">
             Define your long-term vision with these three-year goals
           </p>
         </div>
         
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-4">
           <div className="relative w-64">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input 
               placeholder="Search goals..." 
-              className="pl-9 h-9 w-full"
+              className="pl-9 h-10 w-full rounded-full bg-background"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Button onClick={handleAddGoal} className="flex items-center rounded-full h-9 px-4 bg-primary hover:bg-primary/90">
+          <Button onClick={handleAddGoal} className="flex items-center rounded-full h-10 px-4 bg-primary hover:bg-primary/90">
             <Plus className="h-4 w-4 mr-1.5" />
             <span>Add Goal</span>
           </Button>
         </div>
       </div>
       
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto p-6">
         {filteredGoals.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center p-6">
             <div className="bg-muted/50 rounded-full p-6 mb-4">
@@ -75,7 +75,7 @@ const GoalList: React.FC = () => {
             )}
           </div>
         ) : (
-          <div className="p-4 grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredGoals.map(goal => (
               <GoalItem 
                 key={goal.id} 

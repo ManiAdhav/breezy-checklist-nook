@@ -7,44 +7,44 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    --background: 260 30% 98%;
+    --foreground: 224 71% 4%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 224 71% 4%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 224 71% 4%;
 
-    --primary: 221 83% 53%;
+    --primary: 252 56% 57%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 260 30% 95%;
+    --secondary-foreground: 224 71% 4%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 8% 46%;
 
-    --accent: 210 40% 96%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 260 30% 95%;
+    --accent-foreground: 224 71% 4%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 221 83% 53%;
+    --ring: 252 56% 57%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
 
-    --sidebar-background: 222 47% 11%;
+    --sidebar-background: 252 56% 57%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 221 83% 53%;
-    --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 223 47% 20%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 252 56% 57%;
+    --sidebar-accent: 252 47% 65%;
     --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 223 47% 20%;
-    --sidebar-ring: 221 83% 53%;
+    --sidebar-border: 252 47% 65%;
+    --sidebar-ring: 0 0% 100%;
   }
 
   * {
@@ -94,7 +94,7 @@
   }
 
   .sidebar-item-active {
-    @apply bg-primary text-white font-medium;
+    @apply bg-sidebar-primary text-sidebar-primary-foreground font-medium;
   }
   
   .page-transition {
@@ -114,7 +114,7 @@
   }
   
   .progress-bar {
-    @apply h-2 rounded-full bg-blue-100 overflow-hidden;
+    @apply h-2 rounded-full bg-primary/10 overflow-hidden;
   }
   
   .progress-value {
@@ -141,4 +141,3 @@
   transform: translateY(-10px);
   transition: opacity 200ms, transform 200ms;
 }
-
