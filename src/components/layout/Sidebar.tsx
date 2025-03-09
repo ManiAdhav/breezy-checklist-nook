@@ -145,10 +145,10 @@ const Sidebar: React.FC = () => {
             >
               <div className="flex items-center gap-3 flex-1">
                 {getIconForList(list.icon)}
-                <span>{list.name}</span>
+                <span className="mr-auto">{list.name}</span>
               </div>
               {getTaskCountForList(list.id) > 0 && (
-                <span className="text-[9px] bg-secondary rounded-full px-1.5 py-0.5 min-w-5 text-center ml-auto">
+                <span className="text-[9px] bg-secondary rounded-full px-1.5 py-0.5 min-w-5 text-center">
                   {getTaskCountForList(list.id)}
                 </span>
               )}
@@ -176,10 +176,10 @@ const Sidebar: React.FC = () => {
                   >
                     <div className="flex items-center gap-3 flex-1">
                       {getIconForList(list.icon)}
-                      <span>{list.name}</span>
+                      <span className="mr-auto">{list.name}</span>
                     </div>
                     {getTaskCountForList(list.id) > 0 && (
-                      <span className="text-[9px] bg-secondary rounded-full px-1.5 py-0.5 min-w-5 text-center ml-auto">
+                      <span className="text-[9px] bg-secondary rounded-full px-1.5 py-0.5 min-w-5 text-center">
                         {getTaskCountForList(list.id)}
                       </span>
                     )}
