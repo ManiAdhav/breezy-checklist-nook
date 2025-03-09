@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useGoal } from '@/contexts/GoalContext';
 import GoalItem from './GoalItem';
 import GoalForm from './GoalForm';
+import GoalDetailView from './GoalDetailView';
 import { Button } from '@/components/ui/button';
 import { ThreeYearGoal } from '@/types/task';
 import { Plus, CheckCircle2, Search } from 'lucide-react';
@@ -14,6 +15,7 @@ const GoalList: React.FC = () => {
   const [isGoalFormOpen, setIsGoalFormOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<ThreeYearGoal | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
   
   const handleAddGoal = () => {
     setEditingGoal(null);
@@ -24,11 +26,25 @@ const GoalList: React.FC = () => {
     setEditingGoal(goal);
     setIsGoalFormOpen(true);
   };
+  
+  const handleViewGoal = (goalId: string) => {
+    setSelectedGoalId(goalId);
+  };
 
   const filteredGoals = threeYearGoals.filter(goal => 
     goal.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (goal.description && goal.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
+  
+  // If a goal is selected, show the goal detail view
+  if (selectedGoalId) {
+    return (
+      <GoalDetailView 
+        goalId={selectedGoalId} 
+        onBack={() => setSelectedGoalId(null)} 
+      />
+    );
+  }
   
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-background">
@@ -81,6 +97,7 @@ const GoalList: React.FC = () => {
                 key={goal.id} 
                 goal={goal} 
                 onEdit={handleEditGoal}
+                onView={() => handleViewGoal(goal.id)}
               />
             ))}
           </div>

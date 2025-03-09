@@ -13,6 +13,7 @@ import { CalendarIcon, Target, Flag, Flame, Gift, Heart, Key, Layers, Lightbulb,
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { toast } from '@/hooks/use-toast';
 
 interface GoalFormProps {
   isOpen: boolean;
@@ -74,7 +75,14 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!title.trim()) return;
+    if (!title.trim()) {
+      toast({
+        title: "Error",
+        description: "Goal title is required",
+        variant: "destructive",
+      });
+      return;
+    }
     
     const goalData = {
       title: title.trim(),
@@ -87,8 +95,16 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
     
     if (editingGoal) {
       updateThreeYearGoal(editingGoal.id, goalData);
+      toast({
+        title: "Goal updated",
+        description: "Your goal has been updated successfully",
+      });
     } else {
       addThreeYearGoal(goalData);
+      toast({
+        title: "Goal created",
+        description: "Your new goal has been created",
+      });
     }
     
     onClose();
@@ -97,7 +113,6 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
   const handleIconSelect = (iconValue: string) => {
     setSelectedIcon(iconValue);
     setIconPopoverOpen(false);
-    console.log("Icon selected:", iconValue); // Debug log
   };
   
   const statusOptions = [

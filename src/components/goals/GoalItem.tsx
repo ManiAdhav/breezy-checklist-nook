@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { ThreeYearGoal, GoalStatus } from '@/types/task';
 import { useGoal } from '@/contexts/GoalContext';
-import { Pencil, Trash2, Calendar, MoreHorizontal } from 'lucide-react';
+import { Pencil, Trash2, Calendar, MoreHorizontal, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Tag from '@/components/ui/Tag';
 import {
@@ -16,9 +16,10 @@ import {
 interface GoalItemProps {
   goal: ThreeYearGoal;
   onEdit: (goal: ThreeYearGoal) => void;
+  onView: () => void;
 }
 
-const GoalItem: React.FC<GoalItemProps> = ({ goal, onEdit }) => {
+const GoalItem: React.FC<GoalItemProps> = ({ goal, onEdit, onView }) => {
   const { deleteThreeYearGoal } = useGoal();
   const [isHovered, setIsHovered] = useState(false);
 
@@ -59,7 +60,12 @@ const GoalItem: React.FC<GoalItemProps> = ({ goal, onEdit }) => {
       <div className="flex items-start">
         <div className="flex-1 min-w-0 mr-2">
           <div className="flex justify-between">
-            <div className="font-medium text-lg">{goal.title}</div>
+            <div 
+              className="font-medium text-lg hover:text-primary cursor-pointer"
+              onClick={onView}
+            >
+              {goal.title}
+            </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
@@ -67,6 +73,10 @@ const GoalItem: React.FC<GoalItemProps> = ({ goal, onEdit }) => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={onView}>
+                  <Eye className="h-4 w-4 mr-2" />
+                  View Details
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onEdit(goal)}>
                   <Pencil className="h-4 w-4 mr-2" />
                   Edit
