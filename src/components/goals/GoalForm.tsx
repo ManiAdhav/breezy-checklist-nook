@@ -12,6 +12,7 @@ import { format } from 'date-fns';
 import { CalendarIcon, Target, Flag, Flame, Gift, Heart, Key, Layers, Lightbulb, Package, Rocket, Star } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 interface GoalFormProps {
   isOpen: boolean;
@@ -105,6 +106,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
     { value: 'abandoned', label: 'Abandoned' }
   ];
 
+  // Get the icon component based on the selected icon value
   const IconComponent = iconOptions.find(i => i.value === selectedIcon)?.icon || Target;
   
   return (
@@ -142,7 +144,10 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
                           type="button"
                           variant={selectedIcon === option.value ? "default" : "outline"}
                           size="icon"
-                          className="h-10 w-10"
+                          className={cn(
+                            "h-10 w-10",
+                            selectedIcon === option.value && "bg-primary text-primary-foreground"
+                          )}
                           onClick={() => handleIconSelect(option.value)}
                         >
                           <Icon className="h-5 w-5" />
