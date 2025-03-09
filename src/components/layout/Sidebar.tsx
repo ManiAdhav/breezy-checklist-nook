@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Inbox, Calendar, CalendarClock, ListChecks, PlusCircle, ChevronDown, ChevronRight, MoreHorizontal, User, Briefcase, Target, Goal, CalendarCheck } from 'lucide-react';
+import { Inbox, Mail, Package, MailOpen, TrayDown, ChevronDown, ChevronRight, MoreHorizontal, User, Briefcase, Target, Mail as MailIcon, Calendar } from 'lucide-react';
 import { useTask } from '@/contexts/TaskContext';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { List } from '@/types/task';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+
 const Sidebar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -26,25 +27,28 @@ const Sidebar: React.FC = () => {
   const [isAddListOpen, setIsAddListOpen] = useState(false);
   const [newListName, setNewListName] = useState('');
   const [editingList, setEditingList] = useState<List | null>(null);
+
   const getIconForList = (icon: string | undefined) => {
     switch (icon) {
       case 'inbox':
         return <Inbox className="h-4 w-4" />;
       case 'calendar':
-        return <Calendar className="h-4 w-4" />;
+        return <Mail className="h-4 w-4" />;
       case 'calendar-clock':
-        return <CalendarClock className="h-4 w-4" />;
+        return <MailOpen className="h-4 w-4" />;
       case 'user':
-        return <User className="h-4 w-4" />;
+        return <Package className="h-4 w-4" />;
       case 'briefcase':
-        return <Briefcase className="h-4 w-4" />;
+        return <TrayDown className="h-4 w-4" />;
       default:
-        return <ListChecks className="h-4 w-4" />;
+        return <Inbox className="h-4 w-4" />;
     }
   };
+
   const getTaskCountForList = (listId: string) => {
     return tasks.filter(task => task.listId === listId && !task.completed).length;
   };
+
   const handleAddList = () => {
     if (newListName.trim()) {
       if (editingList) {
@@ -62,15 +66,18 @@ const Sidebar: React.FC = () => {
       setIsAddListOpen(false);
     }
   };
+
   const openEditDialog = (list: List) => {
     setEditingList(list);
     setNewListName(list.name);
     setIsAddListOpen(true);
   };
+
   const handleListClick = (listId: string) => {
     setSelectedListId(listId);
-    navigate('/'); // Redirect to main tasks page
+    navigate('/');
   };
+
   return <aside className="w-60 border-r border-border h-[calc(100vh-4rem)] flex flex-col overflow-hidden bg-background">
       <div className="flex-1 overflow-y-auto py-2 px-2">
         <div className="mb-2 space-y-0.5">
@@ -83,19 +90,19 @@ const Sidebar: React.FC = () => {
           {showGoals && <div className="ml-1 space-y-0.5">
               <Link to="/goals" className="block">
                 <Button variant="ghost" className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/goals' ? 'sidebar-item-active' : ''}`}>
-                  <Goal className="h-4 w-4 mr-3" />
+                  <Package className="h-4 w-4 mr-3" />
                   <span>Yearly Goals</span>
                 </Button>
               </Link>
               <Link to="/targets" className="block">
                 <Button variant="ghost" className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/targets' ? 'sidebar-item-active' : ''}`}>
-                  <Target className="h-4 w-4 mr-3" />
+                  <TrayDown className="h-4 w-4 mr-3" />
                   <span>90-Day Goals</span>
                 </Button>
               </Link>
               <Link to="/weekly" className="block">
                 <Button variant="ghost" className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/weekly' ? 'sidebar-item-active font-medium' : ''}`}>
-                  <CalendarCheck className="h-4 w-4 mr-3" />
+                  <Mail className="h-4 w-4 mr-3" />
                   <span>Weekly Goals</span>
                 </Button>
               </Link>
@@ -103,7 +110,7 @@ const Sidebar: React.FC = () => {
           
           <Link to="/calendar" className="block mt-2">
             <Button variant="ghost" className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/calendar' ? 'sidebar-item-active' : ''}`}>
-              <Calendar className="h-4 w-4 mr-3" />
+              <MailOpen className="h-4 w-4 mr-3" />
               <span>Calendar</span>
             </Button>
           </Link>
@@ -159,7 +166,7 @@ const Sidebar: React.FC = () => {
             setEditingList(null);
             setIsAddListOpen(true);
           }}>
-                <PlusCircle className="h-4 w-4 mr-3" />
+                <Package className="h-4 w-4 mr-3" />
                 <span>Add List</span>
               </Button>
             </nav>}
@@ -187,4 +194,5 @@ const Sidebar: React.FC = () => {
       </Dialog>
     </aside>;
 };
+
 export default Sidebar;
