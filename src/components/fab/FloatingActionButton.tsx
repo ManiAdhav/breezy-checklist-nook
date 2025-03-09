@@ -1,15 +1,16 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus, X, Calendar, Clock, Save } from 'lucide-react';
+import { Plus, Save } from 'lucide-react';
 import { useTask } from '@/contexts/TaskContext';
 import { format } from 'date-fns';
 import { parseNaturalLanguageTask } from '@/utils/dateParser';
 import { Priority } from '@/types/task';
 import { toast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
 
 const FloatingActionButton: React.FC = () => {
   const { addTask } = useTask();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [parsedTask, setParsedTask] = useState<{
     title: string;
@@ -40,26 +41,34 @@ const FloatingActionButton: React.FC = () => {
   }, [inputValue]);
   
   useEffect(() => {
-    // Focus the input when the FAB is opened
-    if (isOpen && inputRef.current) {
+    // Focus the input when the FAB is expanded
+    if (isExpanded && inputRef.current) {
       inputRef.current.focus();
     }
     
     // Add click outside listener
     const handleClickOutside = (event: MouseEvent) => {
       if (fabRef.current && !fabRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+        setIsExpanded(false);
       }
     };
     
-    if (isOpen) {
+    if (isExpanded) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isOpen]);
+  }, [isExpanded]);
+  
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && inputValue.trim()) {
+      handleSave();
+    } else if (e.key === 'Escape') {
+      setIsExpanded(false);
+    }
+  };
   
   const handleSave = () => {
     if (!parsedTask.title.trim()) {
@@ -77,7 +86,6 @@ const FloatingActionButton: React.FC = () => {
       dueDate: parsedTask.dueDate,
       priority: 'none' as Priority,
       listId: 'inbox',
-      // Add recurring information if available
       notes: parsedTask.recurring 
         ? `Recurring: ${parsedTask.recurringPattern}` 
         : undefined,
@@ -90,73 +98,73 @@ const FloatingActionButton: React.FC = () => {
     
     // Reset the input and close the FAB
     setInputValue('');
-    setIsOpen(false);
+    setIsExpanded(false);
   };
   
   return (
     <div 
-      className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2" 
+      className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50"
+      style={{ maxWidth: '600px', width: '92%' }}
       ref={fabRef}
     >
-      {isOpen && (
-        <div className="mb-4 w-[300px] bg-white rounded-xl shadow-lg border border-border animate-scale-in">
-          <div className="p-4">
-            <input
+      <div 
+        className={`
+          bg-white rounded-full shadow-md transition-all duration-300 overflow-hidden
+          ${isExpanded ? 'w-full' : 'w-full'}
+          flex items-center 
+        `}
+      >
+        {isExpanded ? (
+          <div className="w-full flex items-center p-3">
+            <Input
               ref={inputRef}
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              className="w-full border-b border-border pb-2 mb-4 focus:outline-none focus:border-primary"
+              onKeyDown={handleKeyDown}
+              className="w-full border-none focus:ring-0 h-10 pl-4 text-base"
               placeholder="Add a task... (e.g., 'Call John tomorrow at 3pm')"
+              autoFocus
             />
             
-            {parsedTask.title && (
-              <div className="text-sm">
-                <div className="font-medium">{parsedTask.title}</div>
-                {parsedTask.dueDate && (
-                  <div className="flex items-center text-muted-foreground mt-1">
-                    <Calendar className="w-4 h-4 mr-1" />
-                    <span>{format(parsedTask.dueDate, 'PPP')}</span>
-                    {parsedTask.dueDate.getHours() !== 0 && (
-                      <>
-                        <Clock className="w-4 h-4 ml-2 mr-1" />
-                        <span>{format(parsedTask.dueDate, 'p')}</span>
-                      </>
-                    )}
-                  </div>
-                )}
-                {parsedTask.recurring && (
-                  <div className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full inline-block mt-2">
-                    Recurring: {parsedTask.recurringPattern}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-          
-          <div className="border-t border-border p-2 flex justify-end">
             <button
               onClick={handleSave}
-              className="bg-primary text-white px-4 py-2 rounded-md flex items-center text-sm font-medium"
-              disabled={!parsedTask.title}
+              className={`
+                ml-2 rounded-full p-2 transition-all duration-300
+                ${inputValue.trim() ? 'bg-primary text-white hover:bg-primary/90' : 'bg-gray-100 text-gray-400'}
+              `}
+              disabled={!inputValue.trim()}
             >
-              <Save className="w-4 h-4 mr-1" />
-              Save Task
+              <Save className="w-4 h-4" />
             </button>
           </div>
+        ) : (
+          <button
+            onClick={() => setIsExpanded(true)}
+            className="w-full h-12 bg-white flex items-center justify-center hover:bg-gray-50 transition-colors"
+          >
+            <Plus className="w-5 h-5 text-primary" />
+          </button>
+        )}
+      </div>
+      
+      {/* Task preview when date/time is detected */}
+      {isExpanded && parsedTask.dueDate && (
+        <div className="mt-2 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-sm animate-fade-in">
+          <div className="text-sm text-gray-500">Task will be scheduled for:</div>
+          <div className="font-medium">
+            {format(parsedTask.dueDate, 'PPP')}
+            {parsedTask.dueDate.getHours() !== 0 && (
+              <span className="ml-2">{format(parsedTask.dueDate, 'p')}</span>
+            )}
+          </div>
+          {parsedTask.recurring && (
+            <div className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full inline-block mt-1">
+              Recurring: {parsedTask.recurringPattern}
+            </div>
+          )}
         </div>
       )}
-      
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 ${
-          isOpen 
-            ? 'bg-destructive text-destructive-foreground rotate-45' 
-            : 'bg-primary text-primary-foreground'
-        }`}
-      >
-        <Plus className="w-6 h-6" />
-      </button>
     </div>
   );
 };
