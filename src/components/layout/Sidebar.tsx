@@ -81,7 +81,7 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <aside className="w-60 border-r border-border h-[calc(100vh-4rem)] flex flex-col">
+    <aside className="w-60 border-r border-border h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
       <div className="flex-1 overflow-y-auto py-2 px-2">
         <div className="mb-2 space-y-0.5">
           {/* Tasks Section */}

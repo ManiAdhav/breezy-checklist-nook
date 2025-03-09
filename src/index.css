@@ -93,6 +93,10 @@
     @apply flex items-center rounded-md text-foreground hover:bg-accent/40 hover:text-foreground transition-colors duration-200;
   }
 
+  .sidebar-item span {
+    @apply inline-block; /* Ensure text is always visible */
+  }
+
   .sidebar-item-active {
     @apply bg-accent/30 text-foreground font-medium;
   }
