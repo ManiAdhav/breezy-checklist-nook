@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Inbox, Mail, Package, MailOpen, Archive, ChevronDown, ChevronRight, MoreHorizontal, User, Briefcase, Target, Mail as MailIcon, Calendar } from 'lucide-react';
+import { Inbox, Mail, Package, MailOpen, Archive, ChevronDown, ChevronRight, MoreHorizontal, User, Briefcase, Target, Mail as MailIcon, Calendar, Clock, CalendarClock } from 'lucide-react';
 import { useTask } from '@/contexts/TaskContext';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -25,6 +25,7 @@ const Sidebar: React.FC = () => {
   } = useTask();
   const [showCustomLists, setShowCustomLists] = useState(true);
   const [showGoals, setShowGoals] = useState(true);
+  const [showTasks, setShowTasks] = useState(true);
   const [isAddListOpen, setIsAddListOpen] = useState(false);
   const [newListName, setNewListName] = useState('');
   const [editingList, setEditingList] = useState<List | null>(null);
@@ -82,6 +83,39 @@ const Sidebar: React.FC = () => {
   return <aside className="w-60 border-r border-border h-[calc(100vh-4rem)] flex flex-col overflow-hidden bg-background">
       <div className="flex-1 overflow-y-auto py-2 px-2">
         <div className="mb-2 space-y-0.5">
+          {/* Tasks Section */}
+          <div className="flex items-center px-2 py-1 text-xs font-medium text-foreground cursor-pointer mt-2 hover:bg-accent/30 rounded-md" onClick={() => setShowTasks(!showTasks)}>
+            {showTasks ? <ChevronDown className="h-3.5 w-3.5 mr-1" /> : <ChevronRight className="h-3.5 w-3.5 mr-1" />}
+            <span>Tasks</span>
+          </div>
+          
+          {showTasks && <div className="ml-1 space-y-0.5">
+              <Button 
+                variant="ghost" 
+                className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${selectedListId === 'inbox' && location.pathname === '/' ? 'sidebar-item-active' : ''}`}
+                onClick={() => handleListClick('inbox')}
+              >
+                <Inbox className="h-4 w-4 mr-3" />
+                <span>Inbox</span>
+              </Button>
+              <Button 
+                variant="ghost" 
+                className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${selectedListId === 'today' && location.pathname === '/' ? 'sidebar-item-active' : ''}`}
+                onClick={() => handleListClick('today')}
+              >
+                <Clock className="h-4 w-4 mr-3" />
+                <span>Today</span>
+              </Button>
+              <Button 
+                variant="ghost" 
+                className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${selectedListId === 'planned' && location.pathname === '/' ? 'sidebar-item-active' : ''}`}
+                onClick={() => handleListClick('planned')}
+              >
+                <CalendarClock className="h-4 w-4 mr-3" />
+                <span>Planned</span>
+              </Button>
+            </div>}
+          
           {/* Goals Section */}
           <div className="flex items-center px-2 py-1 text-xs font-medium text-foreground cursor-pointer mt-2 hover:bg-accent/30 rounded-md" onClick={() => setShowGoals(!showGoals)}>
             {showGoals ? <ChevronDown className="h-3.5 w-3.5 mr-1" /> : <ChevronRight className="h-3.5 w-3.5 mr-1" />}
