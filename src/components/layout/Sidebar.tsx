@@ -24,6 +24,7 @@ const Sidebar: React.FC = () => {
     tasks
   } = useTask();
   const [showCustomLists, setShowCustomLists] = useState(true);
+  const [showGoals, setShowGoals] = useState(true);
   const [isAddListOpen, setIsAddListOpen] = useState(false);
   const [newListName, setNewListName] = useState('');
   const [editingList, setEditingList] = useState<List | null>(null);
@@ -88,25 +89,40 @@ const Sidebar: React.FC = () => {
               <span className="ml-2">Tasks</span>
             </Button>
           </Link>
-          <Link to="/goals" className="block">
-            <Button variant="ghost" className={`w-full justify-start sidebar-item ${location.pathname === '/goals' ? 'sidebar-item-active' : ''}`}>
-              <Goal className="h-4 w-4" />
-              <span className="ml-2">Three-Year Goals</span>
-            </Button>
-          </Link>
-          <Link to="/targets" className="block">
-            <Button variant="ghost" className={`w-full justify-start sidebar-item ${location.pathname === '/targets' ? 'sidebar-item-active' : ''}`}>
-              <Target className="h-4 w-4" />
-              <span className="ml-2">90-Day Targets</span>
-            </Button>
-          </Link>
-          <Link to="/weekly" className="block">
-            <Button variant="ghost" className={`w-full justify-start sidebar-item ${location.pathname === '/weekly' ? 'sidebar-item-active' : ''}`}>
-              <CalendarCheck className="h-4 w-4 text-left" />
-              <span className="ml-2">Weekly Goals</span>
-            </Button>
-          </Link>
-          <Link to="/calendar" className="block">
+          
+          {/* Goals Section */}
+          <div 
+            className="flex items-center px-3 py-2 text-sm font-medium text-sidebar-foreground cursor-pointer mt-4" 
+            onClick={() => setShowGoals(!showGoals)}
+          >
+            {showGoals ? <ChevronDown className="h-4 w-4 mr-1" /> : <ChevronRight className="h-4 w-4 mr-1" />}
+            <span>Goals</span>
+          </div>
+          
+          {showGoals && (
+            <div className="ml-2 space-y-1">
+              <Link to="/goals" className="block">
+                <Button variant="ghost" className={`w-full justify-start sidebar-item ${location.pathname === '/goals' ? 'sidebar-item-active' : ''}`}>
+                  <Goal className="h-4 w-4" />
+                  <span className="ml-2">Yearly Goals</span>
+                </Button>
+              </Link>
+              <Link to="/targets" className="block">
+                <Button variant="ghost" className={`w-full justify-start sidebar-item ${location.pathname === '/targets' ? 'sidebar-item-active' : ''}`}>
+                  <Target className="h-4 w-4" />
+                  <span className="ml-2">90-Day Goals</span>
+                </Button>
+              </Link>
+              <Link to="/weekly" className="block">
+                <Button variant="ghost" className={`w-full justify-start sidebar-item ${location.pathname === '/weekly' ? 'sidebar-item-active' : ''}`}>
+                  <CalendarCheck className="h-4 w-4" />
+                  <span className="ml-2">Weekly Goals</span>
+                </Button>
+              </Link>
+            </div>
+          )}
+          
+          <Link to="/calendar" className="block mt-4">
             <Button variant="ghost" className={`w-full justify-start sidebar-item ${location.pathname === '/calendar' ? 'sidebar-item-active' : ''}`}>
               <Calendar className="h-4 w-4" />
               <span className="ml-2">Calendar</span>
