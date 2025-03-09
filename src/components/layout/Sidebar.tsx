@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Inbox, Calendar, CalendarClock, ListChecks, PlusCircle, ChevronDown, ChevronRight, MoreHorizontal, User, Briefcase, Target, Goal, CalendarCheck } from 'lucide-react';
@@ -8,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { List } from '@/types/task';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+
 const Sidebar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -25,6 +27,7 @@ const Sidebar: React.FC = () => {
   const [isAddListOpen, setIsAddListOpen] = useState(false);
   const [newListName, setNewListName] = useState('');
   const [editingList, setEditingList] = useState<List | null>(null);
+
   const getIconForList = (icon: string | undefined) => {
     switch (icon) {
       case 'inbox':
@@ -41,9 +44,11 @@ const Sidebar: React.FC = () => {
         return <ListChecks className="h-4 w-4" />;
     }
   };
+
   const getTaskCountForList = (listId: string) => {
     return tasks.filter(task => task.listId === listId && !task.completed).length;
   };
+
   const handleAddList = () => {
     if (newListName.trim()) {
       if (editingList) {
@@ -61,16 +66,20 @@ const Sidebar: React.FC = () => {
       setIsAddListOpen(false);
     }
   };
+
   const openEditDialog = (list: List) => {
     setEditingList(list);
     setNewListName(list.name);
     setIsAddListOpen(true);
   };
+
   const handleListClick = (listId: string) => {
     setSelectedListId(listId);
     navigate('/'); // Redirect to main tasks page
   };
-  return <aside className="w-60 border-r border-border h-[calc(100vh-4rem)] flex flex-col bg-sidebar">
+
+  return (
+    <aside className="w-60 border-r border-border h-[calc(100vh-4rem)] flex flex-col bg-sidebar">
       <div className="flex-1 overflow-y-auto py-4 px-3">
         <div className="mb-6 space-y-1">
           <Link to="/" className="block">
@@ -97,37 +106,67 @@ const Sidebar: React.FC = () => {
               <span className="ml-2">Weekly Goals</span>
             </Button>
           </Link>
+          <Link to="/calendar" className="block">
+            <Button variant="ghost" className={`w-full justify-start sidebar-item ${location.pathname === '/calendar' ? 'sidebar-item-active' : ''}`}>
+              <Calendar className="h-4 w-4" />
+              <span className="ml-2">Calendar</span>
+            </Button>
+          </Link>
         </div>
       
         <nav className="space-y-1">
-          {lists.map(list => <Button key={list.id} variant="ghost" className={`w-full justify-start sidebar-item ${selectedListId === list.id && location.pathname === '/' ? 'sidebar-item-active' : ''}`} onClick={() => handleListClick(list.id)}>
+          {lists.map(list => (
+            <Button 
+              key={list.id} 
+              variant="ghost" 
+              className={`w-full justify-start sidebar-item ${selectedListId === list.id && location.pathname === '/' ? 'sidebar-item-active' : ''}`} 
+              onClick={() => handleListClick(list.id)}
+            >
               {getIconForList(list.icon)}
               <span className="ml-2 flex-1">{list.name}</span>
-              {getTaskCountForList(list.id) > 0 && <span className="text-xs bg-secondary rounded-full px-2 py-0.5">
+              {getTaskCountForList(list.id) > 0 && (
+                <span className="text-xs bg-secondary rounded-full px-2 py-0.5">
                   {getTaskCountForList(list.id)}
-                </span>}
-            </Button>)}
+                </span>
+              )}
+            </Button>
+          ))}
         </nav>
 
         <div className="mt-6">
-          <div className="flex items-center px-3 py-2 text-sm font-medium text-sidebar-foreground cursor-pointer" onClick={() => setShowCustomLists(!showCustomLists)}>
+          <div 
+            className="flex items-center px-3 py-2 text-sm font-medium text-sidebar-foreground cursor-pointer" 
+            onClick={() => setShowCustomLists(!showCustomLists)}
+          >
             {showCustomLists ? <ChevronDown className="h-4 w-4 mr-1" /> : <ChevronRight className="h-4 w-4 mr-1" />}
             <span>Lists</span>
           </div>
 
-          {showCustomLists && <nav className="mt-1 space-y-1">
-              {customLists.map(list => <div key={list.id} className="group relative">
-                  <Button variant="ghost" className={`w-full justify-start sidebar-item ${selectedListId === list.id && location.pathname === '/' ? 'sidebar-item-active' : ''}`} onClick={() => handleListClick(list.id)}>
+          {showCustomLists && (
+            <nav className="mt-1 space-y-1">
+              {customLists.map(list => (
+                <div key={list.id} className="group relative">
+                  <Button 
+                    variant="ghost" 
+                    className={`w-full justify-start sidebar-item ${selectedListId === list.id && location.pathname === '/' ? 'sidebar-item-active' : ''}`} 
+                    onClick={() => handleListClick(list.id)}
+                  >
                     {getIconForList(list.icon)}
                     <span className="ml-2 flex-1">{list.name}</span>
-                    {getTaskCountForList(list.id) > 0 && <span className="text-xs bg-secondary rounded-full px-2 py-0.5">
+                    {getTaskCountForList(list.id) > 0 && (
+                      <span className="text-xs bg-secondary rounded-full px-2 py-0.5">
                         {getTaskCountForList(list.id)}
-                      </span>}
+                      </span>
+                    )}
                   </Button>
                   
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
                         <MoreHorizontal className="h-3 w-3" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -138,17 +177,23 @@ const Sidebar: React.FC = () => {
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                </div>)}
+                </div>
+              ))}
 
-              <Button variant="ghost" className="w-full justify-start text-muted-foreground sidebar-item" onClick={() => {
-            setNewListName('');
-            setEditingList(null);
-            setIsAddListOpen(true);
-          }}>
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start text-muted-foreground sidebar-item" 
+                onClick={() => {
+                  setNewListName('');
+                  setEditingList(null);
+                  setIsAddListOpen(true);
+                }}
+              >
                 <PlusCircle className="h-4 w-4" />
                 <span className="ml-2">Add List</span>
               </Button>
-            </nav>}
+            </nav>
+          )}
         </div>
       </div>
 
@@ -162,7 +207,13 @@ const Sidebar: React.FC = () => {
               <Label htmlFor="list-name" className="text-right">
                 Name
               </Label>
-              <Input id="list-name" value={newListName} onChange={e => setNewListName(e.target.value)} className="col-span-3" autoFocus />
+              <Input 
+                id="list-name" 
+                value={newListName} 
+                onChange={e => setNewListName(e.target.value)} 
+                className="col-span-3" 
+                autoFocus 
+              />
             </div>
           </div>
           <DialogFooter>
@@ -171,6 +222,8 @@ const Sidebar: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </aside>;
+    </aside>
+  );
 };
+
 export default Sidebar;
