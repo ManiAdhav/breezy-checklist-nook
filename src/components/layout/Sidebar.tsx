@@ -1,8 +1,10 @@
 
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   Inbox, Calendar, CalendarClock, ListChecks, PlusCircle, 
-  ChevronDown, ChevronRight, MoreHorizontal, User, Briefcase
+  ChevronDown, ChevronRight, MoreHorizontal, User, Briefcase,
+  Target, Goal
 } from 'lucide-react';
 import { useTask } from '@/contexts/TaskContext';
 import { Button } from '@/components/ui/button';
@@ -71,6 +73,36 @@ const Sidebar: React.FC = () => {
   return (
     <aside className="w-60 border-r border-border h-[calc(100vh-4rem)] flex flex-col bg-sidebar">
       <div className="flex-1 overflow-y-auto py-4 px-3">
+        <div className="mb-6 space-y-1">
+          <Link to="/" className="block">
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start sidebar-item"
+            >
+              <Inbox className="h-4 w-4" />
+              <span className="ml-2">Tasks</span>
+            </Button>
+          </Link>
+          <Link to="/goals" className="block">
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start sidebar-item"
+            >
+              <Goal className="h-4 w-4" />
+              <span className="ml-2">Three-Year Goals</span>
+            </Button>
+          </Link>
+          <Link to="/targets" className="block">
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start sidebar-item"
+            >
+              <Target className="h-4 w-4" />
+              <span className="ml-2">90-Day Targets</span>
+            </Button>
+          </Link>
+        </div>
+      
         <nav className="space-y-1">
           {lists.map((list) => (
             <Button
