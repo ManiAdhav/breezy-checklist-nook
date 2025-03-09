@@ -97,6 +97,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
   const handleIconSelect = (iconValue: string) => {
     setSelectedIcon(iconValue);
     setIconPopoverOpen(false);
+    console.log("Icon selected:", iconValue); // Debug log
   };
   
   const statusOptions = [
@@ -110,7 +111,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
   const IconComponent = iconOptions.find(i => i.value === selectedIcon)?.icon || Target;
   
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[550px] animate-scale-in">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
@@ -134,7 +135,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
                     <IconComponent className="h-5 w-5" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[220px] p-2">
+                <PopoverContent className="w-64 p-3" align="start">
                   <div className="grid grid-cols-4 gap-2">
                     {iconOptions.map((option) => {
                       const Icon = option.icon;
@@ -151,6 +152,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
                           onClick={() => handleIconSelect(option.value)}
                         >
                           <Icon className="h-5 w-5" />
+                          <span className="sr-only">{option.value}</span>
                         </Button>
                       );
                     })}
