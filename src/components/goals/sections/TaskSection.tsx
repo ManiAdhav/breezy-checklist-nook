@@ -17,38 +17,43 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from '@/hooks/use-toast';
+import { 
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface TaskSectionProps {
   goalId: string;
 }
 
-// Placeholder data for demonstration
-const demoTasks = [
-  { 
-    id: 't1', 
-    title: 'Set up study environment', 
-    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), 
-    completed: true,
-    priority: 'high' as const
-  },
-  { 
-    id: 't2', 
-    title: 'Complete first chapter exercises', 
-    dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), 
-    completed: false,
-    priority: 'medium' as const
-  },
-  { 
-    id: 't3', 
-    title: 'Schedule weekly review sessions', 
-    dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), 
-    completed: false,
-    priority: 'low' as const
-  },
-];
+interface Task {
+  id: string;
+  title: string;
+  dueDate: Date;
+  completed: boolean;
+  priority: 'high' | 'medium' | 'low' | 'none';
+}
 
 const TaskSection: React.FC<TaskSectionProps> = ({ goalId }) => {
-  const [tasks, setTasks] = useState(demoTasks);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [taskTitle, setTaskTitle] = useState('');
+  const [taskDueDate, setTaskDueDate] = useState<Date>(new Date());
+  const [taskPriority, setTaskPriority] = useState<'high' | 'medium' | 'low' | 'none'>('medium');
   
   const getPriorityClasses = (priority: 'high' | 'medium' | 'low' | 'none') => {
     switch (priority) {
@@ -88,12 +93,88 @@ const TaskSection: React.FC<TaskSectionProps> = ({ goalId }) => {
     [newTasks[index], newTasks[newIndex]] = [newTasks[newIndex], newTasks[index]];
     setTasks(newTasks);
   };
+
+  const openCreateTaskDialog = () => {
+    setEditingTask(null);
+    setTaskTitle('');
+    setTaskDueDate(new Date());
+    setTaskPriority('medium');
+    setIsTaskDialogOpen(true);
+  };
+
+  const openEditTaskDialog = (task: Task) => {
+    setEditingTask(task);
+    setTaskTitle(task.title);
+    setTaskDueDate(new Date(task.dueDate));
+    setTaskPriority(task.priority);
+    setIsTaskDialogOpen(true);
+  };
+
+  const handleSaveTask = () => {
+    if (!taskTitle.trim()) {
+      toast({
+        title: "Error",
+        description: "Task title is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (editingTask) {
+      // Update existing task
+      setTasks(prevTasks => 
+        prevTasks.map(task => 
+          task.id === editingTask.id 
+            ? { 
+                ...task, 
+                title: taskTitle, 
+                dueDate: taskDueDate, 
+                priority: taskPriority 
+              }
+            : task
+        )
+      );
+      toast({
+        title: "Task updated",
+        description: "Your task has been updated successfully",
+      });
+    } else {
+      // Create new task
+      const newTask: Task = {
+        id: `t${Date.now()}`,
+        title: taskTitle,
+        dueDate: taskDueDate,
+        completed: false,
+        priority: taskPriority
+      };
+      setTasks(prevTasks => [...prevTasks, newTask]);
+      toast({
+        title: "Task created",
+        description: "Your new task has been created",
+      });
+    }
+    setIsTaskDialogOpen(false);
+  };
+
+  const handleDeleteTask = (id: string) => {
+    setTasks(prevTasks => prevTasks.filter(task => task.id !== id));
+    toast({
+      title: "Task deleted",
+      description: "Your task has been deleted",
+      variant: "destructive",
+    });
+  };
   
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <p className="text-sm text-muted-foreground">Actionable steps to achieve your goal</p>
-        <Button variant="outline" size="sm" className="h-8">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="h-8"
+          onClick={openCreateTaskDialog}
+        >
           <Plus className="h-4 w-4 mr-1" />
           Add Task
         </Button>
@@ -102,7 +183,11 @@ const TaskSection: React.FC<TaskSectionProps> = ({ goalId }) => {
       {tasks.length === 0 ? (
         <div className="flex flex-col items-center justify-center p-6 bg-muted/20 rounded-md">
           <p className="text-muted-foreground mb-2">No tasks yet</p>
-          <Button variant="outline" size="sm">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={openCreateTaskDialog}
+          >
             <Plus className="h-4 w-4 mr-1" />
             Add Your First Task
           </Button>
@@ -174,14 +259,93 @@ const TaskSection: React.FC<TaskSectionProps> = ({ goalId }) => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem>Edit</DropdownMenuItem>
-                  <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => openEditTaskDialog(task)}>Edit</DropdownMenuItem>
+                  <DropdownMenuItem 
+                    className="text-destructive"
+                    onClick={() => handleDeleteTask(task.id)}
+                  >
+                    Delete
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           ))}
         </div>
       )}
+
+      {/* Task Dialog */}
+      <Dialog open={isTaskDialogOpen} onOpenChange={setIsTaskDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>
+              {editingTask ? 'Edit Task' : 'Create New Task'}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="task-title">Title</Label>
+              <Input
+                id="task-title"
+                value={taskTitle}
+                onChange={(e) => setTaskTitle(e.target.value)}
+                placeholder="Enter task title"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="task-due-date">Due Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    id="task-due-date"
+                    variant="outline"
+                    className="w-full justify-start text-left"
+                  >
+                    <Calendar className="mr-2 h-4 w-4" />
+                    {format(taskDueDate, 'PPP')}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarComponent
+                    mode="single"
+                    selected={taskDueDate}
+                    onSelect={(date) => date && setTaskDueDate(date)}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="task-priority">Priority</Label>
+              <Select 
+                value={taskPriority} 
+                onValueChange={(value) => setTaskPriority(value as 'high' | 'medium' | 'low' | 'none')}
+              >
+                <SelectTrigger id="task-priority">
+                  <SelectValue placeholder="Select priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsTaskDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveTask}>
+              {editingTask ? 'Save Changes' : 'Create Task'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

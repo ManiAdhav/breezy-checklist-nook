@@ -14,7 +14,13 @@ import {
   Flag,
   ListChecks,
   Repeat,
-  ArrowLeft
+  ArrowLeft,
+  Edit,
+  Star,
+  Heart,
+  Key,
+  Clock,
+  MapPin
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -28,6 +34,24 @@ import PlanSection from './sections/PlanSection';
 import TaskSection from './sections/TaskSection';
 import HabitSection from './sections/HabitSection';
 import { toast } from '@/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { 
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 interface GoalDetailViewProps {
   goalId: string;
@@ -45,6 +69,15 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
     tasks: true,
     habits: false,
   });
+
+  // Edit goal state
+  const [isEditGoalDialogOpen, setIsEditGoalDialogOpen] = useState(false);
+  const [editedTitle, setEditedTitle] = useState('');
+  const [editedDescription, setEditedDescription] = useState('');
+  const [editedStartDate, setEditedStartDate] = useState<Date>(new Date());
+  const [editedEndDate, setEditedEndDate] = useState<Date>(new Date());
+  const [editedStatus, setEditedStatus] = useState<GoalStatus>('not_started');
+  const [editedIcon, setEditedIcon] = useState('');
   
   // Simple progress calculation for demo purposes
   // In a real app, this would be calculated based on milestones, tasks, etc.
@@ -90,6 +123,60 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
       description: `Status changed to ${getStatusLabel(status)}`,
     });
   };
+
+  const openEditGoalDialog = () => {
+    if (!goal) return;
+    
+    setEditedTitle(goal.title);
+    setEditedDescription(goal.description || '');
+    setEditedStartDate(new Date(goal.startDate));
+    setEditedEndDate(new Date(goal.endDate));
+    setEditedStatus(goal.status);
+    setEditedIcon(goal.icon || 'Target');
+    setIsEditGoalDialogOpen(true);
+  };
+
+  const handleSaveGoal = () => {
+    if (!goal) return;
+    
+    if (!editedTitle.trim()) {
+      toast({
+        title: "Error",
+        description: "Goal title is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    updateThreeYearGoal(goal.id, {
+      title: editedTitle,
+      description: editedDescription,
+      startDate: editedStartDate,
+      endDate: editedEndDate,
+      status: editedStatus,
+      icon: editedIcon
+    });
+
+    toast({
+      title: "Goal updated",
+      description: "Your goal has been updated successfully",
+    });
+    
+    setIsEditGoalDialogOpen(false);
+  };
+
+  const iconOptions = [
+    { value: 'Target', icon: Target },
+    { value: 'Flag', icon: Flag },
+    { value: 'ListChecks', icon: ListChecks },
+    { value: 'Repeat', icon: Repeat },
+    { value: 'Calendar', icon: Calendar },
+    { value: 'Star', icon: Star },
+    { value: 'Heart', icon: Heart },
+    { value: 'Key', icon: Key },
+    { value: 'Clock', icon: Clock },
+    { value: 'MapPin', icon: MapPin },
+  ];
   
   if (!goal) {
     return (
@@ -107,12 +194,12 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
   const endDate = format(new Date(goal.endDate), 'MMM d, yyyy');
   
   // Get the icon component based on the goal's icon value
-  const IconOptions = {
-    Target: Target,
-    Flag: Flag,
-    // ... add all the other icons here
+  const getIcon = (iconName: string | undefined) => {
+    const icon = iconOptions.find(opt => opt.value === iconName);
+    return icon ? icon.icon : Target;
   };
-  const GoalIcon = (goal.icon && IconOptions[goal.icon as keyof typeof IconOptions]) || Target;
+  
+  const GoalIcon = getIcon(goal.icon);
   
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-background">
@@ -133,6 +220,15 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
           </p>
         </div>
         <div className="flex items-center space-x-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex items-center"
+            onClick={openEditGoalDialog}
+          >
+            <Edit className="h-4 w-4 mr-1" />
+            Edit
+          </Button>
           <div className="flex items-center">
             <select 
               value={goal.status}
@@ -280,6 +376,143 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
           </Collapsible>
         </div>
       </div>
+      
+      {/* Edit Goal Dialog */}
+      <Dialog open={isEditGoalDialogOpen} onOpenChange={setIsEditGoalDialogOpen}>
+        <DialogContent className="sm:max-w-[550px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              {React.createElement(getIcon(editedIcon), { className: "h-5 w-5 text-primary mr-2" })}
+              <span>Edit Goal</span>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="goal-title">Title</Label>
+              <Input
+                id="goal-title"
+                value={editedTitle}
+                onChange={(e) => setEditedTitle(e.target.value)}
+                placeholder="Enter goal title"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="goal-description">Description</Label>
+              <Textarea
+                id="goal-description"
+                value={editedDescription}
+                onChange={(e) => setEditedDescription(e.target.value)}
+                placeholder="Enter goal description"
+                className="min-h-24 resize-none"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Icon</Label>
+              <div className="grid grid-cols-5 gap-2">
+                {iconOptions.map((option) => {
+                  const Icon = option.icon;
+                  return (
+                    <Button
+                      key={option.value}
+                      type="button"
+                      variant={editedIcon === option.value ? "default" : "outline"}
+                      size="icon"
+                      className={cn(
+                        "h-10 w-10",
+                        editedIcon === option.value && "bg-primary text-primary-foreground"
+                      )}
+                      onClick={() => setEditedIcon(option.value)}
+                    >
+                      <Icon className="h-5 w-5" />
+                      <span className="sr-only">{option.value}</span>
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="goal-start-date">Start Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      id="goal-start-date"
+                      variant="outline"
+                      className="w-full justify-start text-left"
+                    >
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {format(editedStartDate, 'PPP')}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={editedStartDate}
+                      onSelect={(date) => date && setEditedStartDate(date)}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="goal-end-date">Target Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      id="goal-end-date"
+                      variant="outline"
+                      className="w-full justify-start text-left"
+                    >
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {format(editedEndDate, 'PPP')}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={editedEndDate}
+                      onSelect={(date) => date && setEditedEndDate(date)}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="goal-status">Status</Label>
+              <Select 
+                value={editedStatus} 
+                onValueChange={(value) => setEditedStatus(value as GoalStatus)}
+              >
+                <SelectTrigger id="goal-status">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="not_started">Not Started</SelectItem>
+                  <SelectItem value="in_progress">In Progress</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="abandoned">Abandoned</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditGoalDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveGoal}>
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       
       {/* Floating Action Button */}
       <div className="fixed bottom-6 right-6">
