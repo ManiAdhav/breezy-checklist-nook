@@ -152,15 +152,7 @@ const Sidebar: React.FC = () => {
         </div>
       
         <nav className="space-y-0.5 mt-2">
-          {lists.map(list => <Button key={list.id} variant="ghost" className={`w-full justify-start h-8 px-2 py-1 text-xs sidebar-item ${selectedListId === list.id && location.pathname === '/' ? 'sidebar-item-active' : ''}`} onClick={() => handleListClick(list.id)}>
-              <div className="flex items-center gap-3 flex-1 rounded mx-0 my-0 px-0">
-                {getIconForList(list.icon)}
-                <span className="mr-auto text-left text-xs">{list.name}</span>
-              </div>
-              {getTaskCountForList(list.id) > 0 && <span className="bg-secondary rounded-full py-0.5 min-w-5 px-[6px] text-[[9px]] text-center">
-                  {getTaskCountForList(list.id)}
-                </span>}
-            </Button>)}
+          {/* Removed the duplicate list items for Inbox, Today, and Planned as they're now in the Tasks section */}
         </nav>
 
         <div className="mt-2">
