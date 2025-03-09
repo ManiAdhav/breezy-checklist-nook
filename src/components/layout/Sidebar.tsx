@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Inbox, Mail, Package, MailOpen, TrayDown, ChevronDown, ChevronRight, MoreHorizontal, User, Briefcase, Target, Mail as MailIcon, Calendar } from 'lucide-react';
+import { Inbox, Mail, Package, MailOpen, Archive, ChevronDown, ChevronRight, MoreHorizontal, User, Briefcase, Target, Mail as MailIcon, Calendar } from 'lucide-react';
 import { useTask } from '@/contexts/TaskContext';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -39,7 +40,7 @@ const Sidebar: React.FC = () => {
       case 'user':
         return <Package className="h-4 w-4" />;
       case 'briefcase':
-        return <TrayDown className="h-4 w-4" />;
+        return <Archive className="h-4 w-4" />;
       default:
         return <Inbox className="h-4 w-4" />;
     }
@@ -96,7 +97,7 @@ const Sidebar: React.FC = () => {
               </Link>
               <Link to="/targets" className="block">
                 <Button variant="ghost" className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/targets' ? 'sidebar-item-active' : ''}`}>
-                  <TrayDown className="h-4 w-4 mr-3" />
+                  <Archive className="h-4 w-4 mr-3" />
                   <span>90-Day Goals</span>
                 </Button>
               </Link>
