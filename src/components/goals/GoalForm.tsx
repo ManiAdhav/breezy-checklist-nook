@@ -113,13 +113,48 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
         
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="space-y-4">
-            <Input
-              placeholder="Goal name"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="text-base font-medium"
-              autoFocus
-            />
+            <div className="flex items-center space-x-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="icon" 
+                    className="flex-shrink-0"
+                    aria-label="Change icon"
+                  >
+                    <IconComponent className="h-5 w-5" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[220px] p-2">
+                  <div className="grid grid-cols-4 gap-2">
+                    {iconOptions.map((option) => {
+                      const Icon = option.icon;
+                      return (
+                        <Button
+                          key={option.value}
+                          type="button"
+                          variant={selectedIcon === option.value ? "default" : "outline"}
+                          size="icon"
+                          className="h-10 w-10"
+                          onClick={() => setSelectedIcon(option.value)}
+                        >
+                          <Icon className="h-5 w-5" />
+                        </Button>
+                      );
+                    })}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            
+              <Input
+                placeholder="Goal name"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="text-base font-medium flex-1"
+                autoFocus
+              />
+            </div>
             
             <Textarea
               placeholder="Description (optional)"
@@ -178,54 +213,23 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
               </div>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Status</Label>
-                <Select
-                  value={status}
-                  onValueChange={(value) => setStatus(value as GoalStatus)}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {statusOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label>Icon</Label>
-                <Select
-                  value={selectedIcon}
-                  onValueChange={setSelectedIcon}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {iconOptions.map((option) => {
-                      const Icon = option.icon;
-                      return (
-                        <SelectItem 
-                          key={option.value} 
-                          value={option.value}
-                          className="flex items-center"
-                        >
-                          <div className="flex items-center">
-                            <Icon className="h-4 w-4 mr-2" />
-                            <span>{option.value}</span>
-                          </div>
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <Select
+                value={status}
+                onValueChange={(value) => setStatus(value as GoalStatus)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {statusOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           
