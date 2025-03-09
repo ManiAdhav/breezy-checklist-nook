@@ -11,11 +11,13 @@ const Index: React.FC = () => {
   return (
     <TaskProvider>
       <GoalProvider>
-        <div className="min-h-screen flex flex-col bg-background">
+        <div className="min-h-screen flex flex-col bg-[#F9F9F9]">
           <Header />
           <div className="flex flex-1 overflow-hidden">
             <Sidebar />
-            <TaskList />
+            <main className="flex-1 overflow-y-auto p-6">
+              <TaskList />
+            </main>
           </div>
           <FloatingActionButton />
         </div>

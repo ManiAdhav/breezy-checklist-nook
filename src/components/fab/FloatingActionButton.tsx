@@ -104,27 +104,27 @@ const FloatingActionButton: React.FC = () => {
   return (
     <div 
       className="fixed bottom-6 right-6 z-50 transition-all duration-300"
-      style={{ maxWidth: '600px', width: isExpanded ? '92%' : 'auto' }}
+      style={{ width: isExpanded ? 'calc(100% - 88px)' : 'auto', maxWidth: isExpanded ? '900px' : 'auto' }}
       ref={fabRef}
     >
       <div 
         className={`
           transition-all duration-300 overflow-hidden
           ${isExpanded 
-            ? 'w-full rounded-lg bg-white shadow-medium' 
-            : 'w-10 h-10 rounded-full bg-[#F2F2F2] hover:bg-[#EAEAEA] shadow-soft'}
+            ? 'w-full rounded-md bg-white shadow-[0_2px_10px_rgba(0,0,0,0.1)]' 
+            : 'w-12 h-12 rounded-full bg-[#F5F5F5] hover:bg-[#EEEEEE] shadow-[0_2px_5px_rgba(0,0,0,0.08)]'}
           flex items-center 
         `}
       >
         {isExpanded ? (
-          <div className="w-full flex items-center p-3">
+          <div className="w-full flex items-center p-2">
             <Input
               ref={inputRef}
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="w-full border-none focus:ring-0 h-10 pl-4 text-base"
+              className="w-full border-none focus:ring-0 h-10 text-sm"
               placeholder="Add a task... (e.g., 'Call John tomorrow at 3pm')"
               autoFocus
             />
@@ -153,7 +153,7 @@ const FloatingActionButton: React.FC = () => {
       
       {/* Task preview when date/time is detected */}
       {isExpanded && parsedTask.dueDate && (
-        <div className="mt-2 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-sm animate-fade-in absolute bottom-full mb-2 left-0 right-0">
+        <div className="mt-2 bg-white/95 backdrop-blur-sm rounded-md p-3 shadow-sm animate-fade-in absolute bottom-full mb-2 left-0 right-0">
           <div className="text-sm text-gray-500">Task will be scheduled for:</div>
           <div className="font-medium">
             {format(parsedTask.dueDate, 'PPP')}

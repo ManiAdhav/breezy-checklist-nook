@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
@@ -82,177 +83,220 @@ const Sidebar: React.FC = () => {
   return (
     <aside 
       className={cn(
-        "border-r border-border h-[calc(100vh-4rem)] flex flex-col bg-sidebar transition-all duration-300",
-        isCollapsed ? "w-16" : "w-60"
+        "h-[calc(100vh-4rem)] flex flex-col transition-all duration-300 shadow-md",
+        isCollapsed ? "w-16" : "w-56"
       )}
     >
-      <div className="flex-1 overflow-y-auto py-4 px-3">
-        <div className="mb-6 space-y-1">
-          <Link to="/" className="block">
-            <Button 
-              variant="ghost" 
-              className={cn(
-                "w-full justify-start sidebar-item group",
-                location.pathname === '/' && selectedListId === 'inbox' ? 'sidebar-item-active' : '',
-                isCollapsed && "justify-center px-2"
-              )}
-              onClick={() => setSelectedListId('inbox')}
-            >
-              <Inbox className="h-4 w-4" />
-              {!isCollapsed && <span className="ml-2 group-hover:translate-x-1 transition-transform">Tasks</span>}
-            </Button>
-          </Link>
-          <Link to="/goals" className="block">
-            <Button 
-              variant="ghost" 
-              className={cn(
-                "w-full justify-start sidebar-item group",
-                location.pathname === '/goals' ? 'sidebar-item-active' : '',
-                isCollapsed && "justify-center px-2"
-              )}
-            >
-              <Goal className="h-4 w-4" />
-              {!isCollapsed && <span className="ml-2 group-hover:translate-x-1 transition-transform">Three-Year Goals</span>}
-            </Button>
-          </Link>
-          <Link to="/targets" className="block">
-            <Button 
-              variant="ghost" 
-              className={cn(
-                "w-full justify-start sidebar-item group",
-                location.pathname === '/targets' ? 'sidebar-item-active' : '',
-                isCollapsed && "justify-center px-2"
-              )}
-            >
-              <Target className="h-4 w-4" />
-              {!isCollapsed && <span className="ml-2 group-hover:translate-x-1 transition-transform">90-Day Targets</span>}
-            </Button>
-          </Link>
-          <Link to="/weekly" className="block">
-            <Button 
-              variant="ghost" 
-              className={cn(
-                "w-full justify-start sidebar-item group",
-                location.pathname === '/weekly' ? 'sidebar-item-active' : '',
-                isCollapsed && "justify-center px-2"
-              )}
-            >
-              <CalendarCheck className="h-4 w-4" />
-              {!isCollapsed && <span className="ml-2 group-hover:translate-x-1 transition-transform">Weekly Goals</span>}
-            </Button>
-          </Link>
-        </div>
-      
-        <nav className="space-y-1">
-          {lists.map((list) => (
-            <Button
-              key={list.id}
-              variant="ghost"
-              className={cn(
-                "w-full justify-start sidebar-item group",
-                selectedListId === list.id && location.pathname === '/' ? 'sidebar-item-active' : '',
-                isCollapsed && "justify-center px-2"
-              )}
-              onClick={() => handleListClick(list.id)}
-            >
-              {getIconForList(list.icon)}
-              {!isCollapsed && (
-                <>
-                  <span className="ml-2 flex-1 group-hover:translate-x-1 transition-transform">{list.name}</span>
-                  {getTaskCountForList(list.id) > 0 && (
-                    <span className="text-xs bg-secondary rounded-full px-2 py-0.5">
-                      {getTaskCountForList(list.id)}
-                    </span>
-                  )}
-                </>
-              )}
-              {isCollapsed && getTaskCountForList(list.id) > 0 && (
-                <span className="absolute top-0 right-0 text-xs bg-primary text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
-                  {getTaskCountForList(list.id)}
-                </span>
-              )}
-            </Button>
-          ))}
-        </nav>
-
-        {!isCollapsed && (
-          <div className="mt-6">
-            <div 
-              className="flex items-center px-3 py-2 text-sm font-medium text-sidebar-foreground cursor-pointer"
-              onClick={() => setShowCustomLists(!showCustomLists)}
-            >
-              {showCustomLists ? <ChevronDown className="h-4 w-4 mr-1" /> : <ChevronRight className="h-4 w-4 mr-1" />}
-              <span>Lists</span>
+      <div className="flex-1 overflow-y-auto py-4 bg-white">
+        <TooltipProvider delayDuration={300}>
+          <div className="flex flex-col items-center space-y-4">
+            {/* Main navigation */}
+            <div className="w-full px-2">
+              <Link to="/" className="block">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      className={cn(
+                        "w-full justify-center sidebar-item text-gray-600 hover:bg-gray-100",
+                        location.pathname === '/' && selectedListId === 'inbox' ? 'bg-gray-100 text-primary font-medium' : '',
+                        !isCollapsed && "justify-start"
+                      )}
+                      onClick={() => setSelectedListId('inbox')}
+                    >
+                      <Inbox className="h-5 w-5" />
+                      {!isCollapsed && <span className="ml-2">Tasks</span>}
+                    </Button>
+                  </TooltipTrigger>
+                  {isCollapsed && <TooltipContent side="right">Tasks</TooltipContent>}
+                </Tooltip>
+              </Link>
+              <Link to="/goals" className="block mt-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      className={cn(
+                        "w-full justify-center sidebar-item text-gray-600 hover:bg-gray-100",
+                        location.pathname === '/goals' ? 'bg-gray-100 text-primary font-medium' : '',
+                        !isCollapsed && "justify-start"
+                      )}
+                    >
+                      <Goal className="h-5 w-5" />
+                      {!isCollapsed && <span className="ml-2">Goals</span>}
+                    </Button>
+                  </TooltipTrigger>
+                  {isCollapsed && <TooltipContent side="right">Three-Year Goals</TooltipContent>}
+                </Tooltip>
+              </Link>
+              <Link to="/targets" className="block mt-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      className={cn(
+                        "w-full justify-center sidebar-item text-gray-600 hover:bg-gray-100",
+                        location.pathname === '/targets' ? 'bg-gray-100 text-primary font-medium' : '',
+                        !isCollapsed && "justify-start"
+                      )}
+                    >
+                      <Target className="h-5 w-5" />
+                      {!isCollapsed && <span className="ml-2">Targets</span>}
+                    </Button>
+                  </TooltipTrigger>
+                  {isCollapsed && <TooltipContent side="right">90-Day Targets</TooltipContent>}
+                </Tooltip>
+              </Link>
+              <Link to="/weekly" className="block mt-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      className={cn(
+                        "w-full justify-center sidebar-item text-gray-600 hover:bg-gray-100",
+                        location.pathname === '/weekly' ? 'bg-gray-100 text-primary font-medium' : '',
+                        !isCollapsed && "justify-start"
+                      )}
+                    >
+                      <CalendarCheck className="h-5 w-5" />
+                      {!isCollapsed && <span className="ml-2">Weekly</span>}
+                    </Button>
+                  </TooltipTrigger>
+                  {isCollapsed && <TooltipContent side="right">Weekly Goals</TooltipContent>}
+                </Tooltip>
+              </Link>
             </div>
 
-            {showCustomLists && (
-              <nav className="mt-1 space-y-1">
-                {customLists.map((list) => (
-                  <div key={list.id} className="group relative">
+            {/* Lists section */}
+            <div className="w-full px-2">
+              {!isCollapsed && (
+                <div 
+                  className="flex items-center px-3 py-2 text-sm font-medium text-gray-500 cursor-pointer"
+                  onClick={() => setShowCustomLists(!showCustomLists)}
+                >
+                  {showCustomLists ? <ChevronDown className="h-4 w-4 mr-1" /> : <ChevronRight className="h-4 w-4 mr-1" />}
+                  <span>Lists</span>
+                </div>
+              )}
+
+              {(showCustomLists || isCollapsed) && (
+                <div className="mt-1 space-y-1 px-2">
+                  {/* Default lists */}
+                  {lists.map((list) => (
+                    <Tooltip key={list.id}>
+                      <TooltipTrigger asChild>
+                        <div className="relative">
+                          <Button
+                            variant="ghost"
+                            className={cn(
+                              "w-full justify-center text-gray-600 hover:bg-gray-100 rounded-md",
+                              selectedListId === list.id && location.pathname === '/' ? 'bg-gray-100 text-primary font-medium' : '',
+                              !isCollapsed && "justify-start"
+                            )}
+                            onClick={() => handleListClick(list.id)}
+                          >
+                            {getIconForList(list.icon)}
+                            {!isCollapsed && <span className="ml-2 flex-1">{list.name}</span>}
+                            {!isCollapsed && getTaskCountForList(list.id) > 0 && (
+                              <span className="text-xs bg-gray-100 rounded-full px-2 py-0.5 text-gray-700">
+                                {getTaskCountForList(list.id)}
+                              </span>
+                            )}
+                            {isCollapsed && getTaskCountForList(list.id) > 0 && (
+                              <span className="absolute top-0 right-0 text-xs bg-primary text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
+                                {getTaskCountForList(list.id)}
+                              </span>
+                            )}
+                          </Button>
+                        </div>
+                      </TooltipTrigger>
+                      {isCollapsed && <TooltipContent side="right">{list.name}</TooltipContent>}
+                    </Tooltip>
+                  ))}
+
+                  {/* Custom lists */}
+                  {customLists.map((list) => (
+                    <Tooltip key={list.id}>
+                      <TooltipTrigger asChild>
+                        <div className="group relative">
+                          <Button
+                            variant="ghost"
+                            className={cn(
+                              "w-full justify-center text-gray-600 hover:bg-gray-100 rounded-md",
+                              selectedListId === list.id && location.pathname === '/' ? 'bg-gray-100 text-primary font-medium' : '',
+                              !isCollapsed && "justify-start"
+                            )}
+                            onClick={() => handleListClick(list.id)}
+                          >
+                            {getIconForList(list.icon)}
+                            {!isCollapsed && <span className="ml-2 flex-1">{list.name}</span>}
+                            {!isCollapsed && getTaskCountForList(list.id) > 0 && (
+                              <span className="text-xs bg-gray-100 rounded-full px-2 py-0.5 text-gray-700">
+                                {getTaskCountForList(list.id)}
+                              </span>
+                            )}
+                            {isCollapsed && getTaskCountForList(list.id) > 0 && (
+                              <span className="absolute top-0 right-0 text-xs bg-primary text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
+                                {getTaskCountForList(list.id)}
+                              </span>
+                            )}
+                          </Button>
+                          
+                          {!isCollapsed && (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  <MoreHorizontal className="h-3 w-3" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-36">
+                                <DropdownMenuItem onClick={() => openEditDialog(list)}>Rename</DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  className="text-destructive focus:text-destructive"
+                                  onClick={() => deleteList(list.id)}
+                                >
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
+                        </div>
+                      </TooltipTrigger>
+                      {isCollapsed && <TooltipContent side="right">{list.name}</TooltipContent>}
+                    </Tooltip>
+                  ))}
+
+                  {!isCollapsed && (
                     <Button
                       variant="ghost"
-                      className={cn(
-                        "w-full justify-start sidebar-item group",
-                        selectedListId === list.id && location.pathname === '/' ? 'sidebar-item-active' : ''
-                      )}
-                      onClick={() => handleListClick(list.id)}
+                      className="w-full justify-start text-gray-500 hover:bg-gray-100"
+                      onClick={() => {
+                        setNewListName('');
+                        setEditingList(null);
+                        setIsAddListOpen(true);
+                      }}
                     >
-                      {getIconForList(list.icon)}
-                      <span className="ml-2 flex-1 group-hover:translate-x-1 transition-transform">{list.name}</span>
-                      {getTaskCountForList(list.id) > 0 && (
-                        <span className="text-xs bg-secondary rounded-full px-2 py-0.5">
-                          {getTaskCountForList(list.id)}
-                        </span>
-                      )}
+                      <PlusCircle className="h-4 w-4" />
+                      <span className="ml-2">Add List</span>
                     </Button>
-                    
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <MoreHorizontal className="h-3 w-3" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-36">
-                        <DropdownMenuItem onClick={() => openEditDialog(list)}>Rename</DropdownMenuItem>
-                        <DropdownMenuItem 
-                          className="text-destructive focus:text-destructive"
-                          onClick={() => deleteList(list.id)}
-                        >
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                ))}
-
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-muted-foreground sidebar-item group"
-                  onClick={() => {
-                    setNewListName('');
-                    setEditingList(null);
-                    setIsAddListOpen(true);
-                  }}
-                >
-                  <PlusCircle className="h-4 w-4" />
-                  <span className="ml-2 group-hover:translate-x-1 transition-transform">Add List</span>
-                </Button>
-              </nav>
-            )}
+                  )}
+                </div>
+              )}
+            </div>
           </div>
-        )}
+        </TooltipProvider>
       </div>
 
       {/* Collapse/Expand button */}
-      <div className="flex justify-center p-2 border-t border-border">
+      <div className="flex justify-center p-2 border-t bg-white">
         <Button 
           variant="ghost" 
           size="icon"
-          className="rounded-full h-8 w-8 hover:bg-sidebar-accent"
+          className="rounded-full h-8 w-8 hover:bg-gray-100 text-gray-500"
           onClick={() => setIsCollapsed(!isCollapsed)}
         >
           {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
