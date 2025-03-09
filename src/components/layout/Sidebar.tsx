@@ -25,6 +25,7 @@ const Sidebar: React.FC = () => {
   } = useTask();
   const [showCustomLists, setShowCustomLists] = useState(true);
   const [showGoals, setShowGoals] = useState(true);
+  const [showTasks, setShowTasks] = useState(true);
   const [isAddListOpen, setIsAddListOpen] = useState(false);
   const [newListName, setNewListName] = useState('');
   const [editingList, setEditingList] = useState<List | null>(null);
@@ -83,12 +84,37 @@ const Sidebar: React.FC = () => {
     <aside className="w-60 border-r border-border h-[calc(100vh-4rem)] flex flex-col bg-sidebar">
       <div className="flex-1 overflow-y-auto py-4 px-3">
         <div className="mb-6 space-y-1">
-          <Link to="/" className="block">
-            <Button variant="ghost" className={`w-full justify-start sidebar-item ${location.pathname === '/' && selectedListId === 'inbox' ? 'sidebar-item-active' : ''}`} onClick={() => setSelectedListId('inbox')}>
-              <Inbox className="h-4 w-4" />
-              <span className="ml-2">Tasks</span>
-            </Button>
-          </Link>
+          {/* Tasks Section */}
+          <div 
+            className="flex items-center px-3 py-2 text-sm font-medium text-sidebar-foreground cursor-pointer" 
+            onClick={() => setShowTasks(!showTasks)}
+          >
+            {showTasks ? <ChevronDown className="h-4 w-4 mr-1" /> : <ChevronRight className="h-4 w-4 mr-1" />}
+            <span>Tasks</span>
+          </div>
+          
+          {showTasks && (
+            <div className="ml-2 space-y-1">
+              <Link to="/" className="block">
+                <Button variant="ghost" className={`w-full justify-start sidebar-item ${location.pathname === '/' && selectedListId === 'inbox' ? 'sidebar-item-active' : ''}`} onClick={() => setSelectedListId('inbox')}>
+                  <Inbox className="h-4 w-4" />
+                  <span className="ml-2">Inbox</span>
+                </Button>
+              </Link>
+              <Link to="/" className="block">
+                <Button variant="ghost" className={`w-full justify-start sidebar-item ${selectedListId === 'today' && location.pathname === '/' ? 'sidebar-item-active' : ''}`} onClick={() => setSelectedListId('today')}>
+                  <Calendar className="h-4 w-4" />
+                  <span className="ml-2">Today</span>
+                </Button>
+              </Link>
+              <Link to="/" className="block">
+                <Button variant="ghost" className={`w-full justify-start sidebar-item ${selectedListId === 'planned' && location.pathname === '/' ? 'sidebar-item-active' : ''}`} onClick={() => setSelectedListId('planned')}>
+                  <CalendarClock className="h-4 w-4" />
+                  <span className="ml-2">Planned</span>
+                </Button>
+              </Link>
+            </div>
+          )}
           
           {/* Goals Section */}
           <div 
