@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Inbox, Calendar, CalendarClock, ListChecks, PlusCircle, 
   ChevronDown, ChevronRight, MoreHorizontal, User, Briefcase,
@@ -21,6 +21,7 @@ import {
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { 
     lists, 
     customLists, 
@@ -70,6 +71,11 @@ const Sidebar: React.FC = () => {
     setNewListName(list.name);
     setIsAddListOpen(true);
   };
+  
+  const handleListClick = (listId: string) => {
+    setSelectedListId(listId);
+    navigate('/'); // Redirect to main tasks page
+  };
 
   return (
     <aside className="w-60 border-r border-border h-[calc(100vh-4rem)] flex flex-col bg-sidebar">
@@ -78,7 +84,8 @@ const Sidebar: React.FC = () => {
           <Link to="/" className="block">
             <Button 
               variant="ghost" 
-              className="w-full justify-start sidebar-item"
+              className={`w-full justify-start sidebar-item ${location.pathname === '/' && selectedListId === 'inbox' ? 'sidebar-item-active' : ''}`}
+              onClick={() => setSelectedListId('inbox')}
             >
               <Inbox className="h-4 w-4" />
               <span className="ml-2">Tasks</span>
@@ -118,8 +125,8 @@ const Sidebar: React.FC = () => {
             <Button
               key={list.id}
               variant="ghost"
-              className={`w-full justify-start sidebar-item ${selectedListId === list.id ? 'sidebar-item-active' : ''}`}
-              onClick={() => setSelectedListId(list.id)}
+              className={`w-full justify-start sidebar-item ${selectedListId === list.id && location.pathname === '/' ? 'sidebar-item-active' : ''}`}
+              onClick={() => handleListClick(list.id)}
             >
               {getIconForList(list.icon)}
               <span className="ml-2 flex-1">{list.name}</span>
@@ -147,8 +154,8 @@ const Sidebar: React.FC = () => {
                 <div key={list.id} className="group relative">
                   <Button
                     variant="ghost"
-                    className={`w-full justify-start sidebar-item ${selectedListId === list.id ? 'sidebar-item-active' : ''}`}
-                    onClick={() => setSelectedListId(list.id)}
+                    className={`w-full justify-start sidebar-item ${selectedListId === list.id && location.pathname === '/' ? 'sidebar-item-active' : ''}`}
+                    onClick={() => handleListClick(list.id)}
                   >
                     {getIconForList(list.icon)}
                     <span className="ml-2 flex-1">{list.name}</span>
