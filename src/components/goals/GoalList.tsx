@@ -25,17 +25,17 @@ const GoalList: React.FC = () => {
   
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
-      <div className="py-4 px-6 flex justify-between items-center border-b border-border sticky top-0 bg-background z-10">
+      <div className="py-4 px-6 flex justify-between items-center border-b border-border sticky top-0 bg-background/95 backdrop-blur-sm z-10">
         <div>
-          <h2 className="text-2xl font-semibold">Three-Year Goals</h2>
+          <h2 className="text-xl font-medium tracking-tight">Three-Year Goals</h2>
           <p className="text-sm text-muted-foreground mt-1">
             {threeYearGoals.length} goals
           </p>
         </div>
         
         <div className="flex items-center space-x-2">
-          <Button onClick={handleAddGoal} className="flex items-center">
-            <Plus className="h-4 w-4 mr-1" />
+          <Button onClick={handleAddGoal} className="flex items-center rounded-full px-4">
+            <Plus className="h-4 w-4 mr-1.5" />
             <span>Add Goal</span>
           </Button>
         </div>
@@ -44,15 +44,15 @@ const GoalList: React.FC = () => {
       <div className="flex-1 overflow-y-auto">
         {threeYearGoals.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center p-6">
-            <div className="bg-muted rounded-full p-6 mb-4">
-              <CheckCircle2 className="h-12 w-12 text-muted-foreground" />
+            <div className="bg-muted/50 rounded-full p-6 mb-4">
+              <CheckCircle2 className="h-12 w-12 text-muted-foreground/70" />
             </div>
             <h3 className="text-xl font-medium">No goals yet</h3>
             <p className="text-muted-foreground mt-2 max-w-sm">
               Add a three-year goal to start planning your future.
             </p>
-            <Button onClick={handleAddGoal} className="mt-6">
-              <Plus className="h-4 w-4 mr-1" />
+            <Button onClick={handleAddGoal} className="mt-6 rounded-full">
+              <Plus className="h-4 w-4 mr-1.5" />
               <span>Add Goal</span>
             </Button>
           </div>

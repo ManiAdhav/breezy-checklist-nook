@@ -94,7 +94,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit }) => {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="h-8 w-8 rounded-full"
             onClick={() => onEdit(task)}
           >
             <Pencil className="h-4 w-4" />
@@ -102,7 +102,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit }) => {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-destructive hover:text-destructive"
+            className="h-8 w-8 rounded-full text-destructive hover:text-destructive"
             onClick={() => deleteTask(task.id)}
           >
             <Trash2 className="h-4 w-4" />

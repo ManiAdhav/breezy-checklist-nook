@@ -19,9 +19,9 @@ const WeeklyGoalItem: React.FC<WeeklyGoalItemProps> = ({ goal, onEdit }) => {
   const getStatusColor = (status: GoalStatus): string => {
     const colors = {
       not_started: '#6B7280', // gray
-      in_progress: '#3B82F6', // blue
-      completed: '#10B981', // green
-      abandoned: '#EF4444', // red
+      in_progress: '#60A5FA', // blue
+      completed: '#34D399', // green
+      abandoned: '#F87171', // red
     };
     return colors[status];
   };
@@ -46,7 +46,7 @@ const WeeklyGoalItem: React.FC<WeeklyGoalItemProps> = ({ goal, onEdit }) => {
 
   return (
     <div 
-      className={`group p-3 border border-border rounded-md transition-colors duration-150 ${
+      className={`group p-3 border border-border rounded-lg transition-colors duration-150 ${
         isHovered ? 'bg-card/80' : 'bg-card'
       } ${goal.status === 'completed' ? 'border-green-200 bg-green-50/30' : ''}`}
       onMouseEnter={() => setIsHovered(true)}
@@ -56,7 +56,7 @@ const WeeklyGoalItem: React.FC<WeeklyGoalItemProps> = ({ goal, onEdit }) => {
         <Button
           variant="ghost"
           size="icon"
-          className={`h-6 w-6 mr-2 ${goal.status === 'completed' ? 'text-green-500' : 'text-muted-foreground'}`}
+          className={`h-6 w-6 mr-2 rounded-full ${goal.status === 'completed' ? 'text-green-500' : 'text-muted-foreground'}`}
           onClick={toggleComplete}
         >
           <CheckCircle className={`h-5 w-5 ${goal.status === 'completed' ? 'fill-green-500' : ''}`} />
@@ -97,7 +97,7 @@ const WeeklyGoalItem: React.FC<WeeklyGoalItemProps> = ({ goal, onEdit }) => {
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7"
+            className="h-7 w-7 rounded-full"
             onClick={() => onEdit(goal)}
           >
             <Pencil className="h-4 w-4" />
@@ -105,7 +105,7 @@ const WeeklyGoalItem: React.FC<WeeklyGoalItemProps> = ({ goal, onEdit }) => {
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7 text-destructive hover:text-destructive"
+            className="h-7 w-7 rounded-full text-destructive hover:text-destructive"
             onClick={() => deleteWeeklyGoal(goal.id)}
           >
             <Trash2 className="h-4 w-4" />

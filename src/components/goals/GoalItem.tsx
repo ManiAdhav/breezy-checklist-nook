@@ -19,9 +19,9 @@ const GoalItem: React.FC<GoalItemProps> = ({ goal, onEdit }) => {
   const getStatusColor = (status: GoalStatus): string => {
     const colors = {
       not_started: '#6B7280', // gray
-      in_progress: '#3B82F6', // blue
-      completed: '#10B981', // green
-      abandoned: '#EF4444', // red
+      in_progress: '#60A5FA', // blue
+      completed: '#34D399', // green
+      abandoned: '#F87171', // red
     };
     return colors[status];
   };
@@ -46,7 +46,7 @@ const GoalItem: React.FC<GoalItemProps> = ({ goal, onEdit }) => {
     >
       <div className="flex items-start">
         <div className="flex-1 min-w-0 mr-2">
-          <div className="font-medium text-lg">{goal.title}</div>
+          <div className="font-medium text-base">{goal.title}</div>
           
           {goal.description && (
             <div className="text-sm text-muted-foreground mt-1">
@@ -76,7 +76,7 @@ const GoalItem: React.FC<GoalItemProps> = ({ goal, onEdit }) => {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="h-8 w-8 rounded-full"
             onClick={() => onEdit(goal)}
           >
             <Pencil className="h-4 w-4" />
@@ -84,7 +84,7 @@ const GoalItem: React.FC<GoalItemProps> = ({ goal, onEdit }) => {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-destructive hover:text-destructive"
+            className="h-8 w-8 rounded-full text-destructive hover:text-destructive"
             onClick={() => deleteThreeYearGoal(goal.id)}
           >
             <Trash2 className="h-4 w-4" />

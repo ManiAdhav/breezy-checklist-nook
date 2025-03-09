@@ -20,7 +20,7 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				sans: ['SF Pro Display', 'system-ui', 'sans-serif'],
+				sans: ['Inter', 'system-ui', 'sans-serif'],
 				mono: ['SF Mono', 'monospace'],
 			},
 			colors: {
@@ -68,9 +68,9 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				priority: {
-					high: '#E25C3D',
-					medium: '#F7A928',
-					low: '#4095EB',
+					high: '#F87171',
+					medium: '#FBBF24',
+					low: '#60A5FA',
 					none: '#9CA3AF',
 				},
 				task: {
@@ -129,8 +129,8 @@ export default {
 			},
 			boxShadow: {
 				'soft': '0 2px 10px rgba(0, 0, 0, 0.05)',
-				'medium': '0 4px 20px rgba(0, 0, 0, 0.08)',
-				'hard': '0 10px 40px rgba(0, 0, 0, 0.12)',
+				'medium': '0 4px 16px rgba(0, 0, 0, 0.08)',
+				'hard': '0 8px 30px rgba(0, 0, 0, 0.12)',
 			},
 		}
 	},
