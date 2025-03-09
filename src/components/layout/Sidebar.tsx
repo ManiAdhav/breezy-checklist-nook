@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Inbox, Mail, Package, MailOpen, Archive, ChevronDown, ChevronRight, MoreHorizontal, User, Briefcase, Target, Mail as MailIcon, Calendar, Clock, CalendarClock } from 'lucide-react';
+import { Inbox, Mail, Package, MailOpen, Archive, ChevronDown, ChevronRight, MoreHorizontal, User, Briefcase, Target, Mail as MailIcon, Calendar, Clock, CalendarClock, Plus, Play } from 'lucide-react';
 import { useTask } from '@/contexts/TaskContext';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -9,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { List } from '@/types/task';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useGoal } from '@/contexts/GoalContext';
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
@@ -23,6 +24,9 @@ const Sidebar: React.FC = () => {
     deleteList,
     tasks
   } = useTask();
+  
+  const { weeklyGoals } = useGoal();
+  
   const [showCustomLists, setShowCustomLists] = useState(true);
   const [showGoals, setShowGoals] = useState(true);
   const [showTasks, setShowTasks] = useState(true);
@@ -80,6 +84,8 @@ const Sidebar: React.FC = () => {
     navigate('/');
   };
 
+  const activeWeeklyGoals = weeklyGoals.filter(goal => goal.status !== 'completed' && goal.status !== 'abandoned');
+
   return <aside className="w-60 border-r border-border h-[calc(100vh-4rem)] flex flex-col overflow-hidden bg-background">
       <div className="flex-1 overflow-y-auto py-2 px-2">
         <div className="mb-2 space-y-0.5">
@@ -114,6 +120,55 @@ const Sidebar: React.FC = () => {
                 <CalendarClock className="h-4 w-4 mr-2" />
                 <span>Planned</span>
               </Button>
+              
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item group"
+                  >
+                    <Play className="h-4 w-4 mr-2 text-blue-500" />
+                    <span className="font-medium">Actions</span>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-56 p-0" align="start">
+                  <div className="bg-white rounded-md shadow-md border overflow-hidden">
+                    <div className="px-2 py-1.5 border-b bg-muted/30">
+                      <h3 className="text-sm font-medium">Weekly Goals</h3>
+                    </div>
+                    <div className="max-h-[200px] overflow-y-auto">
+                      {activeWeeklyGoals.length > 0 ? (
+                        <div className="p-1">
+                          {activeWeeklyGoals.map(goal => (
+                            <div 
+                              key={goal.id} 
+                              className="px-2 py-1.5 text-xs hover:bg-accent/50 rounded cursor-pointer"
+                              onClick={() => navigate(`/weekly?goalId=${goal.id}`)}
+                            >
+                              {goal.title}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="p-3 text-xs text-muted-foreground text-center">
+                          No active goals
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-1 border-t">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="w-full justify-start text-xs"
+                        onClick={() => navigate('/weekly')}
+                      >
+                        <Plus className="h-3.5 w-3.5 mr-1" />
+                        Add New Action
+                      </Button>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>}
           
           {/* Goals Section */}
