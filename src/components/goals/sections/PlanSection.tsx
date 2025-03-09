@@ -54,18 +54,18 @@ const PlanSection: React.FC<PlanSectionProps> = ({ goalId }) => {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <p className="text-sm text-muted-foreground">Strategies to achieve your goal</p>
-        <Button variant="outline" size="sm" className="h-8">
-          <Plus className="h-4 w-4 mr-1" />
+        <p className="text-xs text-muted-foreground">Strategies to achieve your goal</p>
+        <Button variant="outline" size="sm" className="h-8 px-3 text-xs rounded-lg">
+          <Plus className="h-3.5 w-3.5 mr-1" />
           Add Plan
         </Button>
       </div>
       
       {plans.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-6 bg-muted/20 rounded-md">
-          <p className="text-muted-foreground mb-2">No plans yet</p>
-          <Button variant="outline" size="sm">
-            <Plus className="h-4 w-4 mr-1" />
+        <div className="flex flex-col items-center justify-center p-6 bg-card rounded-lg border border-border">
+          <p className="text-muted-foreground mb-2 text-sm">No plans yet</p>
+          <Button variant="outline" size="sm" className="mt-1">
+            <Plus className="h-3.5 w-3.5 mr-1" />
             Add Your First Plan
           </Button>
         </div>
@@ -74,29 +74,29 @@ const PlanSection: React.FC<PlanSectionProps> = ({ goalId }) => {
           {plans.map(plan => (
             <div 
               key={plan.id}
-              className="p-3 border border-border rounded-md bg-card"
+              className="p-3.5 border border-border rounded-lg bg-card hover:bg-card/80 transition-colors"
             >
               <div className="flex justify-between">
-                <div className="font-medium flex items-center">
+                <div className="font-medium flex items-center text-sm">
                   <Target className="h-4 w-4 mr-2 text-primary" />
                   {plan.title}
                 </div>
                 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full hover:bg-muted">
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>Edit</DropdownMenuItem>
-                    <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                  <DropdownMenuContent align="end" className="w-36">
+                    <DropdownMenuItem className="cursor-pointer">Edit</DropdownMenuItem>
+                    <DropdownMenuItem className="text-destructive cursor-pointer">Delete</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
               
               {plan.description && (
-                <p className="text-sm text-muted-foreground mt-2">
+                <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
                   {plan.description}
                 </p>
               )}
