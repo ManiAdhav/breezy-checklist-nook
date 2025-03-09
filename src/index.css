@@ -126,7 +126,7 @@
   }
 }
 
-// Task item transitions
+/* Task item transitions */
 .task-enter {
   opacity: 0;
   transform: translateY(10px);
