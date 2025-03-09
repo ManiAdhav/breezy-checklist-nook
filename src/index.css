@@ -141,28 +141,3 @@
   transform: translateY(-10px);
   transition: opacity 200ms, transform 200ms;
 }
-
-/* Sidebar active states */
-.sidebar-nav-item {
-  @apply flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200;
-}
-
-.sidebar-nav-item.active {
-  @apply bg-primary/10 text-primary;
-}
-
-.sidebar-nav-item:not(.active) {
-  @apply text-gray-500 hover:bg-gray-100 hover:text-primary;
-}
-
-.list-item {
-  @apply flex items-center px-3 py-2 rounded-md transition-colors duration-200;
-}
-
-.list-item.active {
-  @apply bg-primary text-white;
-}
-
-.list-item:not(.active) {
-  @apply hover:bg-gray-100;
-}

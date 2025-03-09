@@ -1,11 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  Inbox, Calendar, CalendarClock, ListChecks, PlusCircle, 
-  ChevronDown, ChevronRight, MoreHorizontal, User, Briefcase, 
-  Target, Goal, CalendarCheck, Settings, Search, Home 
-} from 'lucide-react';
+import { Inbox, Calendar, CalendarClock, ListChecks, PlusCircle, ChevronDown, ChevronRight, MoreHorizontal, User, Briefcase, Target, Goal, CalendarCheck } from 'lucide-react';
 import { useTask } from '@/contexts/TaskContext';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -31,7 +27,6 @@ const Sidebar: React.FC = () => {
   const [isAddListOpen, setIsAddListOpen] = useState(false);
   const [newListName, setNewListName] = useState('');
   const [editingList, setEditingList] = useState<List | null>(null);
-  const [sidebarExpanded, setSidebarExpanded] = useState(true);
 
   const getIconForList = (icon: string | undefined) => {
     switch (icon) {
@@ -84,146 +79,123 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <div className="flex h-[calc(100vh-4rem)]">
-      <aside className="w-72 border-r border-border h-full flex flex-col bg-white">
-        <div className="p-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input placeholder="Search..." className="pl-9 bg-gray-50" />
-          </div>
+    <aside className="w-60 border-r border-border h-[calc(100vh-4rem)] flex flex-col bg-sidebar">
+      <div className="flex-1 overflow-y-auto py-4 px-3">
+        <div className="mb-6 space-y-1">
+          <Link to="/" className="block">
+            <Button variant="ghost" className={`w-full justify-start sidebar-item ${location.pathname === '/' && selectedListId === 'inbox' ? 'sidebar-item-active' : ''}`} onClick={() => setSelectedListId('inbox')}>
+              <Inbox className="h-4 w-4" />
+              <span className="ml-2">Tasks</span>
+            </Button>
+          </Link>
+          <Link to="/goals" className="block">
+            <Button variant="ghost" className={`w-full justify-start sidebar-item ${location.pathname === '/goals' ? 'sidebar-item-active' : ''}`}>
+              <Goal className="h-4 w-4" />
+              <span className="ml-2">Three-Year Goals</span>
+            </Button>
+          </Link>
+          <Link to="/targets" className="block">
+            <Button variant="ghost" className={`w-full justify-start sidebar-item ${location.pathname === '/targets' ? 'sidebar-item-active' : ''}`}>
+              <Target className="h-4 w-4" />
+              <span className="ml-2">90-Day Targets</span>
+            </Button>
+          </Link>
+          <Link to="/weekly" className="block">
+            <Button variant="ghost" className={`w-full justify-start sidebar-item ${location.pathname === '/weekly' ? 'sidebar-item-active' : ''}`}>
+              <CalendarCheck className="h-4 w-4 text-left" />
+              <span className="ml-2">Weekly Goals</span>
+            </Button>
+          </Link>
+          <Link to="/calendar" className="block">
+            <Button variant="ghost" className={`w-full justify-start sidebar-item ${location.pathname === '/calendar' ? 'sidebar-item-active' : ''}`}>
+              <Calendar className="h-4 w-4" />
+              <span className="ml-2">Calendar</span>
+            </Button>
+          </Link>
         </div>
-        
-        <div className="flex-1 overflow-y-auto py-2 px-3">
-          <h2 className="font-semibold text-lg mb-2">Columbus Workspace</h2>
-          
-          <div className="space-y-1">
-            {lists.map(list => (
-              <Button 
-                key={list.id} 
-                variant="ghost" 
-                className={`w-full justify-start text-left h-auto py-2 ${
-                  selectedListId === list.id && location.pathname === '/' 
-                    ? 'bg-primary text-white hover:bg-primary hover:text-white' 
-                    : 'hover:bg-gray-100'
-                }`} 
-                onClick={() => handleListClick(list.id)}
-              >
-                <div className="w-5 h-5 mr-3 flex-shrink-0 flex items-center justify-center">
-                  {getIconForList(list.icon)}
-                </div>
-                <span className="flex-1 truncate">{list.name}</span>
-                {getTaskCountForList(list.id) > 0 && (
-                  <span className="ml-2 text-xs bg-white/20 rounded-full px-2 py-0.5">
-                    {getTaskCountForList(list.id)}
-                  </span>
-                )}
-              </Button>
-            ))}
-          </div>
-
-          <div className="mt-4">
-            <div 
-              className="flex items-center px-2 py-2 text-sm font-medium cursor-pointer" 
-              onClick={() => setShowCustomLists(!showCustomLists)}
+      
+        <nav className="space-y-1">
+          {lists.map(list => (
+            <Button 
+              key={list.id} 
+              variant="ghost" 
+              className={`w-full justify-start sidebar-item ${selectedListId === list.id && location.pathname === '/' ? 'sidebar-item-active' : ''}`} 
+              onClick={() => handleListClick(list.id)}
             >
-              {showCustomLists ? <ChevronDown className="h-4 w-4 mr-1" /> : <ChevronRight className="h-4 w-4 mr-1" />}
-              <span>Lists</span>
-            </div>
+              {getIconForList(list.icon)}
+              <span className="ml-2 flex-1">{list.name}</span>
+              {getTaskCountForList(list.id) > 0 && (
+                <span className="text-xs bg-secondary rounded-full px-2 py-0.5">
+                  {getTaskCountForList(list.id)}
+                </span>
+              )}
+            </Button>
+          ))}
+        </nav>
 
-            {showCustomLists && (
-              <div className="mt-1 space-y-1">
-                {customLists.map(list => (
-                  <div key={list.id} className="group relative">
-                    <Button 
-                      variant="ghost" 
-                      className={`w-full justify-start text-left h-auto py-2 ${
-                        selectedListId === list.id && location.pathname === '/' 
-                          ? 'bg-primary text-white hover:bg-primary hover:text-white' 
-                          : 'hover:bg-gray-100'
-                      }`} 
-                      onClick={() => handleListClick(list.id)}
-                    >
-                      <div className={`w-5 h-5 mr-3 flex-shrink-0 rounded-full border ${
-                        selectedListId === list.id ? 'border-white' : 'border-gray-400'
-                      } flex items-center justify-center`}>
-                        {getIconForList(list.icon)}
-                      </div>
-                      <span className="flex-1 truncate">{list.name}</span>
-                      {getTaskCountForList(list.id) > 0 && (
-                        <span className={`ml-2 text-xs ${
-                          selectedListId === list.id ? 'bg-white/20' : 'bg-gray-200'
-                        } rounded-full px-2 py-0.5`}>
-                          {getTaskCountForList(list.id)}
-                        </span>
-                      )}
-                    </Button>
-                    
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <MoreHorizontal className="h-3 w-3" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-36">
-                        <DropdownMenuItem onClick={() => openEditDialog(list)}>Rename</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => deleteList(list.id)}>
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                ))}
-
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start text-muted-foreground hover:bg-gray-100" 
-                  onClick={() => {
-                    setNewListName('');
-                    setEditingList(null);
-                    setIsAddListOpen(true);
-                  }}
-                >
-                  <PlusCircle className="h-4 w-4 mr-3" />
-                  <span>Add List</span>
-                </Button>
-              </div>
-            )}
+        <div className="mt-6">
+          <div 
+            className="flex items-center px-3 py-2 text-sm font-medium text-sidebar-foreground cursor-pointer" 
+            onClick={() => setShowCustomLists(!showCustomLists)}
+          >
+            {showCustomLists ? <ChevronDown className="h-4 w-4 mr-1" /> : <ChevronRight className="h-4 w-4 mr-1" />}
+            <span>Lists</span>
           </div>
-          
-          <div className="mt-6">
-            <h2 className="font-semibold mb-1">My Workspaces</h2>
-            <div className="space-y-1">
-              {['Dribbble Shot', 'Mobile App', 'Landing Page', 'Dashboard'].map((workspace, i) => (
-                <Button 
-                  key={i} 
-                  variant="ghost" 
-                  className="w-full justify-start text-left h-auto py-2 hover:bg-gray-100"
-                >
-                  <div className="w-5 h-5 mr-3 flex-shrink-0 text-gray-500">
-                    {i === 0 ? (
-                      <div className="w-5 h-5 rounded-full bg-pink-400 text-white flex items-center justify-center text-xs">D</div>
-                    ) : (
-                      <ListChecks className="h-4 w-4" />
+
+          {showCustomLists && (
+            <nav className="mt-1 space-y-1">
+              {customLists.map(list => (
+                <div key={list.id} className="group relative">
+                  <Button 
+                    variant="ghost" 
+                    className={`w-full justify-start sidebar-item ${selectedListId === list.id && location.pathname === '/' ? 'sidebar-item-active' : ''}`} 
+                    onClick={() => handleListClick(list.id)}
+                  >
+                    {getIconForList(list.icon)}
+                    <span className="ml-2 flex-1">{list.name}</span>
+                    {getTaskCountForList(list.id) > 0 && (
+                      <span className="text-xs bg-secondary rounded-full px-2 py-0.5">
+                        {getTaskCountForList(list.id)}
+                      </span>
                     )}
-                  </div>
-                  <span className="truncate">{workspace}</span>
-                </Button>
+                  </Button>
+                  
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <MoreHorizontal className="h-3 w-3" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-36">
+                      <DropdownMenuItem onClick={() => openEditDialog(list)}>Rename</DropdownMenuItem>
+                      <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => deleteList(list.id)}>
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               ))}
-            </div>
-          </div>
+
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start text-muted-foreground sidebar-item" 
+                onClick={() => {
+                  setNewListName('');
+                  setEditingList(null);
+                  setIsAddListOpen(true);
+                }}
+              >
+                <PlusCircle className="h-4 w-4" />
+                <span className="ml-2">Add List</span>
+              </Button>
+            </nav>
+          )}
         </div>
-        
-        <div className="mt-auto p-3">
-          <div className="rounded-lg bg-gray-50 p-3 text-sm text-center">
-            <p className="text-gray-500 mb-2">Upgrade your account for more complete features</p>
-            <Button className="w-full">Upgrade Now</Button>
-          </div>
-        </div>
-      </aside>
+      </div>
 
       <Dialog open={isAddListOpen} onOpenChange={setIsAddListOpen}>
         <DialogContent className="sm:max-w-[425px] animate-scale-in">
@@ -250,7 +222,7 @@ const Sidebar: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </aside>
   );
 };
 
