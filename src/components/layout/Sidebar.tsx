@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { 
@@ -15,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // Allow the icons to be used in various places
 export const sidebarIcons = {
@@ -32,7 +31,7 @@ const Sidebar = () => {
   const { customLists, lists, selectedListId, setSelectedListId } = useTask();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isCustomListsOpen, setIsCustomListsOpen] = useState(true);
-  const { isMobile, mobileMenuOpen, setMobileMenuOpen } = useMobile();
+  const { isMobile, mobileMenuOpen, setMobileMenuOpen } = useIsMobile();
   
   // If on mobile and menu not explicitly opened, don't render the sidebar content
   if (isMobile && !mobileMenuOpen) {
