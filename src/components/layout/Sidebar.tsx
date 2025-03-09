@@ -143,15 +143,15 @@ const Sidebar: React.FC = () => {
               className={`w-full justify-start h-8 px-2 py-1 text-xs sidebar-item ${selectedListId === list.id && location.pathname === '/' ? 'sidebar-item-active' : ''}`} 
               onClick={() => handleListClick(list.id)}
             >
-              <div className="flex items-center flex-1">
+              <div className="flex items-center gap-3 flex-1">
                 {getIconForList(list.icon)}
-                <span className="mr-1">{list.name}</span>
-                {getTaskCountForList(list.id) > 0 && (
-                  <span className="text-[9px] bg-secondary rounded-full px-1.5 py-0.5 min-w-5 text-center">
-                    {getTaskCountForList(list.id)}
-                  </span>
-                )}
+                <span className="mr-auto">{list.name}</span>
               </div>
+              {getTaskCountForList(list.id) > 0 && (
+                <span className="text-[9px] bg-secondary rounded-full px-1.5 py-0.5 min-w-5 text-center">
+                  {getTaskCountForList(list.id)}
+                </span>
+              )}
             </Button>
           ))}
         </nav>
@@ -174,15 +174,15 @@ const Sidebar: React.FC = () => {
                     className={`w-full justify-start h-8 px-2 py-1 text-xs sidebar-item ${selectedListId === list.id && location.pathname === '/' ? 'sidebar-item-active' : ''}`} 
                     onClick={() => handleListClick(list.id)}
                   >
-                    <div className="flex items-center flex-1">
+                    <div className="flex items-center gap-3 flex-1">
                       {getIconForList(list.icon)}
-                      <span className="mr-1">{list.name}</span>
-                      {getTaskCountForList(list.id) > 0 && (
-                        <span className="text-[9px] bg-secondary rounded-full px-1.5 py-0.5 min-w-5 text-center">
-                          {getTaskCountForList(list.id)}
-                        </span>
-                      )}
+                      <span className="mr-auto">{list.name}</span>
                     </div>
+                    {getTaskCountForList(list.id) > 0 && (
+                      <span className="text-[9px] bg-secondary rounded-full px-1.5 py-0.5 min-w-5 text-center">
+                        {getTaskCountForList(list.id)}
+                      </span>
+                    )}
                   </Button>
                   
                   <DropdownMenu>
