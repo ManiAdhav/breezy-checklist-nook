@@ -103,14 +103,16 @@ const FloatingActionButton: React.FC = () => {
   
   return (
     <div 
-      className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50"
-      style={{ maxWidth: '600px', width: '92%' }}
+      className="fixed bottom-6 right-6 z-50 transition-all duration-300"
+      style={{ maxWidth: '600px', width: isExpanded ? '92%' : 'auto' }}
       ref={fabRef}
     >
       <div 
         className={`
-          bg-white rounded-full shadow-md transition-all duration-300 overflow-hidden
-          ${isExpanded ? 'w-full' : 'w-full'}
+          bg-white shadow-md transition-all duration-300 overflow-hidden
+          ${isExpanded 
+            ? 'w-full rounded-lg' 
+            : 'w-12 h-12 rounded-full'}
           flex items-center 
         `}
       >
@@ -141,16 +143,16 @@ const FloatingActionButton: React.FC = () => {
         ) : (
           <button
             onClick={() => setIsExpanded(true)}
-            className="w-full h-12 bg-white flex items-center justify-center hover:bg-gray-50 transition-colors"
+            className="w-full h-full bg-primary text-white flex items-center justify-center hover:bg-primary/90 transition-colors rounded-full"
           >
-            <Plus className="w-5 h-5 text-primary" />
+            <Plus className="w-5 h-5" />
           </button>
         )}
       </div>
       
       {/* Task preview when date/time is detected */}
       {isExpanded && parsedTask.dueDate && (
-        <div className="mt-2 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-sm animate-fade-in">
+        <div className="mt-2 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-sm animate-fade-in absolute bottom-full mb-2 left-0 right-0">
           <div className="text-sm text-gray-500">Task will be scheduled for:</div>
           <div className="font-medium">
             {format(parsedTask.dueDate, 'PPP')}
