@@ -25,7 +25,6 @@ const Sidebar: React.FC = () => {
   } = useTask();
   const [showCustomLists, setShowCustomLists] = useState(true);
   const [showGoals, setShowGoals] = useState(true);
-  const [showTasks, setShowTasks] = useState(true);
   const [isAddListOpen, setIsAddListOpen] = useState(false);
   const [newListName, setNewListName] = useState('');
   const [editingList, setEditingList] = useState<List | null>(null);
@@ -84,50 +83,6 @@ const Sidebar: React.FC = () => {
     <aside className="w-60 border-r border-border h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
       <div className="flex-1 overflow-y-auto py-2 px-2">
         <div className="mb-2 space-y-0.5">
-          {/* Tasks Section */}
-          <div 
-            className="flex items-center px-2 py-1 text-xs font-medium text-foreground cursor-pointer" 
-            onClick={() => setShowTasks(!showTasks)}
-          >
-            {showTasks ? <ChevronDown className="h-3 w-3 mr-0.5" /> : <ChevronRight className="h-3 w-3 mr-0.5" />}
-            <span>Tasks</span>
-          </div>
-          
-          {showTasks && (
-            <div className="ml-1 space-y-0.5">
-              <Link to="/" className="block">
-                <Button 
-                  variant="ghost" 
-                  className={`w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/' && selectedListId === 'inbox' ? 'sidebar-item-active' : ''}`} 
-                  onClick={() => setSelectedListId('inbox')}
-                >
-                  <Inbox className="h-3 w-3 mr-1" />
-                  <span>Inbox</span>
-                </Button>
-              </Link>
-              <Link to="/" className="block">
-                <Button 
-                  variant="ghost" 
-                  className={`w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item ${selectedListId === 'today' && location.pathname === '/' ? 'sidebar-item-active' : ''}`} 
-                  onClick={() => setSelectedListId('today')}
-                >
-                  <Calendar className="h-3 w-3 mr-1" />
-                  <span>Today</span>
-                </Button>
-              </Link>
-              <Link to="/" className="block">
-                <Button 
-                  variant="ghost" 
-                  className={`w-full justify-start h-6 px-2 py-0.5 text-xs sidebar-item ${selectedListId === 'planned' && location.pathname === '/' ? 'sidebar-item-active' : ''}`} 
-                  onClick={() => setSelectedListId('planned')}
-                >
-                  <CalendarClock className="h-3 w-3 mr-1" />
-                  <span>Planned</span>
-                </Button>
-              </Link>
-            </div>
-          )}
-          
           {/* Goals Section */}
           <div 
             className="flex items-center px-2 py-1 text-xs font-medium text-foreground cursor-pointer mt-2" 
