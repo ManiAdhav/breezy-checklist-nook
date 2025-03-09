@@ -1,22 +1,8 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { ThreeYearGoal, NinetyDayTarget, WeeklyGoal, GoalStatus } from '@/types/task';
-import { generateId } from '@/utils/taskUtils';
 import { toast } from '@/hooks/use-toast';
-
-// Sample goals for demonstration
-const sampleThreeYearGoals: ThreeYearGoal[] = [
-  {
-    id: generateId(),
-    title: 'Master Web Development',
-    description: 'Become proficient in full-stack web development with React, Node.js, and related technologies.',
-    startDate: new Date(),
-    endDate: new Date(Date.now() + 3 * 365 * 24 * 60 * 60 * 1000), // 3 years from now
-    status: 'in_progress',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-];
+import * as GoalService from '@/api/goalService';
 
 interface GoalContextType {
   threeYearGoals: ThreeYearGoal[];
@@ -31,157 +17,313 @@ interface GoalContextType {
   addWeeklyGoal: (goal: Omit<WeeklyGoal, 'id' | 'createdAt' | 'updatedAt'>) => void;
   updateWeeklyGoal: (id: string, updates: Partial<WeeklyGoal>) => void;
   deleteWeeklyGoal: (id: string) => void;
+  isLoading: boolean;
 }
 
 const GoalContext = createContext<GoalContextType | undefined>(undefined);
 
 export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [threeYearGoals, setThreeYearGoals] = useState<ThreeYearGoal[]>(sampleThreeYearGoals);
+  const [threeYearGoals, setThreeYearGoals] = useState<ThreeYearGoal[]>([]);
   const [ninetyDayTargets, setNinetyDayTargets] = useState<NinetyDayTarget[]>([]);
   const [weeklyGoals, setWeeklyGoals] = useState<WeeklyGoal[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // Load data from localStorage when component mounts
+  // Load data when component mounts
   useEffect(() => {
-    const savedThreeYearGoals = localStorage.getItem('threeYearGoals');
-    const savedNinetyDayTargets = localStorage.getItem('ninetyDayTargets');
-    const savedWeeklyGoals = localStorage.getItem('weeklyGoals');
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const [goalsResponse, targetsResponse, weeklyResponse] = await Promise.all([
+          GoalService.getThreeYearGoals(),
+          GoalService.getNinetyDayTargets(),
+          GoalService.getWeeklyGoals()
+        ]);
+        
+        if (goalsResponse.success && goalsResponse.data) {
+          setThreeYearGoals(goalsResponse.data);
+        }
+        
+        if (targetsResponse.success && targetsResponse.data) {
+          setNinetyDayTargets(targetsResponse.data);
+        }
+        
+        if (weeklyResponse.success && weeklyResponse.data) {
+          setWeeklyGoals(weeklyResponse.data);
+        }
+      } catch (error) {
+        console.error('Error loading goals data:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load goals data",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    if (savedThreeYearGoals) setThreeYearGoals(JSON.parse(savedThreeYearGoals));
-    if (savedNinetyDayTargets) setNinetyDayTargets(JSON.parse(savedNinetyDayTargets));
-    if (savedWeeklyGoals) setWeeklyGoals(JSON.parse(savedWeeklyGoals));
+    fetchData();
   }, []);
 
-  // Save data to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('threeYearGoals', JSON.stringify(threeYearGoals));
-    localStorage.setItem('ninetyDayTargets', JSON.stringify(ninetyDayTargets));
-    localStorage.setItem('weeklyGoals', JSON.stringify(weeklyGoals));
-  }, [threeYearGoals, ninetyDayTargets, weeklyGoals]);
-
   // Three Year Goal operations
-  const addThreeYearGoal = (goal: Omit<ThreeYearGoal, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newGoal: ThreeYearGoal = {
-      ...goal,
-      id: generateId(),
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    
-    setThreeYearGoals(prevGoals => [...prevGoals, newGoal]);
-    toast({
-      title: "Goal added",
-      description: "Your three-year goal was added successfully.",
-    });
+  const addThreeYearGoal = async (goal: Omit<ThreeYearGoal, 'id' | 'createdAt' | 'updatedAt'>) => {
+    setIsLoading(true);
+    try {
+      const response = await GoalService.createThreeYearGoal(goal);
+      
+      if (response.success && response.data) {
+        setThreeYearGoals(prevGoals => [...prevGoals, response.data!]);
+        toast({
+          title: "Goal added",
+          description: "Your three-year goal was added successfully.",
+        });
+      } else {
+        throw new Error(response.error || 'Failed to add goal');
+      }
+    } catch (error) {
+      console.error('Error adding goal:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add goal",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const updateThreeYearGoal = (id: string, updates: Partial<ThreeYearGoal>) => {
-    setThreeYearGoals(prevGoals => 
-      prevGoals.map(goal => 
-        goal.id === id 
-          ? { ...goal, ...updates, updatedAt: new Date() } 
-          : goal
-      )
-    );
-    toast({
-      title: "Goal updated",
-      description: "Your three-year goal was updated successfully.",
-    });
+  const updateThreeYearGoal = async (id: string, updates: Partial<ThreeYearGoal>) => {
+    setIsLoading(true);
+    try {
+      const response = await GoalService.updateThreeYearGoal(id, updates);
+      
+      if (response.success && response.data) {
+        setThreeYearGoals(prevGoals => 
+          prevGoals.map(goal => 
+            goal.id === id ? response.data! : goal
+          )
+        );
+        toast({
+          title: "Goal updated",
+          description: "Your three-year goal was updated successfully.",
+        });
+      } else {
+        throw new Error(response.error || 'Failed to update goal');
+      }
+    } catch (error) {
+      console.error('Error updating goal:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update goal",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const deleteThreeYearGoal = (id: string) => {
-    setThreeYearGoals(prevGoals => prevGoals.filter(goal => goal.id !== id));
-    
-    // Delete all associated 90-day targets
-    setNinetyDayTargets(prevTargets => prevTargets.filter(target => target.threeYearGoalId !== id));
-    
-    toast({
-      title: "Goal deleted",
-      description: "Your three-year goal was deleted successfully.",
-      variant: "destructive",
-    });
+  const deleteThreeYearGoal = async (id: string) => {
+    setIsLoading(true);
+    try {
+      const response = await GoalService.deleteThreeYearGoal(id);
+      
+      if (response.success) {
+        setThreeYearGoals(prevGoals => prevGoals.filter(goal => goal.id !== id));
+        
+        // Also delete related targets from the state
+        setNinetyDayTargets(prevTargets => prevTargets.filter(target => target.threeYearGoalId !== id));
+        
+        toast({
+          title: "Goal deleted",
+          description: "Your three-year goal was deleted successfully.",
+          variant: "destructive",
+        });
+      } else {
+        throw new Error(response.error || 'Failed to delete goal');
+      }
+    } catch (error) {
+      console.error('Error deleting goal:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete goal",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // 90-Day Target operations
-  const addNinetyDayTarget = (target: Omit<NinetyDayTarget, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newTarget: NinetyDayTarget = {
-      ...target,
-      id: generateId(),
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    
-    setNinetyDayTargets(prevTargets => [...prevTargets, newTarget]);
-    toast({
-      title: "Target added",
-      description: "Your 90-day target was added successfully.",
-    });
+  const addNinetyDayTarget = async (target: Omit<NinetyDayTarget, 'id' | 'createdAt' | 'updatedAt'>) => {
+    setIsLoading(true);
+    try {
+      const response = await GoalService.createNinetyDayTarget(target);
+      
+      if (response.success && response.data) {
+        setNinetyDayTargets(prevTargets => [...prevTargets, response.data!]);
+        toast({
+          title: "Target added",
+          description: "Your 90-day target was added successfully.",
+        });
+      } else {
+        throw new Error(response.error || 'Failed to add target');
+      }
+    } catch (error) {
+      console.error('Error adding target:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add target",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const updateNinetyDayTarget = (id: string, updates: Partial<NinetyDayTarget>) => {
-    setNinetyDayTargets(prevTargets => 
-      prevTargets.map(target => 
-        target.id === id 
-          ? { ...target, ...updates, updatedAt: new Date() } 
-          : target
-      )
-    );
-    toast({
-      title: "Target updated",
-      description: "Your 90-day target was updated successfully.",
-    });
+  const updateNinetyDayTarget = async (id: string, updates: Partial<NinetyDayTarget>) => {
+    setIsLoading(true);
+    try {
+      const response = await GoalService.updateNinetyDayTarget(id, updates);
+      
+      if (response.success && response.data) {
+        setNinetyDayTargets(prevTargets => 
+          prevTargets.map(target => 
+            target.id === id ? response.data! : target
+          )
+        );
+        toast({
+          title: "Target updated",
+          description: "Your 90-day target was updated successfully.",
+        });
+      } else {
+        throw new Error(response.error || 'Failed to update target');
+      }
+    } catch (error) {
+      console.error('Error updating target:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update target",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const deleteNinetyDayTarget = (id: string) => {
-    setNinetyDayTargets(prevTargets => prevTargets.filter(target => target.id !== id));
-    
-    // Delete all associated weekly goals
-    setWeeklyGoals(prevGoals => prevGoals.filter(goal => goal.ninetyDayTargetId !== id));
-    
-    toast({
-      title: "Target deleted",
-      description: "Your 90-day target was deleted successfully.",
-      variant: "destructive",
-    });
+  const deleteNinetyDayTarget = async (id: string) => {
+    setIsLoading(true);
+    try {
+      const response = await GoalService.deleteNinetyDayTarget(id);
+      
+      if (response.success) {
+        setNinetyDayTargets(prevTargets => prevTargets.filter(target => target.id !== id));
+        
+        // Also delete related weekly goals from the state
+        setWeeklyGoals(prevGoals => prevGoals.filter(goal => goal.ninetyDayTargetId !== id));
+        
+        toast({
+          title: "Target deleted",
+          description: "Your 90-day target was deleted successfully.",
+          variant: "destructive",
+        });
+      } else {
+        throw new Error(response.error || 'Failed to delete target');
+      }
+    } catch (error) {
+      console.error('Error deleting target:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete target",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Weekly Goal operations
-  const addWeeklyGoal = (goal: Omit<WeeklyGoal, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newGoal: WeeklyGoal = {
-      ...goal,
-      id: generateId(),
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    
-    setWeeklyGoals(prevGoals => [...prevGoals, newGoal]);
-    toast({
-      title: "Goal added",
-      description: "Your weekly goal was added successfully.",
-    });
+  const addWeeklyGoal = async (goal: Omit<WeeklyGoal, 'id' | 'createdAt' | 'updatedAt'>) => {
+    setIsLoading(true);
+    try {
+      const response = await GoalService.createWeeklyGoal(goal);
+      
+      if (response.success && response.data) {
+        setWeeklyGoals(prevGoals => [...prevGoals, response.data!]);
+        toast({
+          title: "Goal added",
+          description: "Your weekly goal was added successfully.",
+        });
+      } else {
+        throw new Error(response.error || 'Failed to add goal');
+      }
+    } catch (error) {
+      console.error('Error adding goal:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add goal",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const updateWeeklyGoal = (id: string, updates: Partial<WeeklyGoal>) => {
-    setWeeklyGoals(prevGoals => 
-      prevGoals.map(goal => 
-        goal.id === id 
-          ? { ...goal, ...updates, updatedAt: new Date() } 
-          : goal
-      )
-    );
-    toast({
-      title: "Goal updated",
-      description: "Your weekly goal was updated successfully.",
-    });
+  const updateWeeklyGoal = async (id: string, updates: Partial<WeeklyGoal>) => {
+    setIsLoading(true);
+    try {
+      const response = await GoalService.updateWeeklyGoal(id, updates);
+      
+      if (response.success && response.data) {
+        setWeeklyGoals(prevGoals => 
+          prevGoals.map(goal => 
+            goal.id === id ? response.data! : goal
+          )
+        );
+        toast({
+          title: "Goal updated",
+          description: "Your weekly goal was updated successfully.",
+        });
+      } else {
+        throw new Error(response.error || 'Failed to update goal');
+      }
+    } catch (error) {
+      console.error('Error updating goal:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update goal",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const deleteWeeklyGoal = (id: string) => {
-    setWeeklyGoals(prevGoals => prevGoals.filter(goal => goal.id !== id));
-    
-    toast({
-      title: "Goal deleted",
-      description: "Your weekly goal was deleted successfully.",
-      variant: "destructive",
-    });
+  const deleteWeeklyGoal = async (id: string) => {
+    setIsLoading(true);
+    try {
+      const response = await GoalService.deleteWeeklyGoal(id);
+      
+      if (response.success) {
+        setWeeklyGoals(prevGoals => prevGoals.filter(goal => goal.id !== id));
+        
+        toast({
+          title: "Goal deleted",
+          description: "Your weekly goal was deleted successfully.",
+          variant: "destructive",
+        });
+      } else {
+        throw new Error(response.error || 'Failed to delete goal');
+      }
+    } catch (error) {
+      console.error('Error deleting goal:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete goal",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -198,6 +340,7 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children
       addWeeklyGoal,
       updateWeeklyGoal,
       deleteWeeklyGoal,
+      isLoading
     }}>
       {children}
     </GoalContext.Provider>

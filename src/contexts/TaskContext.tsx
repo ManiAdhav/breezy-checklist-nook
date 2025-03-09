@@ -1,55 +1,15 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Task, List, Priority } from '@/types/task';
-import { generateId, sortTasks, filterTasks } from '@/utils/taskUtils';
+import { sortTasks, filterTasks } from '@/utils/taskUtils';
 import { toast } from '@/hooks/use-toast';
+import * as TaskService from '@/api/taskService';
 
 // Default lists
 const defaultLists: List[] = [
   { id: 'inbox', name: 'Inbox', icon: 'inbox' },
   { id: 'today', name: 'Today', icon: 'calendar' },
   { id: 'planned', name: 'Planned', icon: 'calendar-clock' },
-];
-
-// Sample tasks for demonstration
-const sampleTasks: Task[] = [
-  {
-    id: generateId(),
-    title: 'Welcome to Todo App',
-    completed: false,
-    priority: 'high',
-    listId: 'inbox',
-    notes: 'This is a sample task to help you get started.',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: generateId(),
-    title: 'Create your first task',
-    completed: false,
-    priority: 'medium',
-    listId: 'today',
-    dueDate: new Date(),
-    notes: 'Click the "+" button to add a new task.',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: generateId(),
-    title: 'Plan your week',
-    completed: false,
-    priority: 'low',
-    listId: 'planned',
-    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-];
-
-// Custom lists (user created)
-const sampleCustomLists: List[] = [
-  { id: generateId(), name: 'Work', color: '#4095EB', icon: 'briefcase' },
-  { id: generateId(), name: 'Personal', color: '#E25C3D', icon: 'user' },
 ];
 
 interface TaskContextType {
@@ -72,149 +32,280 @@ interface TaskContextType {
   setShowCompleted: (show: boolean) => void;
   setSearchQuery: (query: string) => void;
   filteredTasks: Task[];
+  isLoading: boolean;
 }
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
 export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [tasks, setTasks] = useState<Task[]>(sampleTasks);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [lists] = useState<List[]>(defaultLists);
-  const [customLists, setCustomLists] = useState<List[]>(sampleCustomLists);
+  const [customLists, setCustomLists] = useState<List[]>([]);
   const [selectedListId, setSelectedListId] = useState<string>('inbox');
   const [sortBy, setSortBy] = useState<'dueDate' | 'priority' | 'title' | 'createdAt'>('createdAt');
   const [showCompleted, setShowCompleted] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // Load data from localStorage when component mounts
+  // Load data when component mounts
   useEffect(() => {
-    const savedTasks = localStorage.getItem('tasks');
-    const savedCustomLists = localStorage.getItem('customLists');
-    const savedSelectedListId = localStorage.getItem('selectedListId');
-    const savedSortBy = localStorage.getItem('sortBy');
-    const savedShowCompleted = localStorage.getItem('showCompleted');
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const [tasksResponse, listsResponse] = await Promise.all([
+          TaskService.getTasks(),
+          TaskService.getLists()
+        ]);
+        
+        if (tasksResponse.success && tasksResponse.data) {
+          setTasks(tasksResponse.data);
+        }
+        
+        if (listsResponse.success && listsResponse.data) {
+          setCustomLists(listsResponse.data);
+        }
+        
+        // Load preferences from localStorage
+        const savedSelectedListId = localStorage.getItem('selectedListId');
+        const savedSortBy = localStorage.getItem('sortBy');
+        const savedShowCompleted = localStorage.getItem('showCompleted');
 
-    if (savedTasks) setTasks(JSON.parse(savedTasks));
-    if (savedCustomLists) setCustomLists(JSON.parse(savedCustomLists));
-    if (savedSelectedListId) setSelectedListId(savedSelectedListId);
-    if (savedSortBy) setSortBy(savedSortBy as any);
-    if (savedShowCompleted) setShowCompleted(JSON.parse(savedShowCompleted));
+        if (savedSelectedListId) setSelectedListId(savedSelectedListId);
+        if (savedSortBy) setSortBy(savedSortBy as any);
+        if (savedShowCompleted) setShowCompleted(JSON.parse(savedShowCompleted));
+      } catch (error) {
+        console.error('Error loading data:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load tasks and lists",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  // Save data to localStorage whenever it changes
+  // Save preferences to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-    localStorage.setItem('customLists', JSON.stringify(customLists));
     localStorage.setItem('selectedListId', selectedListId);
     localStorage.setItem('sortBy', sortBy);
     localStorage.setItem('showCompleted', JSON.stringify(showCompleted));
-  }, [tasks, customLists, selectedListId, sortBy, showCompleted]);
+  }, [selectedListId, sortBy, showCompleted]);
 
   // Filter and sort tasks based on current state
   const filteredTasks = sortTasks(filterTasks(tasks, selectedListId === 'all' ? undefined : selectedListId, searchQuery, showCompleted), sortBy);
 
   // Task operations
-  const addTask = (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newTask: Task = {
-      ...task,
-      id: generateId(),
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    
-    setTasks(prevTasks => [...prevTasks, newTask]);
-    toast({
-      title: "Task added",
-      description: "Your task was added successfully.",
-    });
+  const addTask = async (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
+    setIsLoading(true);
+    try {
+      const response = await TaskService.createTask(task);
+      
+      if (response.success && response.data) {
+        setTasks(prevTasks => [...prevTasks, response.data!]);
+        toast({
+          title: "Task added",
+          description: "Your task was added successfully.",
+        });
+      } else {
+        throw new Error(response.error || 'Failed to add task');
+      }
+    } catch (error) {
+      console.error('Error adding task:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add task",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const updateTask = (id: string, updates: Partial<Task>) => {
-    setTasks(prevTasks => 
-      prevTasks.map(task => 
-        task.id === id 
-          ? { ...task, ...updates, updatedAt: new Date() } 
-          : task
-      )
-    );
-    toast({
-      title: "Task updated",
-      description: "Your task was updated successfully.",
-    });
+  const updateTask = async (id: string, updates: Partial<Task>) => {
+    setIsLoading(true);
+    try {
+      const response = await TaskService.updateTask(id, updates);
+      
+      if (response.success && response.data) {
+        setTasks(prevTasks => 
+          prevTasks.map(task => 
+            task.id === id ? response.data! : task
+          )
+        );
+        toast({
+          title: "Task updated",
+          description: "Your task was updated successfully.",
+        });
+      } else {
+        throw new Error(response.error || 'Failed to update task');
+      }
+    } catch (error) {
+      console.error('Error updating task:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update task",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const deleteTask = (id: string) => {
-    setTasks(prevTasks => prevTasks.filter(task => task.id !== id));
-    toast({
-      title: "Task deleted",
-      description: "Your task was deleted successfully.",
-      variant: "destructive",
-    });
+  const deleteTask = async (id: string) => {
+    setIsLoading(true);
+    try {
+      const response = await TaskService.deleteTask(id);
+      
+      if (response.success) {
+        setTasks(prevTasks => prevTasks.filter(task => task.id !== id));
+        toast({
+          title: "Task deleted",
+          description: "Your task was deleted successfully.",
+          variant: "destructive",
+        });
+      } else {
+        throw new Error(response.error || 'Failed to delete task');
+      }
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete task",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const toggleTaskCompletion = (id: string) => {
-    setTasks(prevTasks => 
-      prevTasks.map(task => 
-        task.id === id 
-          ? { ...task, completed: !task.completed, updatedAt: new Date() } 
-          : task
-      )
-    );
+  const toggleTaskCompletion = async (id: string) => {
+    try {
+      const response = await TaskService.toggleTaskCompletion(id);
+      
+      if (response.success && response.data) {
+        setTasks(prevTasks => 
+          prevTasks.map(task => 
+            task.id === id ? response.data! : task
+          )
+        );
+      } else {
+        throw new Error(response.error || 'Failed to toggle task completion');
+      }
+    } catch (error) {
+      console.error('Error toggling task completion:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update task",
+        variant: "destructive",
+      });
+    }
   };
 
   // List operations
-  const addList = (list: Omit<List, 'id'>) => {
-    const newList: List = {
-      ...list,
-      id: generateId()
-    };
-    
-    setCustomLists(prevLists => [...prevLists, newList]);
-    setSelectedListId(newList.id);
-    toast({
-      title: "List added",
-      description: `"${list.name}" was added successfully.`,
-    });
+  const addList = async (list: Omit<List, 'id'>) => {
+    setIsLoading(true);
+    try {
+      const response = await TaskService.createList(list);
+      
+      if (response.success && response.data) {
+        setCustomLists(prevLists => [...prevLists, response.data!]);
+        setSelectedListId(response.data!.id);
+        toast({
+          title: "List added",
+          description: `"${list.name}" was added successfully.`,
+        });
+      } else {
+        throw new Error(response.error || 'Failed to add list');
+      }
+    } catch (error) {
+      console.error('Error adding list:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add list",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const updateList = (id: string, updates: Partial<List>) => {
-    setCustomLists(prevLists => 
-      prevLists.map(list => 
-        list.id === id 
-          ? { ...list, ...updates } 
-          : list
-      )
-    );
-    toast({
-      title: "List updated",
-      description: "Your list was updated successfully.",
-    });
+  const updateList = async (id: string, updates: Partial<List>) => {
+    setIsLoading(true);
+    try {
+      const response = await TaskService.updateList(id, updates);
+      
+      if (response.success && response.data) {
+        setCustomLists(prevLists => 
+          prevLists.map(list => 
+            list.id === id ? response.data! : list
+          )
+        );
+        toast({
+          title: "List updated",
+          description: "Your list was updated successfully.",
+        });
+      } else {
+        throw new Error(response.error || 'Failed to update list');
+      }
+    } catch (error) {
+      console.error('Error updating list:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update list",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const deleteList = (id: string) => {
+  const deleteList = async (id: string) => {
     // Find the list name before deletion for the toast
     const listToDelete = customLists.find(list => list.id === id);
     
-    setCustomLists(prevLists => prevLists.filter(list => list.id !== id));
-    
-    // If the deleted list was selected, switch to inbox
-    if (selectedListId === id) {
-      setSelectedListId('inbox');
+    setIsLoading(true);
+    try {
+      const response = await TaskService.deleteList(id);
+      
+      if (response.success) {
+        setCustomLists(prevLists => prevLists.filter(list => list.id !== id));
+        
+        // If the deleted list was selected, switch to inbox
+        if (selectedListId === id) {
+          setSelectedListId('inbox');
+        }
+        
+        // Update task references in the state
+        setTasks(prevTasks => 
+          prevTasks.map(task => 
+            task.listId === id 
+              ? { ...task, listId: 'inbox' } 
+              : task
+          )
+        );
+        
+        toast({
+          title: "List deleted",
+          description: `"${listToDelete?.name}" was deleted and its tasks moved to Inbox.`,
+          variant: "destructive",
+        });
+      } else {
+        throw new Error(response.error || 'Failed to delete list');
+      }
+    } catch (error) {
+      console.error('Error deleting list:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete list",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
-    
-    // Delete all tasks in that list or move them to inbox (user preference could be added)
-    setTasks(prevTasks => 
-      prevTasks.map(task => 
-        task.listId === id 
-          ? { ...task, listId: 'inbox' } 
-          : task
-      )
-    );
-    
-    toast({
-      title: "List deleted",
-      description: `"${listToDelete?.name}" was deleted and its tasks moved to Inbox.`,
-      variant: "destructive",
-    });
   };
 
   return (
@@ -237,7 +328,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSortBy,
       setShowCompleted,
       setSearchQuery,
-      filteredTasks
+      filteredTasks,
+      isLoading
     }}>
       {children}
     </TaskContext.Provider>
