@@ -31,8 +31,8 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
     --ring: 221 83% 53%;
 
     --radius: 0.5rem;
@@ -94,7 +94,7 @@
   }
 
   .sidebar-item-active {
-    @apply bg-sidebar-accent text-sidebar-accent-foreground font-medium;
+    @apply bg-primary text-white font-medium;
   }
   
   .page-transition {
@@ -107,6 +107,18 @@
   
   .card-hover {
     @apply transition-all duration-200 hover:shadow-medium;
+  }
+
+  .dashboard-section {
+    @apply bg-white rounded-xl border border-border p-4 shadow-sm;
+  }
+  
+  .progress-bar {
+    @apply h-2 rounded-full bg-blue-100 overflow-hidden;
+  }
+  
+  .progress-value {
+    @apply h-full bg-primary rounded-full;
   }
 }
 
@@ -129,3 +141,4 @@
   transform: translateY(-10px);
   transition: opacity 200ms, transform 200ms;
 }
+

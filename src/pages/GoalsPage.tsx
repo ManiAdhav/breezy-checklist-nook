@@ -10,7 +10,7 @@ const GoalsPage: React.FC = () => {
   return (
     <TaskProvider>
       <GoalProvider>
-        <div className="min-h-screen flex flex-col bg-background">
+        <div className="min-h-screen flex flex-col bg-[#f9fafb]">
           <Header />
           <div className="flex flex-1 overflow-hidden">
             <Sidebar />
