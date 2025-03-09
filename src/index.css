@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
@@ -89,11 +90,11 @@
   }
 
   .sidebar-item {
-    @apply flex items-center rounded-md text-foreground hover:bg-accent/50 hover:text-foreground transition-colors duration-200;
+    @apply flex items-center rounded-md text-foreground hover:bg-accent/40 hover:text-foreground transition-colors duration-200;
   }
 
   .sidebar-item-active {
-    @apply bg-accent/40 text-foreground font-medium;
+    @apply bg-accent/30 text-foreground font-medium;
   }
   
   .page-transition {
