@@ -1,33 +1,61 @@
 
 import React, { useState, useEffect } from 'react';
-import { Task, Priority } from '@/types/task';
 import { useTask } from '@/contexts/TaskContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Task, Priority } from '@/types/task';
+import { Calendar as CalendarIcon, X } from 'lucide-react';
 import { format } from 'date-fns';
-import { CalendarIcon, Flag } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { toast } from '@/hooks/use-toast';
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from '@/lib/utils';
 
 interface TaskFormProps {
   isOpen: boolean;
   onClose: () => void;
   editingTask: Task | null;
+  defaultDueDate?: Date;
 }
 
-const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, editingTask }) => {
-  const { addTask, updateTask, lists, customLists, selectedListId } = useTask();
+const TaskForm: React.FC<TaskFormProps> = ({ 
+  isOpen, 
+  onClose, 
+  editingTask,
+  defaultDueDate 
+}) => {
+  const { addTask, updateTask, lists, customLists } = useTask();
   
   const [title, setTitle] = useState('');
   const [notes, setNotes] = useState('');
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const [priority, setPriority] = useState<Priority>('none');
-  const [listId, setListId] = useState(selectedListId);
-  
-  // Reset form when dialog opens/closes or editing task changes
+  const [listId, setListId] = useState('inbox');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Initialize form with editingTask data or defaults
   useEffect(() => {
     if (isOpen) {
       if (editingTask) {
@@ -37,75 +65,104 @@ const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, editingTask }) => 
         setPriority(editingTask.priority);
         setListId(editingTask.listId);
       } else {
+        // Reset form for new task
         setTitle('');
         setNotes('');
-        setDueDate(undefined);
+        setDueDate(defaultDueDate);
         setPriority('none');
-        setListId(selectedListId);
+        setListId('inbox');
       }
     }
-  }, [isOpen, editingTask, selectedListId]);
-  
+  }, [isOpen, editingTask, defaultDueDate]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
-    if (!title.trim()) return;
+    if (!title.trim()) {
+      toast({
+        title: "Error",
+        description: "Task title is required",
+        variant: "destructive",
+      });
+      setIsSubmitting(false);
+      return;
+    }
     
     const taskData = {
       title: title.trim(),
-      completed: editingTask ? editingTask.completed : false,
       notes: notes.trim() || undefined,
       dueDate,
       priority,
       listId,
+      completed: editingTask ? editingTask.completed : false,
     };
     
-    if (editingTask) {
-      updateTask(editingTask.id, taskData);
-    } else {
-      addTask(taskData);
+    try {
+      if (editingTask) {
+        updateTask(editingTask.id, taskData);
+      } else {
+        addTask(taskData);
+      }
+      
+      onClose();
+      
+      toast({
+        title: editingTask ? "Task updated" : "Task added",
+        description: editingTask 
+          ? "Your task was updated successfully" 
+          : "Your task was added successfully",
+      });
+    } catch (error) {
+      console.error("Error saving task:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save task",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
-    
-    onClose();
   };
   
   const allLists = [...lists, ...customLists];
   
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[550px] animate-scale-in">
-        <DialogHeader>
-          <DialogTitle>{editingTask ? 'Edit Task' : 'Add New Task'}</DialogTitle>
-        </DialogHeader>
-        
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="space-y-4">
-            <Input
-              placeholder="Task title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="text-lg font-medium"
-              autoFocus
-            />
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-[500px]">
+        <form onSubmit={handleSubmit}>
+          <DialogHeader>
+            <DialogTitle>
+              {editingTask ? "Edit Task" : "Add New Task"}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="title">Task</Label>
+              <Input
+                id="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="What needs to be done?"
+                autoFocus
+              />
+            </div>
             
-            <Textarea
-              placeholder="Notes (optional)"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="min-h-24 resize-none"
-            />
-            
-            <div className="flex flex-wrap gap-4">
-              <div className="space-y-2">
-                <div className="text-sm font-medium">Due Date</div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label>Due Date</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className={`w-[180px] justify-start text-left font-normal ${!dueDate ? 'text-muted-foreground' : ''}`}
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !dueDate && "text-muted-foreground"
+                      )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {dueDate ? format(dueDate, 'PPP') : <span>Pick a date</span>}
+                      {dueDate ? format(dueDate, "PPP") : <span>Pick a date</span>}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -114,71 +171,85 @@ const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, editingTask }) => 
                       selected={dueDate}
                       onSelect={setDueDate}
                       initialFocus
+                      className="pointer-events-auto"
                     />
                   </PopoverContent>
                 </Popover>
+                {dueDate && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="mt-1"
+                    onClick={() => setDueDate(undefined)}
+                  >
+                    <X className="h-4 w-4 mr-1" />
+                    Clear date
+                  </Button>
+                )}
               </div>
               
-              <div className="space-y-2">
-                <div className="text-sm font-medium">Priority</div>
-                <Select
-                  value={priority}
+              <div className="grid gap-2">
+                <Label htmlFor="priority">Priority</Label>
+                <Select 
+                  value={priority} 
                   onValueChange={(value) => setPriority(value as Priority)}
                 >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue />
+                  <SelectTrigger id="priority">
+                    <SelectValue placeholder="Select priority" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="high" className="flex items-center">
-                      <div className="flex items-center">
-                        <Flag className="h-4 w-4 text-priority-high mr-2" />
-                        <span>High</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="medium">
-                      <div className="flex items-center">
-                        <Flag className="h-4 w-4 text-priority-medium mr-2" />
-                        <span>Medium</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="low">
-                      <div className="flex items-center">
-                        <Flag className="h-4 w-4 text-priority-low mr-2" />
-                        <span>Low</span>
-                      </div>
-                    </SelectItem>
                     <SelectItem value="none">None</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <div className="text-sm font-medium">List</div>
-                <Select
-                  value={listId}
-                  onValueChange={setListId}
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {allLists.map((list) => (
-                      <SelectItem key={list.id} value={list.id}>
-                        {list.name}
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="list">List</Label>
+              <Select 
+                value={listId} 
+                onValueChange={setListId}
+              >
+                <SelectTrigger id="list">
+                  <SelectValue placeholder="Select list" />
+                </SelectTrigger>
+                <SelectContent>
+                  {allLists.map(list => (
+                    <SelectItem key={list.id} value={list.id}>
+                      {list.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="notes">Notes</Label>
+              <Textarea
+                id="notes"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Add notes (optional)"
+                rows={3}
+              />
+            </div>
           </div>
           
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isSubmitting}
+            >
               Cancel
             </Button>
-            <Button type="submit">
-              {editingTask ? 'Save' : 'Add Task'}
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Saving..." : editingTask ? "Update Task" : "Add Task"}
             </Button>
           </DialogFooter>
         </form>

@@ -1,334 +1,291 @@
 
 import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { 
-  Inbox, Calendar, CalendarClock, ListChecks, PlusCircle, 
-  ChevronDown, ChevronRight, MoreHorizontal, User, Briefcase,
-  Target, Goal, CalendarCheck, Menu, ChevronLeft
+  Inbox, ListChecks, Calendar, CalendarClock, Target, 
+  ChevronDown, ChevronRight, Plus, Settings, 
+  MoreHorizontal, PanelLeft, PanelRight, CalendarRange
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useTask } from '@/contexts/TaskContext';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { List } from '@/types/task';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from '@/lib/utils';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useMobile } from '@/hooks/use-mobile';
 
-const Sidebar: React.FC = () => {
+// Allow the icons to be used in various places
+export const sidebarIcons = {
+  inbox: <Inbox className="h-5 w-5" />,
+  calendar: <Calendar className="h-5 w-5" />,
+  'calendar-clock': <CalendarClock className="h-5 w-5" />,
+  'calendar-range': <CalendarRange className="h-5 w-5" />,
+  'list-checks': <ListChecks className="h-5 w-5" />,
+  target: <Target className="h-5 w-5" />,
+};
+
+const Sidebar = () => {
   const location = useLocation();
-  const navigate = useNavigate();
-  const { 
-    lists, 
-    customLists, 
-    selectedListId, 
-    setSelectedListId,
-    addList,
-    updateList,
-    deleteList,
-    tasks,
-  } = useTask();
-
+  const { customLists, lists, selectedListId, setSelectedListId } = useTask();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [showCustomLists, setShowCustomLists] = useState(true);
-  const [isAddListOpen, setIsAddListOpen] = useState(false);
-  const [newListName, setNewListName] = useState('');
-  const [editingList, setEditingList] = useState<List | null>(null);
-
-  const getIconForList = (icon: string | undefined) => {
-    switch (icon) {
-      case 'inbox': return <Inbox className="h-4 w-4" />;
-      case 'calendar': return <Calendar className="h-4 w-4" />;
-      case 'calendar-clock': return <CalendarClock className="h-4 w-4" />;
-      case 'user': return <User className="h-4 w-4" />;
-      case 'briefcase': return <Briefcase className="h-4 w-4" />;
-      default: return <ListChecks className="h-4 w-4" />;
+  const [isCustomListsOpen, setIsCustomListsOpen] = useState(true);
+  const { isMobile, mobileMenuOpen, setMobileMenuOpen } = useMobile();
+  
+  // If on mobile and menu not explicitly opened, don't render the sidebar content
+  if (isMobile && !mobileMenuOpen) {
+    return null;
+  }
+  
+  const handleListClick = (id: string) => {
+    setSelectedListId(id);
+    if (isMobile) {
+      setMobileMenuOpen(false);
     }
-  };
-
-  const getTaskCountForList = (listId: string) => {
-    return tasks.filter(task => task.listId === listId && !task.completed).length;
-  };
-
-  const handleAddList = () => {
-    if (newListName.trim()) {
-      if (editingList) {
-        updateList(editingList.id, { name: newListName.trim() });
-      } else {
-        addList({ name: newListName.trim(), icon: 'list-checks' });
-      }
-      setNewListName('');
-      setEditingList(null);
-      setIsAddListOpen(false);
-    }
-  };
-
-  const openEditDialog = (list: List) => {
-    setEditingList(list);
-    setNewListName(list.name);
-    setIsAddListOpen(true);
   };
   
-  const handleListClick = (listId: string) => {
-    setSelectedListId(listId);
-    navigate('/'); // Redirect to main tasks page
+  const pathToPageMapping: Record<string, string> = {
+    '/': 'tasks',
+    '/goals': 'goals',
+    '/targets': 'targets',
+    '/weekly': 'weekly',
+    '/calendar': 'calendar'
   };
-
+  
+  const currentPage = pathToPageMapping[location.pathname] || 'tasks';
+  
   return (
     <aside 
       className={cn(
-        "h-[calc(100vh-4rem)] flex flex-col transition-all duration-300 shadow-md",
-        isCollapsed ? "w-16" : "w-56"
+        "bg-white border-r border-border transition-all duration-300 ease-in-out",
+        isCollapsed ? "w-[72px]" : "w-[260px]",
+        isMobile && "absolute inset-y-0 left-0 z-20 shadow-xl"
       )}
     >
-      <div className="flex-1 overflow-y-auto py-4 bg-white">
-        <TooltipProvider delayDuration={300}>
-          <div className="flex flex-col items-center space-y-4">
-            {/* Main navigation */}
-            <div className="w-full px-2">
-              <Link to="/" className="block">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      className={cn(
-                        "w-full justify-center sidebar-item text-gray-600 hover:bg-gray-100",
-                        location.pathname === '/' && selectedListId === 'inbox' ? 'bg-gray-100 text-primary font-medium' : '',
-                        !isCollapsed && "justify-start"
-                      )}
-                      onClick={() => setSelectedListId('inbox')}
-                    >
-                      <Inbox className="h-5 w-5" />
-                      {!isCollapsed && <span className="ml-2">Tasks</span>}
-                    </Button>
-                  </TooltipTrigger>
-                  {isCollapsed && <TooltipContent side="right">Tasks</TooltipContent>}
-                </Tooltip>
-              </Link>
-              <Link to="/goals" className="block mt-1">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      className={cn(
-                        "w-full justify-center sidebar-item text-gray-600 hover:bg-gray-100",
-                        location.pathname === '/goals' ? 'bg-gray-100 text-primary font-medium' : '',
-                        !isCollapsed && "justify-start"
-                      )}
-                    >
-                      <Goal className="h-5 w-5" />
-                      {!isCollapsed && <span className="ml-2">Goals</span>}
-                    </Button>
-                  </TooltipTrigger>
-                  {isCollapsed && <TooltipContent side="right">Three-Year Goals</TooltipContent>}
-                </Tooltip>
-              </Link>
-              <Link to="/targets" className="block mt-1">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      className={cn(
-                        "w-full justify-center sidebar-item text-gray-600 hover:bg-gray-100",
-                        location.pathname === '/targets' ? 'bg-gray-100 text-primary font-medium' : '',
-                        !isCollapsed && "justify-start"
-                      )}
-                    >
-                      <Target className="h-5 w-5" />
-                      {!isCollapsed && <span className="ml-2">Targets</span>}
-                    </Button>
-                  </TooltipTrigger>
-                  {isCollapsed && <TooltipContent side="right">90-Day Targets</TooltipContent>}
-                </Tooltip>
-              </Link>
-              <Link to="/weekly" className="block mt-1">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      className={cn(
-                        "w-full justify-center sidebar-item text-gray-600 hover:bg-gray-100",
-                        location.pathname === '/weekly' ? 'bg-gray-100 text-primary font-medium' : '',
-                        !isCollapsed && "justify-start"
-                      )}
-                    >
-                      <CalendarCheck className="h-5 w-5" />
-                      {!isCollapsed && <span className="ml-2">Weekly</span>}
-                    </Button>
-                  </TooltipTrigger>
-                  {isCollapsed && <TooltipContent side="right">Weekly Goals</TooltipContent>}
-                </Tooltip>
-              </Link>
-            </div>
-
-            {/* Lists section */}
-            <div className="w-full px-2">
+      <div className="flex flex-col h-full">
+        <div className="flex items-center justify-between p-4 h-16 border-b border-border">
+          {!isCollapsed && (
+            <h1 className="text-lg font-bold">Taskify</h1>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className={cn("ml-auto", isCollapsed && "mx-auto")}
+          >
+            {isCollapsed ? (
+              <PanelRight className="h-5 w-5" />
+            ) : (
+              <PanelLeft className="h-5 w-5" />
+            )}
+          </Button>
+        </div>
+        
+        <div className="flex-1 overflow-y-auto py-4">
+          <nav className="space-y-1 px-2">
+            {/* Views section */}
+            <div className="mb-6">
               {!isCollapsed && (
-                <div 
-                  className="flex items-center px-3 py-2 text-sm font-medium text-gray-500 cursor-pointer"
-                  onClick={() => setShowCustomLists(!showCustomLists)}
-                >
-                  {showCustomLists ? <ChevronDown className="h-4 w-4 mr-1" /> : <ChevronRight className="h-4 w-4 mr-1" />}
-                  <span>Lists</span>
-                </div>
+                <h2 className="text-xs font-semibold text-muted-foreground mb-2 px-3">
+                  VIEWS
+                </h2>
               )}
-
-              {(showCustomLists || isCollapsed) && (
-                <div className="mt-1 space-y-1 px-2">
+              <ul className="space-y-1">
+                <SidebarItem
+                  to="/"
+                  icon={<Inbox className="h-5 w-5" />}
+                  text="Tasks"
+                  isActive={currentPage === 'tasks'}
+                  isCollapsed={isCollapsed}
+                  onClick={() => isMobile && setMobileMenuOpen(false)}
+                />
+                <SidebarItem
+                  to="/calendar"
+                  icon={<CalendarRange className="h-5 w-5" />}
+                  text="Calendar"
+                  isActive={currentPage === 'calendar'}
+                  isCollapsed={isCollapsed}
+                  onClick={() => isMobile && setMobileMenuOpen(false)}
+                />
+              </ul>
+            </div>
+            
+            {/* Goals section */}
+            <div className="mb-6">
+              {!isCollapsed && (
+                <h2 className="text-xs font-semibold text-muted-foreground mb-2 px-3">
+                  GOALS
+                </h2>
+              )}
+              <ul className="space-y-1">
+                <SidebarItem
+                  to="/goals"
+                  icon={<Calendar className="h-5 w-5" />}
+                  text="3-Year Goals"
+                  isActive={currentPage === 'goals'}
+                  isCollapsed={isCollapsed}
+                  onClick={() => isMobile && setMobileMenuOpen(false)}
+                />
+                <SidebarItem
+                  to="/targets"
+                  icon={<Target className="h-5 w-5" />}
+                  text="90-Day Targets"
+                  isActive={currentPage === 'targets'}
+                  isCollapsed={isCollapsed}
+                  onClick={() => isMobile && setMobileMenuOpen(false)}
+                />
+                <SidebarItem
+                  to="/weekly"
+                  icon={<CalendarClock className="h-5 w-5" />}
+                  text="Weekly Goals"
+                  isActive={currentPage === 'weekly'}
+                  isCollapsed={isCollapsed}
+                  onClick={() => isMobile && setMobileMenuOpen(false)}
+                />
+              </ul>
+            </div>
+            
+            {/* Lists section */}
+            <div>
+              <div className="flex items-center justify-between px-3 mb-2">
+                {!isCollapsed && (
+                  <h2 className="text-xs font-semibold text-muted-foreground">
+                    LISTS
+                  </h2>
+                )}
+                {!isCollapsed && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-5 w-5"
+                    onClick={() => setIsCustomListsOpen(!isCustomListsOpen)}
+                  >
+                    {isCustomListsOpen ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4" />
+                    )}
+                  </Button>
+                )}
+              </div>
+              
+              {(isCustomListsOpen || isCollapsed) && (
+                <ul className="space-y-1">
                   {/* Default lists */}
                   {lists.map((list) => (
-                    <Tooltip key={list.id}>
-                      <TooltipTrigger asChild>
-                        <div className="relative">
-                          <Button
-                            variant="ghost"
-                            className={cn(
-                              "w-full justify-center text-gray-600 hover:bg-gray-100 rounded-md",
-                              selectedListId === list.id && location.pathname === '/' ? 'bg-gray-100 text-primary font-medium' : '',
-                              !isCollapsed && "justify-start"
-                            )}
-                            onClick={() => handleListClick(list.id)}
-                          >
-                            {getIconForList(list.icon)}
-                            {!isCollapsed && <span className="ml-2 flex-1">{list.name}</span>}
-                            {!isCollapsed && getTaskCountForList(list.id) > 0 && (
-                              <span className="text-xs bg-gray-100 rounded-full px-2 py-0.5 text-gray-700">
-                                {getTaskCountForList(list.id)}
-                              </span>
-                            )}
-                            {isCollapsed && getTaskCountForList(list.id) > 0 && (
-                              <span className="absolute top-0 right-0 text-xs bg-primary text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
-                                {getTaskCountForList(list.id)}
-                              </span>
-                            )}
-                          </Button>
-                        </div>
-                      </TooltipTrigger>
-                      {isCollapsed && <TooltipContent side="right">{list.name}</TooltipContent>}
-                    </Tooltip>
+                    <li key={list.id}>
+                      <button
+                        className={cn(
+                          "flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors",
+                          selectedListId === list.id && currentPage === 'tasks'
+                            ? "bg-primary/10 text-primary font-medium"
+                            : "text-gray-700 hover:bg-gray-100"
+                        )}
+                        onClick={() => handleListClick(list.id)}
+                      >
+                        {list.icon && sidebarIcons[list.icon as keyof typeof sidebarIcons]}
+                        {!isCollapsed && <span className="ml-3">{list.name}</span>}
+                      </button>
+                    </li>
                   ))}
-
+                  
                   {/* Custom lists */}
                   {customLists.map((list) => (
-                    <Tooltip key={list.id}>
-                      <TooltipTrigger asChild>
-                        <div className="group relative">
-                          <Button
-                            variant="ghost"
-                            className={cn(
-                              "w-full justify-center text-gray-600 hover:bg-gray-100 rounded-md",
-                              selectedListId === list.id && location.pathname === '/' ? 'bg-gray-100 text-primary font-medium' : '',
-                              !isCollapsed && "justify-start"
-                            )}
-                            onClick={() => handleListClick(list.id)}
-                          >
-                            {getIconForList(list.icon)}
-                            {!isCollapsed && <span className="ml-2 flex-1">{list.name}</span>}
-                            {!isCollapsed && getTaskCountForList(list.id) > 0 && (
-                              <span className="text-xs bg-gray-100 rounded-full px-2 py-0.5 text-gray-700">
-                                {getTaskCountForList(list.id)}
-                              </span>
-                            )}
-                            {isCollapsed && getTaskCountForList(list.id) > 0 && (
-                              <span className="absolute top-0 right-0 text-xs bg-primary text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
-                                {getTaskCountForList(list.id)}
-                              </span>
-                            )}
-                          </Button>
-                          
-                          {!isCollapsed && (
+                    <li key={list.id}>
+                      <button
+                        className={cn(
+                          "flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors group",
+                          selectedListId === list.id && currentPage === 'tasks'
+                            ? "bg-primary/10 text-primary font-medium"
+                            : "text-gray-700 hover:bg-gray-100"
+                        )}
+                        onClick={() => handleListClick(list.id)}
+                      >
+                        <ListChecks className="h-5 w-5" />
+                        {!isCollapsed && (
+                          <>
+                            <span className="ml-3 flex-1 truncate">{list.name}</span>
                             <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
+                              <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                                 <Button 
                                   variant="ghost" 
                                   size="icon" 
-                                  className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  className="h-7 w-7 opacity-0 group-hover:opacity-100"
                                 >
-                                  <MoreHorizontal className="h-3 w-3" />
+                                  <MoreHorizontal className="h-4 w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="w-36">
-                                <DropdownMenuItem onClick={() => openEditDialog(list)}>Rename</DropdownMenuItem>
-                                <DropdownMenuItem 
-                                  className="text-destructive focus:text-destructive"
-                                  onClick={() => deleteList(list.id)}
-                                >
-                                  Delete
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem>
+                                  Edit List
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="text-destructive">
+                                  Delete List
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
-                          )}
-                        </div>
-                      </TooltipTrigger>
-                      {isCollapsed && <TooltipContent side="right">{list.name}</TooltipContent>}
-                    </Tooltip>
+                          </>
+                        )}
+                      </button>
+                    </li>
                   ))}
-
-                  {!isCollapsed && (
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start text-gray-500 hover:bg-gray-100"
-                      onClick={() => {
-                        setNewListName('');
-                        setEditingList(null);
-                        setIsAddListOpen(true);
-                      }}
+                  
+                  {/* Add list button */}
+                  <li>
+                    <button
+                      className="flex items-center w-full px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100 transition-colors"
                     >
-                      <PlusCircle className="h-4 w-4" />
-                      <span className="ml-2">Add List</span>
-                    </Button>
-                  )}
-                </div>
+                      <Plus className="h-5 w-5" />
+                      {!isCollapsed && <span className="ml-3">Add List</span>}
+                    </button>
+                  </li>
+                </ul>
               )}
             </div>
-          </div>
-        </TooltipProvider>
+          </nav>
+        </div>
+        
+        <div className="border-t border-border p-4">
+          <button className="flex items-center w-full px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100 transition-colors">
+            <Settings className="h-5 w-5" />
+            {!isCollapsed && <span className="ml-3">Settings</span>}
+          </button>
+        </div>
       </div>
-
-      {/* Collapse/Expand button */}
-      <div className="flex justify-center p-2 border-t bg-white">
-        <Button 
-          variant="ghost" 
-          size="icon"
-          className="rounded-full h-8 w-8 hover:bg-gray-100 text-gray-500"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-        >
-          {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-        </Button>
-      </div>
-
-      <Dialog open={isAddListOpen} onOpenChange={setIsAddListOpen}>
-        <DialogContent className="sm:max-w-[425px] animate-scale-in">
-          <DialogHeader>
-            <DialogTitle>{editingList ? 'Edit List' : 'Add New List'}</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="list-name" className="text-right">
-                Name
-              </Label>
-              <Input
-                id="list-name"
-                value={newListName}
-                onChange={(e) => setNewListName(e.target.value)}
-                className="col-span-3"
-                autoFocus
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAddListOpen(false)}>Cancel</Button>
-            <Button onClick={handleAddList}>{editingList ? 'Save' : 'Add'}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </aside>
+  );
+};
+
+interface SidebarItemProps {
+  to: string;
+  icon: React.ReactNode;
+  text: string;
+  isActive: boolean;
+  isCollapsed: boolean;
+  onClick?: () => void;
+}
+
+const SidebarItem: React.FC<SidebarItemProps> = ({ 
+  to, icon, text, isActive, isCollapsed, onClick 
+}) => {
+  return (
+    <li>
+      <Link
+        to={to}
+        className={cn(
+          "flex items-center px-3 py-2 text-sm rounded-md transition-colors",
+          isActive
+            ? "bg-primary/10 text-primary font-medium"
+            : "text-gray-700 hover:bg-gray-100"
+        )}
+        onClick={onClick}
+      >
+        {icon}
+        {!isCollapsed && <span className="ml-3">{text}</span>}
+      </Link>
+    </li>
   );
 };
 

@@ -7,8 +7,10 @@ import { parseNaturalLanguageTask } from '@/utils/dateParser';
 import { Priority } from '@/types/task';
 import { toast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
+import { useLocation } from 'react-router-dom';
 
 const FloatingActionButton: React.FC = () => {
+  const location = useLocation();
   const { addTask } = useTask();
   const [isExpanded, setIsExpanded] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -25,6 +27,9 @@ const FloatingActionButton: React.FC = () => {
   
   const inputRef = useRef<HTMLInputElement>(null);
   const fabRef = useRef<HTMLDivElement>(null);
+  
+  // Determine if we're on the calendar page
+  const isCalendarPage = location.pathname.includes('calendar');
   
   useEffect(() => {
     // Parse the input value on change
@@ -101,9 +106,14 @@ const FloatingActionButton: React.FC = () => {
     setIsExpanded(false);
   };
   
+  // Adjusted styles for calendar page if needed
+  const fabPosition = isCalendarPage 
+    ? "fixed bottom-6 right-6 z-50 transition-all duration-300"
+    : "fixed bottom-6 right-6 z-50 transition-all duration-300";
+  
   return (
     <div 
-      className="fixed bottom-6 right-6 z-50 transition-all duration-300"
+      className={fabPosition}
       style={{ width: isExpanded ? 'calc(100% - 88px)' : 'auto', maxWidth: isExpanded ? '900px' : 'auto' }}
       ref={fabRef}
     >
@@ -125,7 +135,9 @@ const FloatingActionButton: React.FC = () => {
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
               className="w-full border-none focus:ring-0 h-10 text-sm"
-              placeholder="Add a task... (e.g., 'Call John tomorrow at 3pm')"
+              placeholder={isCalendarPage 
+                ? "Add a task for this date... (e.g., 'Call John tomorrow at 3pm')" 
+                : "Add a task... (e.g., 'Call John tomorrow at 3pm')"}
               autoFocus
             />
             
