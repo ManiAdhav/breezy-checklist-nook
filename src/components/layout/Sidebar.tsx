@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Inbox, Calendar, CalendarClock, ListChecks, PlusCircle, 
   ChevronDown, ChevronRight, MoreHorizontal, User, Briefcase,
-  Target, Goal, CalendarCheck
+  Target, Goal, CalendarCheck, Menu, ChevronLeft
 } from 'lucide-react';
 import { useTask } from '@/contexts/TaskContext';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from '@/lib/utils';
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
@@ -33,6 +34,7 @@ const Sidebar: React.FC = () => {
     tasks,
   } = useTask();
 
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [showCustomLists, setShowCustomLists] = useState(true);
   const [isAddListOpen, setIsAddListOpen] = useState(false);
   const [newListName, setNewListName] = useState('');
@@ -78,44 +80,65 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <aside className="w-60 border-r border-border h-[calc(100vh-4rem)] flex flex-col bg-sidebar">
+    <aside 
+      className={cn(
+        "border-r border-border h-[calc(100vh-4rem)] flex flex-col bg-sidebar transition-all duration-300",
+        isCollapsed ? "w-16" : "w-60"
+      )}
+    >
       <div className="flex-1 overflow-y-auto py-4 px-3">
         <div className="mb-6 space-y-1">
           <Link to="/" className="block">
             <Button 
               variant="ghost" 
-              className={`w-full justify-start sidebar-item ${location.pathname === '/' && selectedListId === 'inbox' ? 'sidebar-item-active' : ''}`}
+              className={cn(
+                "w-full justify-start sidebar-item group",
+                location.pathname === '/' && selectedListId === 'inbox' ? 'sidebar-item-active' : '',
+                isCollapsed && "justify-center px-2"
+              )}
               onClick={() => setSelectedListId('inbox')}
             >
               <Inbox className="h-4 w-4" />
-              <span className="ml-2">Tasks</span>
+              {!isCollapsed && <span className="ml-2 group-hover:translate-x-1 transition-transform">Tasks</span>}
             </Button>
           </Link>
           <Link to="/goals" className="block">
             <Button 
               variant="ghost" 
-              className={`w-full justify-start sidebar-item ${location.pathname === '/goals' ? 'sidebar-item-active' : ''}`}
+              className={cn(
+                "w-full justify-start sidebar-item group",
+                location.pathname === '/goals' ? 'sidebar-item-active' : '',
+                isCollapsed && "justify-center px-2"
+              )}
             >
               <Goal className="h-4 w-4" />
-              <span className="ml-2">Three-Year Goals</span>
+              {!isCollapsed && <span className="ml-2 group-hover:translate-x-1 transition-transform">Three-Year Goals</span>}
             </Button>
           </Link>
           <Link to="/targets" className="block">
             <Button 
               variant="ghost" 
-              className={`w-full justify-start sidebar-item ${location.pathname === '/targets' ? 'sidebar-item-active' : ''}`}
+              className={cn(
+                "w-full justify-start sidebar-item group",
+                location.pathname === '/targets' ? 'sidebar-item-active' : '',
+                isCollapsed && "justify-center px-2"
+              )}
             >
               <Target className="h-4 w-4" />
-              <span className="ml-2">90-Day Targets</span>
+              {!isCollapsed && <span className="ml-2 group-hover:translate-x-1 transition-transform">90-Day Targets</span>}
             </Button>
           </Link>
           <Link to="/weekly" className="block">
             <Button 
               variant="ghost" 
-              className={`w-full justify-start sidebar-item ${location.pathname === '/weekly' ? 'sidebar-item-active' : ''}`}
+              className={cn(
+                "w-full justify-start sidebar-item group",
+                location.pathname === '/weekly' ? 'sidebar-item-active' : '',
+                isCollapsed && "justify-center px-2"
+              )}
             >
               <CalendarCheck className="h-4 w-4" />
-              <span className="ml-2">Weekly Goals</span>
+              {!isCollapsed && <span className="ml-2 group-hover:translate-x-1 transition-transform">Weekly Goals</span>}
             </Button>
           </Link>
         </div>
@@ -125,13 +148,26 @@ const Sidebar: React.FC = () => {
             <Button
               key={list.id}
               variant="ghost"
-              className={`w-full justify-start sidebar-item ${selectedListId === list.id && location.pathname === '/' ? 'sidebar-item-active' : ''}`}
+              className={cn(
+                "w-full justify-start sidebar-item group",
+                selectedListId === list.id && location.pathname === '/' ? 'sidebar-item-active' : '',
+                isCollapsed && "justify-center px-2"
+              )}
               onClick={() => handleListClick(list.id)}
             >
               {getIconForList(list.icon)}
-              <span className="ml-2 flex-1">{list.name}</span>
-              {getTaskCountForList(list.id) > 0 && (
-                <span className="text-xs bg-secondary rounded-full px-2 py-0.5">
+              {!isCollapsed && (
+                <>
+                  <span className="ml-2 flex-1 group-hover:translate-x-1 transition-transform">{list.name}</span>
+                  {getTaskCountForList(list.id) > 0 && (
+                    <span className="text-xs bg-secondary rounded-full px-2 py-0.5">
+                      {getTaskCountForList(list.id)}
+                    </span>
+                  )}
+                </>
+              )}
+              {isCollapsed && getTaskCountForList(list.id) > 0 && (
+                <span className="absolute top-0 right-0 text-xs bg-primary text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
                   {getTaskCountForList(list.id)}
                 </span>
               )}
@@ -139,71 +175,88 @@ const Sidebar: React.FC = () => {
           ))}
         </nav>
 
-        <div className="mt-6">
-          <div 
-            className="flex items-center px-3 py-2 text-sm font-medium text-sidebar-foreground cursor-pointer"
-            onClick={() => setShowCustomLists(!showCustomLists)}
-          >
-            {showCustomLists ? <ChevronDown className="h-4 w-4 mr-1" /> : <ChevronRight className="h-4 w-4 mr-1" />}
-            <span>Lists</span>
+        {!isCollapsed && (
+          <div className="mt-6">
+            <div 
+              className="flex items-center px-3 py-2 text-sm font-medium text-sidebar-foreground cursor-pointer"
+              onClick={() => setShowCustomLists(!showCustomLists)}
+            >
+              {showCustomLists ? <ChevronDown className="h-4 w-4 mr-1" /> : <ChevronRight className="h-4 w-4 mr-1" />}
+              <span>Lists</span>
+            </div>
+
+            {showCustomLists && (
+              <nav className="mt-1 space-y-1">
+                {customLists.map((list) => (
+                  <div key={list.id} className="group relative">
+                    <Button
+                      variant="ghost"
+                      className={cn(
+                        "w-full justify-start sidebar-item group",
+                        selectedListId === list.id && location.pathname === '/' ? 'sidebar-item-active' : ''
+                      )}
+                      onClick={() => handleListClick(list.id)}
+                    >
+                      {getIconForList(list.icon)}
+                      <span className="ml-2 flex-1 group-hover:translate-x-1 transition-transform">{list.name}</span>
+                      {getTaskCountForList(list.id) > 0 && (
+                        <span className="text-xs bg-secondary rounded-full px-2 py-0.5">
+                          {getTaskCountForList(list.id)}
+                        </span>
+                      )}
+                    </Button>
+                    
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <MoreHorizontal className="h-3 w-3" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-36">
+                        <DropdownMenuItem onClick={() => openEditDialog(list)}>Rename</DropdownMenuItem>
+                        <DropdownMenuItem 
+                          className="text-destructive focus:text-destructive"
+                          onClick={() => deleteList(list.id)}
+                        >
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                ))}
+
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-muted-foreground sidebar-item group"
+                  onClick={() => {
+                    setNewListName('');
+                    setEditingList(null);
+                    setIsAddListOpen(true);
+                  }}
+                >
+                  <PlusCircle className="h-4 w-4" />
+                  <span className="ml-2 group-hover:translate-x-1 transition-transform">Add List</span>
+                </Button>
+              </nav>
+            )}
           </div>
+        )}
+      </div>
 
-          {showCustomLists && (
-            <nav className="mt-1 space-y-1">
-              {customLists.map((list) => (
-                <div key={list.id} className="group relative">
-                  <Button
-                    variant="ghost"
-                    className={`w-full justify-start sidebar-item ${selectedListId === list.id && location.pathname === '/' ? 'sidebar-item-active' : ''}`}
-                    onClick={() => handleListClick(list.id)}
-                  >
-                    {getIconForList(list.icon)}
-                    <span className="ml-2 flex-1">{list.name}</span>
-                    {getTaskCountForList(list.id) > 0 && (
-                      <span className="text-xs bg-secondary rounded-full px-2 py-0.5">
-                        {getTaskCountForList(list.id)}
-                      </span>
-                    )}
-                  </Button>
-                  
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <MoreHorizontal className="h-3 w-3" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-36">
-                      <DropdownMenuItem onClick={() => openEditDialog(list)}>Rename</DropdownMenuItem>
-                      <DropdownMenuItem 
-                        className="text-destructive focus:text-destructive"
-                        onClick={() => deleteList(list.id)}
-                      >
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              ))}
-
-              <Button
-                variant="ghost"
-                className="w-full justify-start text-muted-foreground sidebar-item"
-                onClick={() => {
-                  setNewListName('');
-                  setEditingList(null);
-                  setIsAddListOpen(true);
-                }}
-              >
-                <PlusCircle className="h-4 w-4" />
-                <span className="ml-2">Add List</span>
-              </Button>
-            </nav>
-          )}
-        </div>
+      {/* Collapse/Expand button */}
+      <div className="flex justify-center p-2 border-t border-border">
+        <Button 
+          variant="ghost" 
+          size="icon"
+          className="rounded-full h-8 w-8 hover:bg-sidebar-accent"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+        >
+          {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+        </Button>
       </div>
 
       <Dialog open={isAddListOpen} onOpenChange={setIsAddListOpen}>

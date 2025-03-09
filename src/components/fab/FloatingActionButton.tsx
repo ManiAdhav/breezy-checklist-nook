@@ -109,10 +109,10 @@ const FloatingActionButton: React.FC = () => {
     >
       <div 
         className={`
-          transition-all duration-300 overflow-hidden shadow-md
+          transition-all duration-300 overflow-hidden
           ${isExpanded 
-            ? 'w-full rounded-lg bg-white' 
-            : 'w-10 h-10 rounded-full bg-[#F2F2F2]'}
+            ? 'w-full rounded-lg bg-white shadow-medium' 
+            : 'w-10 h-10 rounded-full bg-[#F2F2F2] hover:bg-[#EAEAEA] shadow-soft'}
           flex items-center 
         `}
       >
