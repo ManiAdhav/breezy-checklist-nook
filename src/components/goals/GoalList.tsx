@@ -50,7 +50,7 @@ const GoalList: React.FC = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Button onClick={handleAddGoal} className="h-9">
+          <Button onClick={handleAddGoal} size="default" type="button">
             <Plus className="h-4 w-4 mr-1" />
             <span>Add Goal</span>
           </Button>
@@ -68,7 +68,7 @@ const GoalList: React.FC = () => {
               {searchQuery ? 'No goals match your search criteria.' : 'Add a goal to start planning your future.'}
             </p>
             {!searchQuery && (
-              <Button onClick={handleAddGoal} className="mt-6">
+              <Button onClick={handleAddGoal} type="button">
                 <Plus className="h-4 w-4 mr-1.5" />
                 <span>Add Goal</span>
               </Button>
