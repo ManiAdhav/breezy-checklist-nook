@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useGoal } from '@/contexts/GoalContext';
 import WeeklyGoalItem from './WeeklyGoalItem';
@@ -60,7 +59,7 @@ const WeeklyGoalList: React.FC = () => {
     }));
     
     setSuggestedGoals(newSuggestions);
-  }, [ninetyDayTargets, weeklyGoals, currentWeekStart, currentWeekEnd]);
+  }, [ninetyDayTargets, weeklyGoals, currentWeekStart.toISOString(), currentWeekEnd.toISOString()]);
   
   const handleAddGoal = () => {
     setEditingGoal(null);
