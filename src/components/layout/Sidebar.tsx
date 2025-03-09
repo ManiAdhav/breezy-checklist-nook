@@ -125,20 +125,20 @@ const Sidebar: React.FC = () => {
           {showGoals && <div className="ml-1 space-y-0.5">
               <Link to="/goals" className="block">
                 <Button variant="ghost" className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/goals' ? 'sidebar-item-active' : ''}`}>
-                  <Package className="h-4 w-4 mr-2" />
-                  <span>Yearly Goals</span>
+                  <Target className="h-4 w-4 mr-2" />
+                  <span>Goals</span>
                 </Button>
               </Link>
               <Link to="/targets" className="block">
                 <Button variant="ghost" className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/targets' ? 'sidebar-item-active' : ''}`}>
                   <Archive className="h-4 w-4 mr-2" />
-                  <span>90-Day Goals</span>
+                  <span>Milestone</span>
                 </Button>
               </Link>
               <Link to="/weekly" className="block">
                 <Button variant="ghost" className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/weekly' ? 'sidebar-item-active font-medium' : ''}`}>
-                  <Mail className="h-4 w-4 mr-2" />
-                  <span>Weekly Goals</span>
+                  <Calendar className="h-4 w-4 mr-2" />
+                  <span>Plan</span>
                 </Button>
               </Link>
             </div>}
