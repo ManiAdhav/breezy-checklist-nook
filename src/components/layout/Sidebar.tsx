@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
@@ -83,94 +82,9 @@ const Sidebar: React.FC = () => {
     navigate('/'); // Redirect to main tasks page
   };
 
-  const navItems = [
-    {
-      icon: <Home className="h-5 w-5" />,
-      title: 'Home',
-      onClick: () => setSelectedListId('inbox'),
-      isActive: location.pathname === '/' && selectedListId === 'inbox'
-    },
-    {
-      icon: <Inbox className="h-5 w-5" />,
-      title: 'Tasks',
-      onClick: () => setSelectedListId('inbox'),
-      isActive: location.pathname === '/' && selectedListId === 'inbox'
-    },
-    {
-      icon: <Goal className="h-5 w-5" />,
-      title: 'Goals',
-      onClick: () => navigate('/goals'),
-      isActive: location.pathname === '/goals'
-    },
-    {
-      icon: <Target className="h-5 w-5" />,
-      title: 'Targets',
-      onClick: () => navigate('/targets'),
-      isActive: location.pathname === '/targets'
-    },
-    {
-      icon: <CalendarCheck className="h-5 w-5" />,
-      title: 'Weekly Goals',
-      onClick: () => navigate('/weekly'),
-      isActive: location.pathname === '/weekly'
-    },
-    {
-      icon: <Calendar className="h-5 w-5" />,
-      title: 'Calendar',
-      onClick: () => navigate('/calendar'),
-      isActive: location.pathname === '/calendar'
-    },
-    {
-      icon: <Settings className="h-5 w-5" />,
-      title: 'Settings',
-      onClick: () => {},
-      isActive: false
-    }
-  ];
-
   return (
     <div className="flex h-[calc(100vh-4rem)]">
-      {/* Icon sidebar */}
-      <aside className="w-16 flex flex-col items-center py-4 border-r border-border bg-white shadow-sm">
-        <div className="mb-8">
-          <div className="w-10 h-10 rounded-lg bg-primary text-white flex items-center justify-center">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" fill="currentColor" />
-              <path d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8V16Z" fill="white" />
-            </svg>
-          </div>
-        </div>
-        
-        <div className="flex-1 space-y-4">
-          {navItems.map((item, index) => (
-            <button 
-              key={index}
-              onClick={item.onClick}
-              className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${
-                item.isActive 
-                  ? 'text-primary bg-primary/10' 
-                  : 'text-gray-500 hover:text-primary hover:bg-gray-100'
-              }`}
-              title={item.title}
-            >
-              {item.icon}
-            </button>
-          ))}
-        </div>
-        
-        <div className="mt-auto mb-4">
-          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary">
-            <img 
-              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" 
-              alt="User avatar" 
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </div>
-      </aside>
-
-      {/* Content sidebar */}
-      <aside className="w-60 border-r border-border h-full flex flex-col bg-white">
+      <aside className="w-72 border-r border-border h-full flex flex-col bg-white">
         <div className="p-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
