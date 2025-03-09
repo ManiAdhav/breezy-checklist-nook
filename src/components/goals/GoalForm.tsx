@@ -42,6 +42,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
   const [endDate, setEndDate] = useState<Date>(new Date(Date.now() + 3 * 365 * 24 * 60 * 60 * 1000)); // 3 years from now
   const [status, setStatus] = useState<GoalStatus>('not_started');
   const [selectedIcon, setSelectedIcon] = useState<string>('Target');
+  const [iconPopoverOpen, setIconPopoverOpen] = useState(false);
   
   // Reset form and pick random icon when dialog opens/closes or editing goal changes
   useEffect(() => {
@@ -92,6 +93,11 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
     onClose();
   };
   
+  const handleIconSelect = (iconValue: string) => {
+    setSelectedIcon(iconValue);
+    setIconPopoverOpen(false);
+  };
+  
   const statusOptions = [
     { value: 'not_started', label: 'Not Started' },
     { value: 'in_progress', label: 'In Progress' },
@@ -114,7 +120,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <Popover>
+              <Popover open={iconPopoverOpen} onOpenChange={setIconPopoverOpen}>
                 <PopoverTrigger asChild>
                   <Button 
                     type="button" 
@@ -137,7 +143,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
                           variant={selectedIcon === option.value ? "default" : "outline"}
                           size="icon"
                           className="h-10 w-10"
-                          onClick={() => setSelectedIcon(option.value)}
+                          onClick={() => handleIconSelect(option.value)}
                         >
                           <Icon className="h-5 w-5" />
                         </Button>
