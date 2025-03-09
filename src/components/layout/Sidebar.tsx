@@ -99,7 +99,7 @@ const Sidebar: React.FC = () => {
                   variant="ghost" 
                   className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/goals' ? 'sidebar-item-active' : ''}`}
                 >
-                  <Goal className="h-4 w-4 mr-1" />
+                  <Goal className="h-4 w-4 mr-3" />
                   <span>Yearly Goals</span>
                 </Button>
               </Link>
@@ -108,7 +108,7 @@ const Sidebar: React.FC = () => {
                   variant="ghost" 
                   className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/targets' ? 'sidebar-item-active' : ''}`}
                 >
-                  <Target className="h-4 w-4 mr-1" />
+                  <Target className="h-4 w-4 mr-3" />
                   <span>90-Day Goals</span>
                 </Button>
               </Link>
@@ -117,7 +117,7 @@ const Sidebar: React.FC = () => {
                   variant="ghost" 
                   className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/weekly' ? 'sidebar-item-active font-medium' : ''}`}
                 >
-                  <CalendarCheck className="h-4 w-4 mr-1" />
+                  <CalendarCheck className="h-4 w-4 mr-3" />
                   <span>Weekly Goals</span>
                 </Button>
               </Link>
@@ -129,7 +129,7 @@ const Sidebar: React.FC = () => {
               variant="ghost" 
               className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/calendar' ? 'sidebar-item-active' : ''}`}
             >
-              <Calendar className="h-4 w-4 mr-1" />
+              <Calendar className="h-4 w-4 mr-3" />
               <span>Calendar</span>
             </Button>
           </Link>
@@ -143,7 +143,7 @@ const Sidebar: React.FC = () => {
               className={`w-full justify-start h-8 px-2 py-1 text-xs sidebar-item ${selectedListId === list.id && location.pathname === '/' ? 'sidebar-item-active' : ''}`} 
               onClick={() => handleListClick(list.id)}
             >
-              <div className="flex items-center gap-1.5 flex-1">
+              <div className="flex items-center gap-3 flex-1">
                 {getIconForList(list.icon)}
                 <span>{list.name}</span>
               </div>
@@ -174,7 +174,7 @@ const Sidebar: React.FC = () => {
                     className={`w-full justify-start h-8 px-2 py-1 text-xs sidebar-item ${selectedListId === list.id && location.pathname === '/' ? 'sidebar-item-active' : ''}`} 
                     onClick={() => handleListClick(list.id)}
                   >
-                    <div className="flex items-center gap-1.5 flex-1">
+                    <div className="flex items-center gap-3 flex-1">
                       {getIconForList(list.icon)}
                       <span>{list.name}</span>
                     </div>
@@ -214,7 +214,7 @@ const Sidebar: React.FC = () => {
                   setIsAddListOpen(true);
                 }}
               >
-                <PlusCircle className="h-4 w-4 mr-1.5" />
+                <PlusCircle className="h-4 w-4 mr-3" />
                 <span>Add List</span>
               </Button>
             </nav>
