@@ -276,7 +276,6 @@ const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
                       selected={actionStartDate}
                       onSelect={(date) => date && setActionStartDate(date)}
                       initialFocus
-                      className="p-3 pointer-events-auto"
                     />
                   </PopoverContent>
                 </Popover>
@@ -300,7 +299,6 @@ const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
                       selected={actionEndDate}
                       onSelect={(date) => date && setActionEndDate(date)}
                       initialFocus
-                      className="p-3 pointer-events-auto"
                     />
                   </PopoverContent>
                 </Popover>
