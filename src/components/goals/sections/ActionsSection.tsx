@@ -3,16 +3,16 @@ import React, { useState } from 'react';
 import { useTask } from '@/contexts/TaskContext';
 import { useGoal } from '@/contexts/GoalContext';
 import { 
-  Button, 
-  Calendar,
   Plus,
   ListChecks,
   Milestone,
-  Target
+  Target,
+  Calendar
 } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@/components/ui/button';
 import { 
   Dialog, 
   DialogContent, 
