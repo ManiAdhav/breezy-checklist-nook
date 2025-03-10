@@ -29,6 +29,7 @@ import { List } from '@/types/task';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useGoal } from '@/contexts/GoalContext';
+import { Checkbox } from '@/components/ui/checkbox';
 import ActionsList from '@/components/actions/ActionsList';
 
 const Sidebar: React.FC = () => {
@@ -42,7 +43,8 @@ const Sidebar: React.FC = () => {
     addList,
     updateList,
     deleteList,
-    tasks
+    tasks,
+    toggleTaskCompletion
   } = useTask();
   
   const { weeklyGoals, threeYearGoals } = useGoal();

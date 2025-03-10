@@ -1,4 +1,3 @@
-
 export type Priority = 'high' | 'medium' | 'low' | 'none';
 
 export interface List {
@@ -18,7 +17,7 @@ export interface Task {
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
-  weeklyGoalId?: string; // Reference to associated weekly goal
+  weeklyGoalId?: string;
 }
 
 export type GoalStatus = 'not_started' | 'in_progress' | 'completed' | 'abandoned';
@@ -30,7 +29,8 @@ export interface ThreeYearGoal {
   startDate: Date;
   endDate: Date;
   status: GoalStatus;
-  icon?: string; // New property for goal icon
+  icon?: string;
+  targets?: NinetyDayTarget[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -42,8 +42,8 @@ export interface NinetyDayTarget {
   startDate: Date;
   endDate: Date;
   status: GoalStatus;
-  threeYearGoalId: string; // Reference to parent goal
-  icon?: string; // New property for target icon
+  threeYearGoalId: string;
+  icon?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -55,8 +55,8 @@ export interface WeeklyGoal {
   startDate: Date;
   endDate: Date;
   status: GoalStatus;
-  ninetyDayTargetId: string; // Reference to parent target
-  icon?: string; // New property for weekly goal icon
+  ninetyDayTargetId: string;
+  icon?: string;
   createdAt: Date;
   updatedAt: Date;
 }
