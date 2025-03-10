@@ -8,20 +8,16 @@ interface TagProps {
   className?: string;
 }
 
-const Tag: React.FC<TagProps> = ({ text, color = '#8B5CF6', className }) => {
-  // Create a lighter version of the color for the background (20% opacity)
-  const bgColor = `${color}20`;
-  
+const Tag: React.FC<TagProps> = ({ text, color, className }) => {
   return (
-    <span
+    <span 
       className={cn(
-        "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
+        "inline-flex items-center text-xs font-medium px-1.5 py-0.5 rounded-full",
         className
       )}
       style={{ 
-        backgroundColor: bgColor,
-        color: color,
-        borderColor: `${color}40`, // 40% opacity border
+        backgroundColor: color ? `${color}20` : undefined, // 20 is hex for 12% opacity
+        color: color
       }}
     >
       {text}

@@ -1,6 +1,25 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Inbox, Mail, Package, MailOpen, Archive, ChevronDown, ChevronRight, MoreHorizontal, User, Briefcase, Target, Mail as MailIcon, Calendar, Clock, CalendarClock, Plus, Play } from 'lucide-react';
+import { 
+  Inbox, 
+  Mail, 
+  Package, 
+  MailOpen, 
+  Archive, 
+  ChevronDown, 
+  ChevronRight, 
+  MoreHorizontal, 
+  User, 
+  Briefcase, 
+  Target, 
+  Mail as MailIcon, 
+  Calendar, 
+  Clock, 
+  CalendarClock, 
+  Plus, 
+  Play,
+  ListChecks
+} from 'lucide-react';
 import { useTask } from '@/contexts/TaskContext';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -10,6 +29,7 @@ import { List } from '@/types/task';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useGoal } from '@/contexts/GoalContext';
+import ActionsList from '@/components/actions/ActionsList';
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
@@ -25,7 +45,7 @@ const Sidebar: React.FC = () => {
     tasks
   } = useTask();
   
-  const { weeklyGoals } = useGoal();
+  const { weeklyGoals, threeYearGoals } = useGoal();
   
   const [showCustomLists, setShowCustomLists] = useState(true);
   const [showGoals, setShowGoals] = useState(true);
@@ -33,6 +53,7 @@ const Sidebar: React.FC = () => {
   const [isAddListOpen, setIsAddListOpen] = useState(false);
   const [newListName, setNewListName] = useState('');
   const [editingList, setEditingList] = useState<List | null>(null);
+  const [actionsPopoverOpen, setActionsPopoverOpen] = useState(false);
 
   const getIconForList = (icon: string | undefined) => {
     switch (icon) {
@@ -86,6 +107,11 @@ const Sidebar: React.FC = () => {
 
   const activeWeeklyGoals = weeklyGoals.filter(goal => goal.status !== 'completed' && goal.status !== 'abandoned');
 
+  const actionTasksCount = tasks.filter(task => 
+    task.weeklyGoalId && 
+    !task.completed
+  ).length;
+
   return <aside className="w-60 border-r border-border h-[calc(100vh-4rem)] flex flex-col overflow-hidden bg-background">
       <div className="flex-1 overflow-y-auto py-2 px-2">
         <div className="mb-2 space-y-0.5">
@@ -120,6 +146,27 @@ const Sidebar: React.FC = () => {
                 <CalendarClock className="h-4 w-4 mr-2" />
                 <span>Planned</span>
               </Button>
+              
+              {/* New Actions Section */}
+              <Popover open={actionsPopoverOpen} onOpenChange={setActionsPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item group"
+                  >
+                    <ListChecks className="h-4 w-4 mr-2 text-blue-500" />
+                    <span className="font-medium mr-auto">Actions</span>
+                    {actionTasksCount > 0 && (
+                      <span className="text-[9px] bg-secondary rounded-full px-1 py-0.5 min-w-4 text-center">
+                        {actionTasksCount}
+                      </span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80 p-0" align="start" sideOffset={5}>
+                  <ActionsList />
+                </PopoverContent>
+              </Popover>
               
               <Popover>
                 <PopoverTrigger asChild>
@@ -196,6 +243,67 @@ const Sidebar: React.FC = () => {
                   <span>Plan</span>
                 </Button>
               </Link>
+              
+              {/* Goal-specific actions */}
+              {threeYearGoals.map(goal => {
+                // Find tasks related to this goal
+                const goalTasks = tasks.filter(task => {
+                  // Find associated weekly goal
+                  const weeklyGoal = goal.targets
+                    ?.flatMap(target => target.weeklyGoals || [])
+                    .find(wg => wg.id === task.weeklyGoalId);
+                  
+                  return weeklyGoal && !task.completed;
+                });
+                
+                if (goalTasks.length === 0) return null;
+                
+                return (
+                  <div key={goal.id} className="ml-4 mt-1">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          className="w-full justify-start h-6 px-2 py-0.5 text-[10px] sidebar-item"
+                        >
+                          <ListChecks className="h-3 w-3 mr-1.5 text-muted-foreground" />
+                          <span className="truncate">{goal.title}</span>
+                          <span className="ml-1 text-[8px] bg-secondary/70 rounded-full px-1 min-w-3 text-center">
+                            {goalTasks.length}
+                          </span>
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-60 p-0" align="start">
+                        <div className="bg-white rounded-md shadow-md border overflow-hidden">
+                          <div className="px-2 py-1.5 border-b bg-muted/30">
+                            <h3 className="text-xs font-medium truncate">{goal.title}</h3>
+                          </div>
+                          <div className="max-h-[200px] overflow-y-auto p-1">
+                            {goalTasks.map(task => (
+                              <div 
+                                key={task.id} 
+                                className="flex items-start p-1.5 hover:bg-accent/20 rounded-md cursor-pointer text-xs"
+                                onClick={() => navigate(`/goals?goalId=${goal.id}`)}
+                              >
+                                <Checkbox 
+                                  checked={task.completed}
+                                  className="mt-0.5 mr-2"
+                                  onCheckedChange={() => {
+                                    // Toggle task completion
+                                    toggleTaskCompletion(task.id);
+                                  }}
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <div>{task.title}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                );
+              })}
             </div>}
           
           <Link to="/calendar" className="block mt-2">
