@@ -114,6 +114,20 @@ const Sidebar: React.FC = () => {
     !task.completed
   ).length;
 
+  const goalsWithActions = threeYearGoals.filter(goal => {
+    // Find tasks related to this goal
+    const goalTasks = tasks.filter(task => {
+      // Find associated weekly goal
+      const weeklyGoal = goal.targets
+        ?.flatMap(target => target.weeklyGoals || [])
+        .find(wg => wg.id === task.weeklyGoalId);
+      
+      return weeklyGoal && !task.completed;
+    });
+    
+    return goalTasks.length > 0;
+  });
+
   return <aside className="w-60 border-r border-border h-[calc(100vh-4rem)] flex flex-col overflow-hidden bg-background">
       <div className="flex-1 overflow-y-auto py-2 px-2">
         <div className="mb-2 space-y-0.5">
@@ -247,7 +261,7 @@ const Sidebar: React.FC = () => {
               </Link>
               
               {/* Goal-specific actions */}
-              {threeYearGoals.map(goal => {
+              {goalsWithActions.map(goal => {
                 // Find tasks related to this goal
                 const goalTasks = tasks.filter(task => {
                   // Find associated weekly goal

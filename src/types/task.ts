@@ -1,3 +1,4 @@
+
 export type Priority = 'high' | 'medium' | 'low' | 'none';
 
 export interface List {
@@ -44,6 +45,7 @@ export interface NinetyDayTarget {
   status: GoalStatus;
   threeYearGoalId: string;
   icon?: string;
+  weeklyGoals?: WeeklyGoal[];
   createdAt: Date;
   updatedAt: Date;
 }
