@@ -183,55 +183,6 @@ const Sidebar: React.FC = () => {
                   <ActionsList />
                 </PopoverContent>
               </Popover>
-              
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    className="w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item group"
-                  >
-                    <Play className="h-4 w-4 mr-2 text-blue-500" />
-                    <span className="font-medium">Actions</span>
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-56 p-0" align="start">
-                  <div className="bg-white rounded-md shadow-md border overflow-hidden">
-                    <div className="px-2 py-1.5 border-b bg-muted/30">
-                      <h3 className="text-sm font-medium">Weekly Goals</h3>
-                    </div>
-                    <div className="max-h-[200px] overflow-y-auto">
-                      {activeWeeklyGoals.length > 0 ? (
-                        <div className="p-1">
-                          {activeWeeklyGoals.map(goal => (
-                            <div 
-                              key={goal.id} 
-                              className="px-2 py-1.5 text-xs hover:bg-accent/50 rounded cursor-pointer"
-                              onClick={() => navigate(`/weekly?goalId=${goal.id}`)}
-                            >
-                              {goal.title}
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="p-3 text-xs text-muted-foreground text-center">
-                          No active goals
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-1 border-t">
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="w-full justify-start text-xs"
-                        onClick={() => navigate('/weekly')}
-                      >
-                        <Plus className="h-3.5 w-3.5 mr-1" />
-                        Add New Action
-                      </Button>
-                    </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
             </div>}
           
           {/* Goals Section */}
