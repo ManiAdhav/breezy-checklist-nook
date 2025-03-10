@@ -162,27 +162,6 @@ const Sidebar: React.FC = () => {
                 <CalendarClock className="h-4 w-4 mr-2" />
                 <span>Planned</span>
               </Button>
-              
-              {/* New Actions Section */}
-              <Popover open={actionsPopoverOpen} onOpenChange={setActionsPopoverOpen}>
-                <PopoverTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    className="w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item group"
-                  >
-                    <ListChecks className="h-4 w-4 mr-2 text-blue-500" />
-                    <span className="font-medium mr-auto">Actions</span>
-                    {actionTasksCount > 0 && (
-                      <span className="text-[9px] bg-secondary rounded-full px-1 py-0.5 min-w-4 text-center">
-                        {actionTasksCount}
-                      </span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-80 p-0" align="start" sideOffset={5}>
-                  <ActionsList />
-                </PopoverContent>
-              </Popover>
             </div>}
           
           {/* Goals Section */}
@@ -210,6 +189,27 @@ const Sidebar: React.FC = () => {
                   <span>Plan</span>
                 </Button>
               </Link>
+              
+              {/* Actions section - moved below Goals */}
+              <Popover open={actionsPopoverOpen} onOpenChange={setActionsPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item group"
+                  >
+                    <ListChecks className="h-4 w-4 mr-2 text-blue-500" />
+                    <span className="font-medium mr-auto">Actions</span>
+                    {actionTasksCount > 0 && (
+                      <span className="text-[9px] bg-secondary rounded-full px-1 py-0.5 min-w-4 text-center">
+                        {actionTasksCount}
+                      </span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80 p-0" align="start" sideOffset={5}>
+                  <ActionsList />
+                </PopoverContent>
+              </Popover>
               
               {/* Goal-specific actions */}
               {goalsWithActions.map(goal => {
