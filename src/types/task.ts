@@ -19,6 +19,8 @@ export interface Task {
   createdAt: Date;
   updatedAt: Date;
   weeklyGoalId?: string;
+  isAction?: boolean; // New field to identify action items
+  startDate?: Date;  // New field specific to actions
 }
 
 export type GoalStatus = 'not_started' | 'in_progress' | 'completed' | 'abandoned';

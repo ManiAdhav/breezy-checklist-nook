@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle, Calendar, Clock, Filter, ListFilter } from 'lucide-react';
+import { CheckCircle, Calendar, Clock, Filter, ListFilter, Plus, Target, Flag, ListChecks, Repeat } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -10,23 +10,58 @@ import { Task, ThreeYearGoal } from '@/types/task';
 import { useTask } from '@/contexts/TaskContext';
 import { useGoal } from '@/contexts/GoalContext';
 import { format, isPast, isToday, isThisWeek, addDays } from 'date-fns';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogFooter, 
+  DialogHeader, 
+  DialogTitle 
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { 
+  Popover, 
+  PopoverContent, 
+  PopoverTrigger 
+} from '@/components/ui/popover';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { toast } from '@/hooks/use-toast';
 
 type FilterTimeframe = 'all' | 'today' | 'week' | 'overdue';
 type SortOption = 'goal' | 'dueDate' | 'priority';
 
 const ActionsList: React.FC = () => {
   const navigate = useNavigate();
-  const { tasks, toggleTaskCompletion } = useTask();
-  const { threeYearGoals } = useGoal();
+  const { tasks, toggleTaskCompletion, addTask } = useTask();
+  const { threeYearGoals, weeklyGoals, ninetyDayTargets } = useGoal();
   const [selectedGoalId, setSelectedGoalId] = useState<string | 'all'>('all');
   const [timeframeFilter, setTimeframeFilter] = useState<FilterTimeframe>('all');
   const [sortBy, setSortBy] = useState<SortOption>('goal');
   const [showFilters, setShowFilters] = useState(false);
+  
+  // New state for add action dialog
+  const [isAddActionOpen, setIsAddActionOpen] = useState(false);
+  const [newActionTitle, setNewActionTitle] = useState('');
+  const [selectedGoalForAction, setSelectedGoalForAction] = useState('');
+  const [selectedWeeklyGoalId, setSelectedWeeklyGoalId] = useState('');
+  const [actionStartDate, setActionStartDate] = useState<Date>(new Date());
+  const [actionEndDate, setActionEndDate] = useState<Date>(addDays(new Date(), 7));
+  const [selectedTab, setSelectedTab] = useState<string>('');
+  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
 
-  // Filter tasks with weeklyGoalId (connected to goals)
+  // Filter tasks that are actions (with weeklyGoalId and isAction flag)
+  const actionTasks = tasks.filter(task => 
+    task.weeklyGoalId && 
+    !task.completed &&
+    task.isAction
+  );
+
+  // Filter regular goal tasks (with weeklyGoalId but no isAction flag)
   const goalTasks = tasks.filter(task => 
     task.weeklyGoalId && 
-    !task.completed
+    !task.completed &&
+    !task.isAction
   );
 
   // Filter by selected goal
@@ -71,7 +106,7 @@ const ActionsList: React.FC = () => {
   };
 
   // Apply all filters
-  const filteredTasks = goalTasks
+  const filteredTasks = actionTasks
     .filter(filterByGoal)
     .filter(filterByTimeframe);
 
@@ -146,19 +181,92 @@ const ActionsList: React.FC = () => {
     }
   });
 
+  // Handle add action submit
+  const handleAddAction = () => {
+    if (!newActionTitle.trim()) {
+      toast({
+        title: "Error",
+        description: "Action title is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!selectedWeeklyGoalId) {
+      toast({
+        title: "Error",
+        description: "Please select a plan for this action",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const newAction: Omit<Task, 'id' | 'createdAt' | 'updatedAt'> = {
+      title: newActionTitle,
+      completed: false,
+      priority: 'medium',
+      listId: 'inbox',
+      weeklyGoalId: selectedWeeklyGoalId,
+      startDate: actionStartDate,
+      dueDate: actionEndDate,
+      isAction: true,
+    };
+
+    addTask(newAction);
+    
+    toast({
+      title: "Action added",
+      description: "Your new action has been added successfully",
+    });
+    
+    setNewActionTitle('');
+    setSelectedGoalForAction('');
+    setSelectedWeeklyGoalId('');
+    setActionStartDate(new Date());
+    setActionEndDate(addDays(new Date(), 7));
+    setIsAddActionOpen(false);
+  };
+
+  // Get all the weekly goals for a selected three year goal
+  const getWeeklyGoalsForGoal = (goalId: string) => {
+    const goal = threeYearGoals.find(g => g.id === goalId);
+    if (!goal) return [];
+    
+    return goal.targets?.flatMap(target => target.weeklyGoals || []) || [];
+  };
+
+  // Toggle task details expansion
+  const toggleTaskDetails = (taskId: string) => {
+    if (expandedTaskId === taskId) {
+      setExpandedTaskId(null);
+    } else {
+      setExpandedTaskId(taskId);
+    }
+  };
+
   return (
     <div className="space-y-2 p-2">
       {/* Filter controls */}
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-sm font-medium">Action Items</h3>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="h-7 w-7" 
-          onClick={() => setShowFilters(!showFilters)}
-        >
-          <Filter className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center space-x-1">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-7 w-7" 
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            <Filter className="h-4 w-4" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-7 w-7 text-primary" 
+            onClick={() => setIsAddActionOpen(true)}
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
       
       {showFilters && (
@@ -233,28 +341,71 @@ const ActionsList: React.FC = () => {
               <CollapsibleContent>
                 <div className="pl-2 space-y-1 mt-1">
                   {tasks.map(task => (
-                    <div 
-                      key={task.id} 
-                      className="flex items-start p-1.5 hover:bg-accent/20 rounded-md cursor-pointer text-xs"
-                      onClick={() => navigateToGoal(task)}
-                    >
-                      <Checkbox 
-                        checked={task.completed}
-                        className="mt-0.5 mr-2"
-                        onCheckedChange={() => toggleTaskCompletion(task.id)}
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                      
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium">{task.title}</div>
+                    <div key={task.id} className="rounded-md border mb-2">
+                      <div 
+                        className="flex items-start p-2 hover:bg-accent/20 rounded-md cursor-pointer text-xs"
+                        onClick={() => toggleTaskDetails(task.id)}
+                      >
+                        <Checkbox 
+                          checked={task.completed}
+                          className="mt-0.5 mr-2"
+                          onCheckedChange={() => toggleTaskCompletion(task.id)}
+                          onClick={(e) => e.stopPropagation()}
+                        />
                         
-                        {task.dueDate && (
-                          <div className="flex items-center text-muted-foreground mt-1">
-                            <Clock className="h-3 w-3 mr-1" />
-                            <span>{format(new Date(task.dueDate), 'MMM d')}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium">{task.title}</div>
+                          
+                          <div className="flex items-center gap-2 text-muted-foreground mt-1">
+                            {task.startDate && (
+                              <div className="flex items-center text-xs">
+                                <Calendar className="h-3 w-3 mr-1" />
+                                <span>{format(new Date(task.startDate), 'MMM d')} - {format(new Date(task.dueDate || task.startDate), 'MMM d')}</span>
+                              </div>
+                            )}
                           </div>
-                        )}
+                        </div>
                       </div>
+                      
+                      {expandedTaskId === task.id && (
+                        <div className="p-2 bg-muted/20 text-xs border-t">
+                          <Tabs defaultValue="milestones" value={selectedTab} onValueChange={setSelectedTab}>
+                            <TabsList className="w-full grid grid-cols-4 h-8">
+                              <TabsTrigger value="milestones" className="text-[10px]">Milestones</TabsTrigger>
+                              <TabsTrigger value="plans" className="text-[10px]">Plans</TabsTrigger>
+                              <TabsTrigger value="tasks" className="text-[10px]">Tasks</TabsTrigger>
+                              <TabsTrigger value="habits" className="text-[10px]">Habits</TabsTrigger>
+                            </TabsList>
+                            
+                            <TabsContent value="milestones" className="p-2">
+                              <p className="text-muted-foreground">Associated milestones will appear here.</p>
+                            </TabsContent>
+                            
+                            <TabsContent value="plans" className="p-2">
+                              <p className="text-muted-foreground">Associated plans will appear here.</p>
+                            </TabsContent>
+                            
+                            <TabsContent value="tasks" className="p-2">
+                              <p className="text-muted-foreground">Associated tasks will appear here.</p>
+                            </TabsContent>
+                            
+                            <TabsContent value="habits" className="p-2">
+                              <p className="text-muted-foreground">Associated habits will appear here.</p>
+                            </TabsContent>
+                          </Tabs>
+                          
+                          <div className="mt-2 flex justify-end">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="text-[10px] h-7"
+                              onClick={() => navigateToGoal(task)}
+                            >
+                              View in Goal
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -263,12 +414,127 @@ const ActionsList: React.FC = () => {
           ))
         ) : (
           <div className="text-center p-4 text-muted-foreground text-sm">
-            {goalTasks.length === 0 
-              ? "No action items found. Create tasks in your goals." 
+            {actionTasks.length === 0 
+              ? "No action items found. Create new actions with the + button." 
               : "No action items match your filters."}
           </div>
         )}
       </div>
+      
+      {/* Add Action Dialog */}
+      <Dialog open={isAddActionOpen} onOpenChange={setIsAddActionOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Add New Action</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="action-title">Action Name</Label>
+              <Input
+                id="action-title"
+                value={newActionTitle}
+                onChange={(e) => setNewActionTitle(e.target.value)}
+                placeholder="Enter action title"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="goal-select">Associated Goal</Label>
+              <Select 
+                value={selectedGoalForAction} 
+                onValueChange={(value) => {
+                  setSelectedGoalForAction(value);
+                  setSelectedWeeklyGoalId(''); // Reset weekly goal when goal changes
+                }}
+              >
+                <SelectTrigger id="goal-select">
+                  <SelectValue placeholder="Select a goal" />
+                </SelectTrigger>
+                <SelectContent>
+                  {threeYearGoals.map(goal => (
+                    <SelectItem key={goal.id} value={goal.id}>{goal.title}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {selectedGoalForAction && (
+              <div className="space-y-2">
+                <Label htmlFor="plan-select">Associated Plan</Label>
+                <Select 
+                  value={selectedWeeklyGoalId} 
+                  onValueChange={setSelectedWeeklyGoalId}
+                >
+                  <SelectTrigger id="plan-select">
+                    <SelectValue placeholder="Select a plan" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {getWeeklyGoalsForGoal(selectedGoalForAction).map(weeklyGoal => (
+                      <SelectItem key={weeklyGoal.id} value={weeklyGoal.id}>{weeklyGoal.title}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Start Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left"
+                    >
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {format(actionStartDate, 'PPP')}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={actionStartDate}
+                      onSelect={(date) => date && setActionStartDate(date)}
+                      initialFocus
+                      className="p-3 pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              
+              <div className="space-y-2">
+                <Label>End Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left"
+                    >
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {format(actionEndDate, 'PPP')}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={actionEndDate}
+                      onSelect={(date) => date && setActionEndDate(date)}
+                      initialFocus
+                      className="p-3 pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddActionOpen(false)}>Cancel</Button>
+            <Button onClick={handleAddAction}>Add Action</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

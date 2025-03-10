@@ -33,6 +33,7 @@ import MilestoneSection from './sections/MilestoneSection';
 import PlanSection from './sections/PlanSection';
 import TaskSection from './sections/TaskSection';
 import HabitSection from './sections/HabitSection';
+import ActionsSection from './sections/ActionsSection';
 import { toast } from '@/hooks/use-toast';
 import {
   Dialog,
@@ -68,6 +69,7 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
     plans: true,
     tasks: true,
     habits: false,
+    actions: true, // New section for actions
   });
 
   // Edit goal state
@@ -271,6 +273,32 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
         
         {/* Sections */}
         <div className="divide-y divide-border">
+          {/* Actions Section - New section */}
+          <Collapsible 
+            open={openSections.actions}
+            onOpenChange={() => toggleSection('actions')}
+            className="px-6 py-4 bg-background"
+          >
+            <CollapsibleTrigger className="flex w-full items-center justify-between p-2 hover:bg-muted/30 rounded-lg transition-colors group">
+              <div className="flex items-center">
+                <ListChecks className="h-5 w-5 mr-2 text-blue-500" />
+                <h3 className="font-medium">Actions</h3>
+              </div>
+              <div className="h-6 w-6 rounded-full flex items-center justify-center bg-muted/50 group-hover:bg-muted transition-colors">
+                {openSections.actions ? (
+                  <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                )}
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="pt-4">
+                <ActionsSection goalId={goal.id} />
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+          
           {/* Milestones Section */}
           <Collapsible 
             open={openSections.milestones}
@@ -454,6 +482,7 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
                       selected={editedStartDate}
                       onSelect={(date) => date && setEditedStartDate(date)}
                       initialFocus
+                      className="p-3 pointer-events-auto"
                     />
                   </PopoverContent>
                 </Popover>
@@ -478,6 +507,7 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
                       selected={editedEndDate}
                       onSelect={(date) => date && setEditedEndDate(date)}
                       initialFocus
+                      className="p-3 pointer-events-auto"
                     />
                   </PopoverContent>
                 </Popover>
