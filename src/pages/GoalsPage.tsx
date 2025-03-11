@@ -16,7 +16,9 @@ const GoalsPage: React.FC = () => {
             <Header />
             <div className="flex flex-1 overflow-hidden">
               <Sidebar />
-              <GoalList />
+              <main className="flex-1 overflow-y-auto">
+                <GoalList />
+              </main>
             </div>
           </div>
         </VisionProvider>

@@ -15,6 +15,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Calendar as CalendarIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface WeeklyGoalFormProps {
   isOpen: boolean;
@@ -38,6 +46,12 @@ const WeeklyGoalForm: React.FC<WeeklyGoalFormProps> = ({
   const [status, setStatus] = useState<GoalStatus>('not_started');
   const [ninetyDayTargetId, setNinetyDayTargetId] = useState('');
   
+  // States for controlling date popovers
+  const [startDateOpen, setStartDateOpen] = useState(false);
+  const [endDateOpen, setEndDateOpen] = useState(false);
+  const [startDate, setStartDate] = useState<Date>(currentWeekStart);
+  const [endDate, setEndDate] = useState<Date>(currentWeekEnd);
+  
   // Reset form when editingGoal changes
   useEffect(() => {
     if (editingGoal) {
@@ -45,13 +59,17 @@ const WeeklyGoalForm: React.FC<WeeklyGoalFormProps> = ({
       setDescription(editingGoal.description || '');
       setStatus(editingGoal.status);
       setNinetyDayTargetId(editingGoal.ninetyDayTargetId);
+      setStartDate(new Date(editingGoal.startDate));
+      setEndDate(new Date(editingGoal.endDate));
     } else {
       setTitle('');
       setDescription('');
       setStatus('not_started');
+      setStartDate(currentWeekStart);
+      setEndDate(currentWeekEnd);
       setNinetyDayTargetId(ninetyDayTargets.length > 0 ? ninetyDayTargets[0].id : '');
     }
-  }, [editingGoal, ninetyDayTargets]);
+  }, [editingGoal, ninetyDayTargets, currentWeekStart, currentWeekEnd]);
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,8 +78,8 @@ const WeeklyGoalForm: React.FC<WeeklyGoalFormProps> = ({
       title,
       description: description || undefined,
       status,
-      startDate: currentWeekStart,
-      endDate: currentWeekEnd,
+      startDate,
+      endDate,
       ninetyDayTargetId,
     };
     
@@ -144,10 +162,69 @@ const WeeklyGoalForm: React.FC<WeeklyGoalFormProps> = ({
             </Select>
           </div>
           
-          <div className="space-y-1">
-            <Label>Date Range</Label>
-            <div className="text-sm text-muted-foreground">
-              {format(currentWeekStart, 'MMM d, yyyy')} - {format(currentWeekEnd, 'MMM d, yyyy')}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label>Start Date</Label>
+              <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      'w-full justify-start text-left font-normal',
+                      !startDate && 'text-muted-foreground'
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {startDate ? format(startDate, 'PPP') : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={startDate}
+                    onSelect={(date) => {
+                      setStartDate(date);
+                      setStartDateOpen(false);
+                    }}
+                    disabled={date =>
+                      date > (endDate ? endDate : new Date('2100-01-01'))
+                    }
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            
+            <div>
+              <Label>End Date</Label>
+              <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      'w-full justify-start text-left font-normal',
+                      !endDate && 'text-muted-foreground'
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {endDate ? format(endDate, 'PPP') : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={endDate}
+                    onSelect={(date) => {
+                      setEndDate(date);
+                      setEndDateOpen(false);
+                    }}
+                    disabled={date =>
+                      date < (startDate ? startDate : new Date('1900-01-01'))
+                    }
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
           
