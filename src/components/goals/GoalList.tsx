@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useGoal } from '@/contexts/GoalContext';
 import GoalItem from './GoalItem';
-import GoalForm from './GoalForm';
+import MindMapGoalForm from '../mindmap/MindMapGoalForm';
 import GoalDetailView from './GoalDetailView';
 import { Button } from '@/components/ui/button';
 import { ThreeYearGoal } from '@/types/task';
@@ -104,7 +104,7 @@ const GoalList: React.FC = () => {
         )}
       </div>
       
-      <GoalForm 
+      <MindMapGoalForm 
         isOpen={isGoalFormOpen} 
         onClose={() => setIsGoalFormOpen(false)} 
         editingGoal={editingGoal}
