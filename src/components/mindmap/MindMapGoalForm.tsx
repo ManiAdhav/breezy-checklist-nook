@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useGoal } from '@/contexts/GoalContext';
 import { useVision } from '@/contexts/VisionContext';
@@ -122,7 +121,7 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({ isOpen, onClose, edit
     return iconOptions[randomIndex].value;
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!title.trim()) {
@@ -172,49 +171,68 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({ isOpen, onClose, edit
         description: "Your goal has been updated in the mind map"
       });
     } else {
-      const result = addThreeYearGoal(goalData);
-      if (result && result.id) {
-        goalId = result.id;
+      try {
+        const result = await addThreeYearGoal(goalData);
+        if (result && result.id) {
+          goalId = result.id;
+          toast({
+            title: "Goal created",
+            description: "Your new goal has been added to the mind map"
+          });
+        }
+      } catch (error) {
+        console.error("Error creating goal:", error);
+        toast({
+          title: "Error",
+          description: "Failed to create goal",
+          variant: "destructive",
+        });
+        return;
       }
-      toast({
-        title: "Goal created",
-        description: "Your new goal has been added to the mind map"
-      });
     }
     
     // Create a weekly goal for this 3-year goal if we have a valid goal ID
     if (goalId && validActions.length > 0) {
-      // Create a weekly goal to associate with the actions
-      const weeklyGoalData = {
-        title: `Weekly plan for ${title}`,
-        description: `Initial weekly plan for achieving ${title}`,
-        startDate: new Date(),
-        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
-        status: 'not_started' as GoalStatus,
-        ninetyDayTargetId: "", // This would normally be set to a real 90-day target
-        icon: "Target"
-      };
-      
-      const weeklyGoalResult = addWeeklyGoal(weeklyGoalData);
-      
-      if (weeklyGoalResult && weeklyGoalResult.id) {
-        // Now create tasks for each action
-        validActions.forEach(action => {
-          addTask({
-            title: action.text,
-            completed: false,
-            priority: 'medium',
-            listId: 'inbox',
-            weeklyGoalId: weeklyGoalResult.id,
-            startDate: new Date(),
-            dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
-            isAction: true,
-          });
-        });
+      try {
+        // Create a weekly goal to associate with the actions
+        const weeklyGoalData = {
+          title: `Weekly plan for ${title}`,
+          description: `Initial weekly plan for achieving ${title}`,
+          startDate: new Date(),
+          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
+          status: 'not_started' as GoalStatus,
+          ninetyDayTargetId: "", // This would normally be set to a real 90-day target
+          icon: "Target"
+        };
         
+        const weeklyGoalResult = await addWeeklyGoal(weeklyGoalData);
+        
+        if (weeklyGoalResult && weeklyGoalResult.id) {
+          // Now create tasks for each action
+          for (const action of validActions) {
+            await addTask({
+              title: action.text,
+              completed: false,
+              priority: 'medium',
+              listId: 'inbox',
+              weeklyGoalId: weeklyGoalResult.id,
+              startDate: new Date(),
+              dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
+              isAction: true,
+            });
+          }
+          
+          toast({
+            title: "Actions created",
+            description: `${validActions.length} action(s) have been added to your tasks`
+          });
+        }
+      } catch (error) {
+        console.error("Error creating weekly goal or actions:", error);
         toast({
-          title: "Actions created",
-          description: `${validActions.length} action(s) have been added to your tasks`
+          title: "Error",
+          description: "Failed to create actions",
+          variant: "destructive",
         });
       }
     }
