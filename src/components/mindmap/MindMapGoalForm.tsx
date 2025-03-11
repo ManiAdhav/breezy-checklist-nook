@@ -1,124 +1,129 @@
 import React, { useState, useEffect } from 'react';
 import { useGoal } from '@/contexts/GoalContext';
 import { useVision } from '@/contexts/VisionContext';
-import { useTask } from '@/contexts/TaskContext';
-import { ThreeYearGoal, GoalStatus, Vision } from '@/types/task';
+import { GoalStatus, Priority } from '@/types/task';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { ChevronDown, Calendar as CalendarIcon, Plus, X } from 'lucide-react';
 import { format } from 'date-fns';
-import { 
-  CalendarIcon, 
-  Target, 
-  Flag, 
-  Flame, 
-  Gift, 
-  Heart, 
-  Key, 
-  Layers, 
-  Lightbulb, 
-  Package, 
-  Rocket, 
-  Star, 
-  Plus,
-  X,
-  Trash
-} from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
 import { toast } from '@/hooks/use-toast';
-import { v4 as uuidv4 } from 'uuid';
+import { useTask } from '@/contexts/TaskContext';
+import { cn } from '@/lib/utils';
+
+type GoalType = 'threeYear' | 'ninetyDay';
 
 interface MindMapGoalFormProps {
   isOpen: boolean;
   onClose: () => void;
-  editingGoal: ThreeYearGoal | null;
+  initialGoalType?: GoalType;
+  initialGoalId?: string;
+  onSave?: () => void;
 }
 
-const iconOptions = [
-  { value: 'Target', icon: Target },
-  { value: 'Flag', icon: Flag },
-  { value: 'Flame', icon: Flame },
-  { value: 'Gift', icon: Gift },
-  { value: 'Heart', icon: Heart },
-  { value: 'Key', icon: Key },
-  { value: 'Layers', icon: Layers },
-  { value: 'Lightbulb', icon: Lightbulb },
-  { value: 'Package', icon: Package },
-  { value: 'Rocket', icon: Rocket },
-  { value: 'Star', icon: Star },
+export const iconOptions = [
+  { value: 'Target', label: 'Target' },
+  { value: 'Award', label: 'Award' },
+  { value: 'Briefcase', label: 'Briefcase' },
+  { value: 'GraduationCap', label: 'Education' },
+  { value: 'Heart', label: 'Heart' },
+  { value: 'Home', label: 'Home' },
+  { value: 'Plane', label: 'Travel' },
+  { value: 'Smartphone', label: 'Technology' },
+  { value: 'Wallet', label: 'Finance' },
+  { value: 'Smile', label: 'Lifestyle' },
+  { value: 'Users', label: 'Relationships' },
+  { value: 'Utensils', label: 'Food' },
+  { value: 'Dumbbell', label: 'Fitness' },
+  { value: 'BookOpen', label: 'Knowledge' },
 ];
 
-// Actions interface
-interface ActionItem {
-  id: string;
-  text: string;
-}
+export const statusOptions = [
+  { value: 'not_started', label: 'Not Started' },
+  { value: 'in_progress', label: 'In Progress' },
+  { value: 'completed', label: 'Completed' },
+  { value: 'abandoned', label: 'Abandoned' },
+];
 
-const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({ isOpen, onClose, editingGoal }) => {
-  const { addThreeYearGoal, updateThreeYearGoal, weeklyGoals, addWeeklyGoal } = useGoal();
-  const { visions, addVision } = useVision();
+const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
+  isOpen,
+  onClose,
+  initialGoalType = 'threeYear',
+  initialGoalId,
+  onSave,
+}) => {
+  const { addThreeYearGoal, updateThreeYearGoal, addNinetyDayTarget, updateNinetyDayTarget, addWeeklyGoal, } = useGoal();
+  const { visions } = useVision();
   const { addTask } = useTask();
   
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [startDate, setStartDate] = useState<Date>(new Date());
-  const [endDate, setEndDate] = useState<Date>(new Date(Date.now() + 3 * 365 * 24 * 60 * 60 * 1000)); // 3 years from now
-  const [status, setStatus] = useState<GoalStatus>('not_started');
-  const [selectedIcon, setSelectedIcon] = useState<string>('Target');
-  const [iconPopoverOpen, setIconPopoverOpen] = useState(false);
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [status, setStatus] = useState<string>('not_started');
+  const [icon, setIcon] = useState<string | undefined>(undefined);
+  const [threeYearGoalId, setThreeYearGoalId] = useState('');
+  const [actions, setActions] = useState([{ id: Date.now(), text: '' }]);
   
-  // Vision-related states
-  const [selectedVisionId, setSelectedVisionId] = useState<string>('');
-  const [newVisionName, setNewVisionName] = useState('');
-  const [isCreatingVision, setIsCreatingVision] = useState(false);
-  const [visionAreaOfLife, setVisionAreaOfLife] = useState('career');
-  
-  // Action items
-  const [actions, setActions] = useState<ActionItem[]>([
-    { id: uuidv4(), text: '' },
-    { id: uuidv4(), text: '' }
-  ]);
-  
-  // Reset form and pick random icon when dialog opens/closes or editing goal changes
   useEffect(() => {
-    if (isOpen) {
-      if (editingGoal) {
-        setTitle(editingGoal.title);
-        setDescription(editingGoal.description || '');
-        setStartDate(new Date(editingGoal.startDate));
-        setEndDate(new Date(editingGoal.endDate));
-        setStatus(editingGoal.status);
-        setSelectedIcon(editingGoal.icon || getRandomIcon());
-        
-        // Prefill with example actions if editing
-        setActions([
-          { id: uuidv4(), text: 'Research required skills' },
-          { id: uuidv4(), text: 'Create a timeline' }
-        ]);
-      } else {
-        setTitle('');
-        setDescription('');
-        setStartDate(new Date());
-        setEndDate(new Date(Date.now() + 3 * 365 * 24 * 60 * 60 * 1000));
-        setStatus('not_started');
-        setSelectedIcon(getRandomIcon());
-        setSelectedVisionId(visions.length > 0 ? visions[0].id : '');
-        setActions([
-          { id: uuidv4(), text: '' },
-          { id: uuidv4(), text: '' }
-        ]);
-      }
+    if (initialGoalId) {
+      // Fetch goal details based on initialGoalId and initialGoalType
+      // For simplicity, let's assume you have functions to fetch goal details
+      // and populate the form fields accordingly.
+      // Example:
+      // const goal = await fetchGoalDetails(initialGoalId, initialGoalType);
+      // setTitle(goal.title);
+      // setDescription(goal.description);
+      // ...
     }
-  }, [isOpen, editingGoal, visions]);
+  }, [initialGoalId, initialGoalType]);
   
   const getRandomIcon = () => {
-    const randomIndex = Math.floor(Math.random() * iconOptions.length);
-    return iconOptions[randomIndex].value;
+    const icons = iconOptions.map(opt => opt.value);
+    return icons[Math.floor(Math.random() * icons.length)];
+  };
+  
+  const addAction = () => {
+    setActions([...actions, { id: Date.now(), text: '' }]);
+  };
+  
+  const updateAction = (id: number, text: string) => {
+    setActions(actions.map(action => action.id === id ? { ...action, text } : action));
+  };
+  
+  const removeAction = (id: number) => {
+    setActions(actions.filter(action => action.id !== id));
+  };
+  
+  const resetForm = () => {
+    setTitle('');
+    setDescription('');
+    setStartDate(undefined);
+    setEndDate(undefined);
+    setStatus('not_started');
+    setIcon(undefined);
+    setActions([{ id: Date.now(), text: '' }]);
   };
   
   const handleSubmit = async (e: React.FormEvent) => {
@@ -133,47 +138,53 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({ isOpen, onClose, edit
       return;
     }
     
-    // Create new vision if needed
-    if (isCreatingVision && newVisionName.trim()) {
-      const newVision = {
-        title: newVisionName.trim(),
-        areaOfLife: visionAreaOfLife,
-        targetDate: endDate,
-        status: 'not_started' as GoalStatus
-      };
-      
-      addVision(newVision);
+    if (!startDate || !endDate) {
       toast({
-        title: "Vision created",
-        description: "New vision has been created and linked to your goal"
+        title: "Error",
+        description: "Start and end dates are required",
+        variant: "destructive",
       });
+      return;
     }
     
-    // Filter out empty actions
+    // Check if any actions are empty
     const validActions = actions.filter(action => action.text.trim() !== '');
     
+    let goalId: string | undefined;
+    
+    // Create the goal data
     const goalData = {
-      title: title.trim(),
-      description: description.trim() || undefined,
+      title,
+      description,
       startDate,
       endDate,
-      status,
-      icon: selectedIcon,
+      status: status as GoalStatus,
+      icon: icon || getRandomIcon(),
     };
     
-    let goalId = '';
-    
-    if (editingGoal) {
-      updateThreeYearGoal(editingGoal.id, goalData);
-      goalId = editingGoal.id;
+    // Update or create the goal
+    if (initialGoalId) {
+      // For an existing goal, update it
+      if (initialGoalType === 'threeYear') {
+        updateThreeYearGoal(initialGoalId, goalData);
+      } else {
+        updateNinetyDayTarget(initialGoalId, {
+          ...goalData,
+          threeYearGoalId,
+        });
+      }
+      
+      goalId = initialGoalId;
+      
       toast({
         title: "Goal updated",
         description: "Your goal has been updated in the mind map"
       });
     } else {
       try {
+        // For a new goal, create it
         const result = await addThreeYearGoal(goalData);
-        if (result && result.id) {
+        if (result) {
           goalId = result.id;
           toast({
             title: "Goal created",
@@ -207,7 +218,7 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({ isOpen, onClose, edit
         
         const weeklyGoalResult = await addWeeklyGoal(weeklyGoalData);
         
-        if (weeklyGoalResult && weeklyGoalResult.id) {
+        if (weeklyGoalResult) {
           // Now create tasks for each action
           for (const action of validActions) {
             await addTask({
@@ -237,187 +248,38 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({ isOpen, onClose, edit
       }
     }
     
-    onClose();
+    // Reset form and close
+    resetForm();
+    if (onSave) onSave();
   };
-  
-  const handleIconSelect = (iconValue: string) => {
-    setSelectedIcon(iconValue);
-    setIconPopoverOpen(false);
-  };
-  
-  const handleActionChange = (id: string, value: string) => {
-    setActions(prevActions => 
-      prevActions.map(action => 
-        action.id === id ? { ...action, text: value } : action
-      )
-    );
-    
-    // If the last action has some text, add a new empty action
-    const lastAction = actions[actions.length - 1];
-    if (lastAction && lastAction.id === id && value.trim() && actions.length < 5) {
-      setActions(prev => [...prev, { id: uuidv4(), text: '' }]);
-    }
-  };
-  
-  const handleRemoveAction = (id: string) => {
-    if (actions.length <= 2) {
-      toast({
-        title: "Cannot remove action",
-        description: "You need at least two actions for a goal",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    setActions(prevActions => prevActions.filter(action => action.id !== id));
-  };
-  
-  const statusOptions = [
-    { value: 'not_started', label: 'Not Started' },
-    { value: 'in_progress', label: 'In Progress' },
-    { value: 'completed', label: 'Completed' },
-    { value: 'abandoned', label: 'Abandoned' }
-  ];
-  
-  const areaOfLifeOptions = [
-    { value: 'career', label: 'Career' },
-    { value: 'health', label: 'Health & Wellness' },
-    { value: 'finance', label: 'Finance' },
-    { value: 'relationships', label: 'Relationships' },
-    { value: 'personal', label: 'Personal Growth' },
-    { value: 'recreation', label: 'Recreation' }
-  ];
-
-  // Get the icon component based on the selected icon value
-  const IconComponent = iconOptions.find(i => i.value === selectedIcon)?.icon || Target;
   
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[650px] animate-scale-in">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[625px]">
         <DialogHeader>
-          <DialogTitle className="flex items-center space-x-2">
-            <IconComponent className="h-5 w-5 text-primary" />
-            <span>{editingGoal ? 'Edit Goal' : 'Create Goal'}</span>
-          </DialogTitle>
+          <DialogTitle>{initialGoalId ? 'Edit Goal' : 'Add New Goal'}</DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <Popover open={iconPopoverOpen} onOpenChange={setIconPopoverOpen}>
-                <PopoverTrigger asChild>
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    size="icon" 
-                    className="flex-shrink-0"
-                    aria-label="Change icon"
-                  >
-                    <IconComponent className="h-5 w-5" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-64 p-3 pointer-events-auto" align="start">
-                  <div className="grid grid-cols-4 gap-2">
-                    {iconOptions.map((option) => {
-                      const Icon = option.icon;
-                      return (
-                        <Button
-                          key={option.value}
-                          type="button"
-                          variant={selectedIcon === option.value ? "default" : "outline"}
-                          size="icon"
-                          className={cn(
-                            "h-10 w-10",
-                            selectedIcon === option.value && "bg-primary text-primary-foreground"
-                          )}
-                          onClick={() => handleIconSelect(option.value)}
-                        >
-                          <Icon className="h-5 w-5" />
-                          <span className="sr-only">{option.value}</span>
-                        </Button>
-                      );
-                    })}
-                  </div>
-                </PopoverContent>
-              </Popover>
-            
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="goal-title">Goal Title</Label>
               <Input
-                placeholder="Goal name"
+                id="goal-title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="text-base font-medium flex-1"
-                autoFocus
+                placeholder="Enter goal title"
               />
             </div>
             
-            <Textarea
-              placeholder="Description (optional)"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="min-h-24 resize-none"
-            />
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Start Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start text-left font-normal"
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {format(startDate, 'PPP')}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={startDate}
-                      onSelect={(date) => date && setStartDate(date)}
-                      initialFocus
-                      className="pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              
-              <div className="space-y-2">
-                <Label>Target Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start text-left font-normal"
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {format(endDate, 'PPP')}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={endDate}
-                      onSelect={(date) => date && setEndDate(date)}
-                      initialFocus
-                      className="pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <Select
-                value={status}
-                onValueChange={(value) => setStatus(value as GoalStatus)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
+            <div>
+              <Label htmlFor="goal-status">Status</Label>
+              <Select value={status} onValueChange={setStatus}>
+                <SelectTrigger id="goal-status">
+                  <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent>
-                  {statusOptions.map((option) => (
+                  {statusOptions.map(option => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>
@@ -425,103 +287,129 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({ isOpen, onClose, edit
                 </SelectContent>
               </Select>
             </div>
-            
-            <div className="space-y-2">
-              <Label>Link to Vision</Label>
-              {!isCreatingVision ? (
-                <div className="flex items-center space-x-2">
-                  <Select
-                    value={selectedVisionId}
-                    onValueChange={setSelectedVisionId}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a vision" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {visions.map((vision) => (
-                        <SelectItem key={vision.id} value={vision.id}>
-                          {vision.title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Button 
-                    type="button"
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label>Start Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
                     variant="outline"
-                    onClick={() => setIsCreatingVision(true)}
+                    className={cn(
+                      'w-full justify-start text-left font-normal',
+                      !startDate && 'text-muted-foreground'
+                    )}
                   >
-                    <Plus className="h-4 w-4 mr-1" />
-                    New
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {startDate ? format(startDate, 'PPP') : <span>Pick a date</span>}
                   </Button>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <Input
-                    placeholder="Vision name"
-                    value={newVisionName}
-                    onChange={(e) => setNewVisionName(e.target.value)}
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={startDate}
+                    onSelect={setStartDate}
+                    disabled={date =>
+                      date > (endDate ? endDate : new Date('2100-01-01'))
+                    }
+                    initialFocus
                   />
-                  
-                  <div className="flex items-center space-x-2">
-                    <Select
-                      value={visionAreaOfLife}
-                      onValueChange={setVisionAreaOfLife}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Area of life" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {areaOfLifeOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    
-                    <Button 
-                      type="button"
-                      variant="ghost" 
-                      size="icon"
-                      onClick={() => setIsCreatingVision(false)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              )}
+                </PopoverContent>
+              </Popover>
             </div>
             
-            <div className="space-y-3">
-              <Label>Actions to Achieve This Goal</Label>
-              {actions.map((action, index) => (
-                <div key={action.id} className="flex items-center space-x-2">
-                  <Input
-                    placeholder={`Action ${index + 1}`}
-                    value={action.text}
-                    onChange={(e) => handleActionChange(action.id, e.target.value)}
+            <div>
+              <Label>End Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      'w-full justify-start text-left font-normal',
+                      !endDate && 'text-muted-foreground'
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {endDate ? format(endDate, 'PPP') : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={endDate}
+                    onSelect={setEndDate}
+                    disabled={date =>
+                      date < (startDate ? startDate : new Date('1900-01-01'))
+                    }
+                    initialFocus
                   />
-                  {index >= 2 && (
-                    <Button 
-                      type="button"
-                      variant="ghost" 
-                      size="icon"
-                      onClick={() => handleRemoveAction(action.id)}
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
           
-          <DialogFooter className="mt-6">
+          <div>
+            <Label htmlFor="goal-description">Description</Label>
+            <Textarea
+              id="goal-description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Enter goal description"
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="goal-icon">Icon</Label>
+            <Select value={icon} onValueChange={setIcon}>
+              <SelectTrigger id="goal-icon">
+                <SelectValue placeholder="Select an icon" />
+              </SelectTrigger>
+              <SelectContent>
+                {iconOptions.map(option => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div>
+            <Label>Actions</Label>
+            <div className="space-y-2">
+              {actions.map(action => (
+                <div key={action.id} className="flex items-center space-x-2">
+                  <Input
+                    type="text"
+                    value={action.text}
+                    onChange={(e) => updateAction(action.id, e.target.value)}
+                    placeholder="Enter action"
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeAction(action.id)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+              <Button type="button" variant="outline" size="sm" onClick={addAction}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Action
+              </Button>
+            </div>
+          </div>
+          
+          <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" className="bg-primary">
-              {editingGoal ? 'Save' : 'Create'}
+            <Button type="submit">
+              {initialGoalId ? 'Update Goal' : 'Create Goal'}
             </Button>
           </DialogFooter>
         </form>

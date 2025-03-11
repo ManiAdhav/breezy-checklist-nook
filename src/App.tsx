@@ -8,6 +8,7 @@ import WeeklyGoalsPage from './pages/WeeklyGoalsPage';
 import CalendarPage from './pages/CalendarPage';
 import VisionPage from './pages/VisionPage';
 import MindMapPage from './pages/MindMapPage';
+import ActionsPage from './pages/ActionsPage';
 import NotFound from './pages/NotFound';
 import { Toaster } from '@/components/ui/toaster';
 
@@ -22,6 +23,7 @@ function App() {
         <Route path="/weekly" element={<WeeklyGoalsPage />} />
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/mindmap" element={<MindMapPage />} />
+        <Route path="/actions" element={<ActionsPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster />

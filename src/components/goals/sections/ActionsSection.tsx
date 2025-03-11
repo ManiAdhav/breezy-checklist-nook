@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useTask } from '@/contexts/TaskContext';
 import { useGoal } from '@/contexts/GoalContext';
@@ -55,24 +56,39 @@ const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
   
   const goal = threeYearGoals.find(g => g.id === goalId);
   
+  // Improved filtering of actions for this goal
   const goalActions = tasks.filter(task => {
-    const weeklyGoalsForThisGoal = weeklyGoals.filter(wg => {
-      const targetForWeeklyGoal = ninetyDayTargets.find(
-        target => target.id === wg.ninetyDayTargetId
-      );
-      return targetForWeeklyGoal?.threeYearGoalId === goalId;
-    });
-    
-    const weeklyGoalIds = weeklyGoalsForThisGoal.map(wg => wg.id);
-    return task.isAction && weeklyGoalIds.includes(task.weeklyGoalId || '');
+    // If task has a weeklyGoalId
+    if (task.isAction && task.weeklyGoalId) {
+      // Find the associated weekly goal
+      const weeklyGoal = weeklyGoals.find(wg => wg.id === task.weeklyGoalId);
+      if (weeklyGoal) {
+        // Find the target associated with this weekly goal
+        const target = ninetyDayTargets.find(t => t.id === weeklyGoal.ninetyDayTargetId);
+        // Check if this target belongs to our goal
+        return target?.threeYearGoalId === goalId;
+      }
+    }
+    return false;
   });
   
   const getWeeklyGoalsForGoal = () => {
     if (!goal) return [];
-    return goal.targets?.flatMap(target => target.weeklyGoals || []) || [];
+    
+    // Get all targets for this goal
+    const targetsForGoal = ninetyDayTargets.filter(target => 
+      target.threeYearGoalId === goalId
+    );
+    
+    // Get all weekly goals for these targets
+    const weeklyGoalsForTargets = weeklyGoals.filter(weekly => 
+      targetsForGoal.some(target => target.id === weekly.ninetyDayTargetId)
+    );
+    
+    return weeklyGoalsForTargets;
   };
   
-  const handleAddAction = () => {
+  const handleAddAction = async () => {
     if (!newActionTitle.trim()) {
       toast({
         title: "Error",
@@ -102,14 +118,23 @@ const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
       isAction: true,
     };
 
-    addTask(newAction);
-    
-    toast({
-      title: "Action added",
-      description: "Your new action has been added successfully",
-    });
-    
-    resetForm();
+    try {
+      await addTask(newAction);
+      
+      toast({
+        title: "Action added",
+        description: "Your new action has been added successfully",
+      });
+      
+      resetForm();
+    } catch (error) {
+      console.error("Error adding action:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add action",
+        variant: "destructive",
+      });
+    }
   };
   
   const resetForm = () => {
