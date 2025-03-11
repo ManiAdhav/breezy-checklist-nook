@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
@@ -162,13 +163,6 @@ const Sidebar: React.FC = () => {
               </Button>
             </div>}
           
-          <Link to="/vision" className="block mt-2">
-            <Button variant="ghost" className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/vision' ? 'sidebar-item-active' : ''}`}>
-              <Lightbulb className="h-4 w-4 mr-2" />
-              <span>Vision</span>
-            </Button>
-          </Link>
-          
           <div className="flex items-center px-2 py-1 text-xs font-medium text-foreground cursor-pointer mt-2 hover:bg-accent/30 rounded-md" onClick={() => setShowGoals(!showGoals)}>
             {showGoals ? <ChevronDown className="h-3.5 w-3.5 mr-1" /> : <ChevronRight className="h-3.5 w-3.5 mr-1" />}
             <span>Goals</span>
@@ -191,6 +185,13 @@ const Sidebar: React.FC = () => {
                 <Button variant="ghost" className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/weekly' ? 'sidebar-item-active font-medium' : ''}`}>
                   <Calendar className="h-4 w-4 mr-2" />
                   <span>Plan</span>
+                </Button>
+              </Link>
+              
+              <Link to="/vision" className="block">
+                <Button variant="ghost" className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/vision' ? 'sidebar-item-active' : ''}`}>
+                  <Lightbulb className="h-4 w-4 mr-2" />
+                  <span>Vision</span>
                 </Button>
               </Link>
               
