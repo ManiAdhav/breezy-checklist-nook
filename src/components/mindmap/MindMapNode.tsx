@@ -7,6 +7,8 @@ import { useGoal } from '@/contexts/GoalContext';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
+import DynamicIcon from '@/components/ui/dynamic-icon';
+import { icons } from 'lucide-react';
 
 interface MindMapNodeProps {
   goal: ThreeYearGoal;
@@ -39,6 +41,11 @@ const MindMapNode: React.FC<MindMapNodeProps> = ({ goal, position, onEdit }) => 
     }
   };
   
+  // Ensure the icon is a valid keyof typeof icons
+  const iconName = (goal.icon && goal.icon in icons) 
+    ? (goal.icon as keyof typeof icons) 
+    : 'Target' as keyof typeof icons;
+  
   return (
     <div 
       className={cn(
@@ -54,7 +61,10 @@ const MindMapNode: React.FC<MindMapNodeProps> = ({ goal, position, onEdit }) => 
       onClick={onEdit}
     >
       <div className="flex items-start justify-between">
-        <h3 className="font-medium text-sm line-clamp-2">{goal.title}</h3>
+        <div className="flex items-center gap-2">
+          <DynamicIcon name={iconName} className="h-4 w-4 text-foreground/70" />
+          <h3 className="font-medium text-sm line-clamp-2">{goal.title}</h3>
+        </div>
         <div className="flex space-x-1 ml-1">
           <Button 
             variant="ghost" 

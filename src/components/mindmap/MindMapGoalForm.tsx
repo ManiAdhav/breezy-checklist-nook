@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useGoal } from '@/contexts/GoalContext';
 import { useVision } from '@/contexts/VisionContext';
@@ -33,6 +32,7 @@ import { toast } from '@/hooks/use-toast';
 import { useTask } from '@/contexts/TaskContext';
 import { cn } from '@/lib/utils';
 import DynamicIcon from '@/components/ui/dynamic-icon';
+import { icons } from 'lucide-react';
 
 type GoalType = 'threeYear' | 'ninetyDay';
 
@@ -46,20 +46,20 @@ interface MindMapGoalFormProps {
 }
 
 export const iconOptions = [
-  { value: 'Target', label: 'Target' },
-  { value: 'Award', label: 'Award' },
-  { value: 'Briefcase', label: 'Briefcase' },
-  { value: 'GraduationCap', label: 'Education' },
-  { value: 'Heart', label: 'Heart' },
-  { value: 'Home', label: 'Home' },
-  { value: 'Plane', label: 'Travel' },
-  { value: 'Smartphone', label: 'Technology' },
-  { value: 'Wallet', label: 'Finance' },
-  { value: 'Smile', label: 'Lifestyle' },
-  { value: 'Users', label: 'Relationships' },
-  { value: 'Utensils', label: 'Food' },
-  { value: 'Dumbbell', label: 'Fitness' },
-  { value: 'BookOpen', label: 'Knowledge' },
+  { value: 'Target' as keyof typeof icons, label: 'Target' },
+  { value: 'Award' as keyof typeof icons, label: 'Award' },
+  { value: 'Briefcase' as keyof typeof icons, label: 'Briefcase' },
+  { value: 'GraduationCap' as keyof typeof icons, label: 'Education' },
+  { value: 'Heart' as keyof typeof icons, label: 'Heart' },
+  { value: 'Home' as keyof typeof icons, label: 'Home' },
+  { value: 'Plane' as keyof typeof icons, label: 'Travel' },
+  { value: 'Smartphone' as keyof typeof icons, label: 'Technology' },
+  { value: 'Wallet' as keyof typeof icons, label: 'Finance' },
+  { value: 'Smile' as keyof typeof icons, label: 'Lifestyle' },
+  { value: 'Users' as keyof typeof icons, label: 'Relationships' },
+  { value: 'Utensils' as keyof typeof icons, label: 'Food' },
+  { value: 'Dumbbell' as keyof typeof icons, label: 'Fitness' },
+  { value: 'BookOpen' as keyof typeof icons, label: 'Knowledge' },
 ];
 
 export const statusOptions = [
@@ -86,7 +86,7 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
   const [startDate, setStartDate] = useState<Date | undefined>(new Date());
   const [endDate, setEndDate] = useState<Date | undefined>(new Date(Date.now() + 90 * 24 * 60 * 60 * 1000));
   const [status, setStatus] = useState<string>('not_started');
-  const [icon, setIcon] = useState<string | undefined>('Target');
+  const [icon, setIcon] = useState<keyof typeof icons>('Target');
   const [threeYearGoalId, setThreeYearGoalId] = useState('');
   const [actions, setActions] = useState([{ id: Date.now(), text: '' }]);
   
@@ -101,7 +101,12 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
       setStartDate(new Date(editingGoal.startDate));
       setEndDate(new Date(editingGoal.endDate));
       setStatus(editingGoal.status);
-      setIcon(editingGoal.icon);
+      // Make sure the icon is valid
+      if (editingGoal.icon && editingGoal.icon in icons) {
+        setIcon(editingGoal.icon as keyof typeof icons);
+      } else {
+        setIcon('Target');
+      }
     } else if (initialGoalId) {
       // Fetch goal details based on initialGoalId and initialGoalType
       // For simplicity, let's assume you have functions to fetch goal details
@@ -116,9 +121,9 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
     }
   }, [editingGoal, initialGoalId]);
   
-  const getRandomIcon = () => {
-    const icons = iconOptions.map(opt => opt.value);
-    return icons[Math.floor(Math.random() * icons.length)];
+  const getRandomIcon = (): keyof typeof icons => {
+    const iconsArray = iconOptions.map(opt => opt.value);
+    return iconsArray[Math.floor(Math.random() * iconsArray.length)];
   };
   
   const addAction = () => {
@@ -176,12 +181,11 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
       startDate,
       endDate,
       status: status as GoalStatus,
-      icon: icon || getRandomIcon(),
+      icon,
     };
     
     // Update or create the goal
     if (editingGoal) {
-      // If we have an editingGoal, use its id
       updateThreeYearGoal(editingGoal.id, goalData);
       goalId = editingGoal.id;
       
@@ -190,7 +194,6 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
         description: "Your goal has been updated in the mind map"
       });
     } else if (initialGoalId) {
-      // For an existing goal identified by ID, update it
       if (initialGoalType === 'threeYear') {
         updateThreeYearGoal(initialGoalId, goalData);
       } else {
@@ -208,7 +211,6 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
       });
     } else {
       try {
-        // For a new goal, create it
         const result = await addThreeYearGoal(goalData);
         goalId = (await result).id;
         toast({
@@ -237,7 +239,7 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
           endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
           status: 'not_started' as GoalStatus,
           ninetyDayTargetId: "", // This would normally be set to a real 90-day target
-          icon: "Target"
+          icon: "Target" as keyof typeof icons
         };
         
         const weeklyGoalResult = await addWeeklyGoal(weeklyGoalData);
@@ -296,7 +298,7 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
                     size="icon" 
                     className="h-10 w-10 rounded-md"
                   >
-                    <DynamicIcon name={icon || 'Target'} className="h-5 w-5" />
+                    <DynamicIcon name={icon} className="h-5 w-5" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-60 p-2">
