@@ -18,7 +18,7 @@ const Header: React.FC = () => {
     <header className="h-16 border-b border-border flex items-center px-6 bg-background/95 backdrop-blur-sm sticky top-0 z-10 justify-between">
       <div className="flex items-center">
         <h1 className="text-xl font-medium tracking-tight mr-8">
-          TodoApp
+          Catalyst
         </h1>
         
         <div 
