@@ -1,154 +1,246 @@
 
-import React, { useState } from 'react';
-import { useTask } from '@/contexts/TaskContext';
+import React, { useState, useEffect } from 'react';
 import { useGoal } from '@/contexts/GoalContext';
-import { 
-  Calendar,
-  ChevronDown,
-  ChevronRight,
-  ListChecks
-} from 'lucide-react';
+import { useTask } from '@/contexts/TaskContext';
+import { Plus, Calendar, Target } from 'lucide-react';
 import { format } from 'date-fns';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import ActionsList from '@/components/actions/ActionsList';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Task } from '@/types/task';
+import { toast } from '@/hooks/use-toast';
 
 const ActionsView: React.FC = () => {
-  const { tasks, toggleTaskCompletion } = useTask();
-  const { threeYearGoals, weeklyGoals, ninetyDayTargets } = useGoal();
-  const [expandedGoalId, setExpandedGoalId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<string>("actions");
-  const navigate = useNavigate();
-
-  // Get all actions
-  const actionTasks = tasks.filter(task => task.isAction);
-
-  // Group actions by goal
-  const getGoalForAction = (task: typeof actionTasks[0]) => {
-    if (!task.weeklyGoalId) return null;
-    
-    const weeklyGoal = weeklyGoals.find(wg => wg.id === task.weeklyGoalId);
-    if (!weeklyGoal) return null;
-    
-    const target = ninetyDayTargets.find(t => t.id === weeklyGoal.ninetyDayTargetId);
-    if (!target) return null;
-    
-    return threeYearGoals.find(g => g.id === target.threeYearGoalId);
-  };
-
-  // Group tasks by goal
-  const tasksByGoal = actionTasks.reduce((groups, task) => {
-    const goal = getGoalForAction(task);
-    if (!goal) return groups;
-    
-    if (!groups[goal.id]) {
-      groups[goal.id] = {
-        goal,
-        tasks: []
-      };
+  const { threeYearGoals } = useGoal();
+  const { tasks, addTask, toggleTaskCompletion } = useTask();
+  
+  const [isAddActionOpen, setIsAddActionOpen] = useState(false);
+  const [newActionTitle, setNewActionTitle] = useState('');
+  const [selectedGoalId, setSelectedGoalId] = useState('');
+  const [actionStartDate, setActionStartDate] = useState<Date>(new Date());
+  const [actionEndDate, setActionEndDate] = useState<Date>(new Date());
+  
+  // Filter tasks that are actions
+  const actions = tasks.filter(task => task.isAction);
+  
+  const handleAddAction = async () => {
+    if (!newActionTitle.trim()) {
+      toast({
+        title: "Error",
+        description: "Action title is required",
+        variant: "destructive",
+      });
+      return;
     }
-    
-    groups[goal.id].tasks.push(task);
-    return groups;
-  }, {} as Record<string, { goal: (typeof threeYearGoals)[0], tasks: typeof actionTasks }>);
 
-  const toggleGoalExpansion = (goalId: string) => {
-    setExpandedGoalId(expandedGoalId === goalId ? null : goalId);
-  };
+    if (!selectedGoalId) {
+      toast({
+        title: "Error",
+        description: "Please select a goal for this action",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  return (
-    <div className="p-4">
-      <h2 className="text-xl font-semibold mb-4 flex items-center">
-        <ListChecks className="mr-2 h-5 w-5 text-blue-500" />
-        All Actions
-      </h2>
+    const newAction: Omit<Task, 'id' | 'createdAt' | 'updatedAt'> = {
+      title: newActionTitle,
+      completed: false,
+      priority: 'medium',
+      listId: 'inbox',
+      startDate: actionStartDate,
+      dueDate: actionEndDate,
+      isAction: true,
+    };
+
+    try {
+      await addTask(newAction);
       
-      <Tabs 
-        defaultValue="actions" 
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="mt-4"
-      >
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="actions">Actions</TabsTrigger>
-          <TabsTrigger value="plans">Plans</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="actions" className="mt-4">
-          {Object.keys(tasksByGoal).length > 0 ? (
-            <div className="space-y-4">
-              {Object.values(tasksByGoal).map(({ goal, tasks }) => (
-                <div key={goal.id} className="border rounded-lg overflow-hidden bg-card">
-                  <div 
-                    className="flex items-center justify-between p-3 cursor-pointer hover:bg-muted/40"
-                    onClick={() => toggleGoalExpansion(goal.id)}
-                  >
+      toast({
+        title: "Action added",
+        description: "Your new action has been added successfully",
+      });
+      
+      resetForm();
+    } catch (error) {
+      console.error("Error adding action:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add action",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  const resetForm = () => {
+    setNewActionTitle('');
+    setSelectedGoalId('');
+    setActionStartDate(new Date());
+    setActionEndDate(new Date());
+    setIsAddActionOpen(false);
+  };
+  
+  return (
+    <div className="container max-w-5xl mx-auto py-6 px-4">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Actions</h1>
+        <Button 
+          onClick={() => setIsAddActionOpen(true)}
+          variant="action"
+          className="flex items-center gap-2"
+        >
+          <Plus className="h-4 w-4" />
+          Create Action
+        </Button>
+      </div>
+      
+      <div className="grid gap-4">
+        {actions.length > 0 ? (
+          actions.map(action => (
+            <div 
+              key={action.id} 
+              className="flex items-start p-4 rounded-lg border shadow-sm hover:shadow-md transition-shadow"
+            >
+              <Checkbox 
+                checked={action.completed}
+                className="mt-1 mr-3"
+                onCheckedChange={() => toggleTaskCompletion(action.id)}
+              />
+              
+              <div className="flex-1">
+                <h3 className="font-medium text-lg">{action.title}</h3>
+                
+                <div className="flex items-center gap-3 text-sm text-muted-foreground mt-2">
+                  {action.startDate && action.dueDate && (
                     <div className="flex items-center">
-                      {expandedGoalId === goal.id ? 
-                        <ChevronDown className="h-4 w-4 mr-2" /> : 
-                        <ChevronRight className="h-4 w-4 mr-2" />
-                      }
-                      <span className="font-medium">{goal.title}</span>
+                      <Calendar className="h-4 w-4 mr-1.5" />
+                      <span>
+                        {format(new Date(action.startDate), 'MMM d')} - {format(new Date(action.dueDate), 'MMM d, yyyy')}
+                      </span>
                     </div>
-                    <Badge variant="outline">
-                      {tasks.filter(t => !t.completed).length} active
-                    </Badge>
-                  </div>
+                  )}
                   
-                  {expandedGoalId === goal.id && (
-                    <div className="divide-y">
-                      {tasks.map(task => (
-                        <div key={task.id} className="p-3 hover:bg-muted/20 flex items-start gap-3">
-                          <Checkbox 
-                            checked={task.completed}
-                            onCheckedChange={() => toggleTaskCompletion(task.id)}
-                            className="mt-1"
-                          />
-                          
-                          <div className="flex-1">
-                            <div className={`${task.completed ? 'line-through text-muted-foreground' : ''}`}>
-                              {task.title}
-                            </div>
-                            
-                            {task.dueDate && (
-                              <div className="text-xs text-muted-foreground mt-1 flex items-center">
-                                <Calendar className="h-3 w-3 mr-1" />
-                                <span>Due {format(new Date(task.dueDate), 'MMM d, yyyy')}</span>
-                              </div>
-                            )}
-                          </div>
-                          
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="text-xs"
-                            onClick={() => navigate(`/goals?goalId=${goal.id}`)}
-                          >
-                            View Goal
-                          </Button>
-                        </div>
-                      ))}
+                  {action.weeklyGoalId && (
+                    <div className="flex items-center">
+                      <Target className="h-4 w-4 mr-1.5" />
+                      <span>
+                        {/* Display associated goal name here */}
+                      </span>
                     </div>
                   )}
                 </div>
-              ))}
+              </div>
             </div>
-          ) : (
-            <div className="text-center p-8 text-muted-foreground border rounded-lg">
-              <ListChecks className="h-12 w-12 mx-auto mb-3 opacity-50" />
-              <h3 className="text-lg font-medium mb-1">No actions found</h3>
-              <p className="text-sm">Create actions for your goals to track your progress.</p>
+          ))
+        ) : (
+          <div className="text-center py-12 border rounded-lg bg-muted/10">
+            <h3 className="font-medium mb-2">No actions yet</h3>
+            <p className="text-muted-foreground mb-4">Create your first action to track progress on your goals</p>
+            <Button 
+              onClick={() => setIsAddActionOpen(true)}
+              variant="outline"
+              className="mt-2"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Create Action
+            </Button>
+          </div>
+        )}
+      </div>
+      
+      <Dialog open={isAddActionOpen} onOpenChange={setIsAddActionOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Create New Action</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="action-title">Action Name</Label>
+              <Input
+                id="action-title"
+                value={newActionTitle}
+                onChange={(e) => setNewActionTitle(e.target.value)}
+                placeholder="Enter action title"
+              />
             </div>
-          )}
-        </TabsContent>
-        
-        <TabsContent value="plans" className="mt-4">
-          <ActionsList />
-        </TabsContent>
-      </Tabs>
+            
+            <div className="space-y-2">
+              <Label htmlFor="goal-select">Map to Goal</Label>
+              <Select 
+                value={selectedGoalId} 
+                onValueChange={setSelectedGoalId}
+              >
+                <SelectTrigger id="goal-select">
+                  <SelectValue placeholder="Select a goal" />
+                </SelectTrigger>
+                <SelectContent>
+                  {threeYearGoals.map(goal => (
+                    <SelectItem key={goal.id} value={goal.id}>{goal.title}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Start Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left"
+                    >
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {format(actionStartDate, 'PPP')}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={actionStartDate}
+                      onSelect={(date) => date && setActionStartDate(date)}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              
+              <div className="space-y-2">
+                <Label>End Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left"
+                    >
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {format(actionEndDate, 'PPP')}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={actionEndDate}
+                      onSelect={(date) => date && setActionEndDate(date)}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddActionOpen(false)}>Cancel</Button>
+            <Button onClick={handleAddAction}>Create Action</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

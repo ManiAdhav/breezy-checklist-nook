@@ -111,7 +111,7 @@ const Sidebar: React.FC = () => {
   const activeWeeklyGoals = weeklyGoals.filter(goal => goal.status !== 'completed' && goal.status !== 'abandoned');
 
   const actionTasksCount = tasks.filter(task => 
-    task.weeklyGoalId && 
+    task.isAction && 
     !task.completed
   ).length;
 
@@ -194,19 +194,29 @@ const Sidebar: React.FC = () => {
                 </Button>
               </Link>
               
+              <Link to="/actions" className="block">
+                <Button 
+                  variant="ghost" 
+                  className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/actions' ? 'sidebar-item-active' : ''}`}
+                >
+                  <ListChecks className="h-4 w-4 mr-2 text-blue-500" />
+                  <span className="font-medium mr-auto">Actions</span>
+                  {actionTasksCount > 0 && (
+                    <span className="text-[9px] bg-secondary rounded-full px-1 py-0.5 min-w-4 text-center">
+                      {actionTasksCount}
+                    </span>
+                  )}
+                </Button>
+              </Link>
+              
               <Popover open={actionsPopoverOpen} onOpenChange={setActionsPopoverOpen}>
                 <PopoverTrigger asChild>
                   <Button 
                     variant="ghost" 
-                    className="w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item group"
+                    className="w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item group ml-4"
                   >
-                    <ListChecks className="h-4 w-4 mr-2 text-blue-500" />
-                    <span className="font-medium mr-auto">Actions</span>
-                    {actionTasksCount > 0 && (
-                      <span className="text-[9px] bg-secondary rounded-full px-1 py-0.5 min-w-4 text-center">
-                        {actionTasksCount}
-                      </span>
-                    )}
+                    <ListChecks className="h-3 w-3 mr-1.5 text-muted-foreground" />
+                    <span className="text-[10px]">Quick Actions</span>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-80 p-0" align="start" sideOffset={5}>
