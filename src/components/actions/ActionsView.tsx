@@ -13,11 +13,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const ActionsView: React.FC = () => {
   const { tasks, toggleTaskCompletion } = useTask();
   const { threeYearGoals, weeklyGoals, ninetyDayTargets } = useGoal();
   const [expandedGoalId, setExpandedGoalId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("actions");
   const navigate = useNavigate();
 
   // Get all actions
@@ -63,71 +65,92 @@ const ActionsView: React.FC = () => {
         All Actions
       </h2>
       
-      {Object.keys(tasksByGoal).length > 0 ? (
-        <div className="space-y-4">
-          {Object.values(tasksByGoal).map(({ goal, tasks }) => (
-            <div key={goal.id} className="border rounded-lg overflow-hidden bg-card">
-              <div 
-                className="flex items-center justify-between p-3 cursor-pointer hover:bg-muted/40"
-                onClick={() => toggleGoalExpansion(goal.id)}
-              >
-                <div className="flex items-center">
-                  {expandedGoalId === goal.id ? 
-                    <ChevronDown className="h-4 w-4 mr-2" /> : 
-                    <ChevronRight className="h-4 w-4 mr-2" />
-                  }
-                  <span className="font-medium">{goal.title}</span>
-                </div>
-                <Badge variant="outline">
-                  {tasks.filter(t => !t.completed).length} active
-                </Badge>
-              </div>
-              
-              {expandedGoalId === goal.id && (
-                <div className="divide-y">
-                  {tasks.map(task => (
-                    <div key={task.id} className="p-3 hover:bg-muted/20 flex items-start gap-3">
-                      <Checkbox 
-                        checked={task.completed}
-                        onCheckedChange={() => toggleTaskCompletion(task.id)}
-                        className="mt-1"
-                      />
-                      
-                      <div className="flex-1">
-                        <div className={`${task.completed ? 'line-through text-muted-foreground' : ''}`}>
-                          {task.title}
-                        </div>
-                        
-                        {task.dueDate && (
-                          <div className="text-xs text-muted-foreground mt-1 flex items-center">
-                            <Calendar className="h-3 w-3 mr-1" />
-                            <span>Due {format(new Date(task.dueDate), 'MMM d, yyyy')}</span>
-                          </div>
-                        )}
-                      </div>
-                      
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-xs"
-                        onClick={() => navigate(`/goals?goalId=${goal.id}`)}
-                      >
-                        View Goal
-                      </Button>
+      <Tabs 
+        defaultValue="actions" 
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="mt-4"
+      >
+        <TabsList>
+          <TabsTrigger value="actions">Actions</TabsTrigger>
+          <TabsTrigger value="plans">Plans</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="actions" className="mt-4">
+          {Object.keys(tasksByGoal).length > 0 ? (
+            <div className="space-y-4">
+              {Object.values(tasksByGoal).map(({ goal, tasks }) => (
+                <div key={goal.id} className="border rounded-lg overflow-hidden bg-card">
+                  <div 
+                    className="flex items-center justify-between p-3 cursor-pointer hover:bg-muted/40"
+                    onClick={() => toggleGoalExpansion(goal.id)}
+                  >
+                    <div className="flex items-center">
+                      {expandedGoalId === goal.id ? 
+                        <ChevronDown className="h-4 w-4 mr-2" /> : 
+                        <ChevronRight className="h-4 w-4 mr-2" />
+                      }
+                      <span className="font-medium">{goal.title}</span>
                     </div>
-                  ))}
+                    <Badge variant="outline">
+                      {tasks.filter(t => !t.completed).length} active
+                    </Badge>
+                  </div>
+                  
+                  {expandedGoalId === goal.id && (
+                    <div className="divide-y">
+                      {tasks.map(task => (
+                        <div key={task.id} className="p-3 hover:bg-muted/20 flex items-start gap-3">
+                          <Checkbox 
+                            checked={task.completed}
+                            onCheckedChange={() => toggleTaskCompletion(task.id)}
+                            className="mt-1"
+                          />
+                          
+                          <div className="flex-1">
+                            <div className={`${task.completed ? 'line-through text-muted-foreground' : ''}`}>
+                              {task.title}
+                            </div>
+                            
+                            {task.dueDate && (
+                              <div className="text-xs text-muted-foreground mt-1 flex items-center">
+                                <Calendar className="h-3 w-3 mr-1" />
+                                <span>Due {format(new Date(task.dueDate), 'MMM d, yyyy')}</span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-xs"
+                            onClick={() => navigate(`/goals?goalId=${goal.id}`)}
+                          >
+                            View Goal
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
+              ))}
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center p-8 text-muted-foreground border rounded-lg">
-          <ListChecks className="h-12 w-12 mx-auto mb-3 opacity-50" />
-          <h3 className="text-lg font-medium mb-1">No actions found</h3>
-          <p className="text-sm">Create actions for your goals to track your progress.</p>
-        </div>
-      )}
+          ) : (
+            <div className="text-center p-8 text-muted-foreground border rounded-lg">
+              <ListChecks className="h-12 w-12 mx-auto mb-3 opacity-50" />
+              <h3 className="text-lg font-medium mb-1">No actions found</h3>
+              <p className="text-sm">Create actions for your goals to track your progress.</p>
+            </div>
+          )}
+        </TabsContent>
+        
+        <TabsContent value="plans" className="mt-4">
+          <div className="text-center p-8 text-muted-foreground border rounded-lg">
+            <h3 className="text-lg font-medium mb-1">Plans View</h3>
+            <p className="text-sm">Create plans for achieving your goals.</p>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
