@@ -193,7 +193,7 @@ const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
                   <div className="flex items-center gap-2 text-muted-foreground mt-1">
                     {action.startDate && action.dueDate && (
                       <div className="flex items-center text-xs">
-                        <Calendar className="h-3 w-3 mr-1" />
+                        <Calendar className="h-3.5 w-3.5 mr-1" />
                         <span>
                           {format(new Date(action.startDate), 'MMM d')} - {format(new Date(action.dueDate), 'MMM d')}
                         </span>

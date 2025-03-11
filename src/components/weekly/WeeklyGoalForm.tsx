@@ -98,7 +98,7 @@ const WeeklyGoalForm: React.FC<WeeklyGoalFormProps> = ({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>
-            {editingGoal ? 'Edit Weekly Goal' : 'Add Weekly Goal'}
+            {editingGoal ? 'Edit Plan' : 'Add Plan'}
           </DialogTitle>
         </DialogHeader>
         
@@ -118,7 +118,7 @@ const WeeklyGoalForm: React.FC<WeeklyGoalFormProps> = ({
               <Input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Weekly goal title"
+                placeholder="Plan title"
                 className="text-lg"
                 required
               />
@@ -131,7 +131,7 @@ const WeeklyGoalForm: React.FC<WeeklyGoalFormProps> = ({
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter goal description"
+              placeholder="Enter plan description"
               rows={3}
             />
           </div>
@@ -249,7 +249,7 @@ const WeeklyGoalForm: React.FC<WeeklyGoalFormProps> = ({
               Cancel
             </Button>
             <Button type="submit">
-              {editingGoal ? 'Update Goal' : 'Add Goal'}
+              {editingGoal ? 'Update Plan' : 'Add Plan'}
             </Button>
           </DialogFooter>
         </form>

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useGoal } from '@/contexts/GoalContext';
 import WeeklyGoalItem from './WeeklyGoalItem';
@@ -51,7 +52,7 @@ const WeeklyGoalList: React.FC = () => {
     // Create suggested goals
     const newSuggestions = activeTargets.map(target => ({
       title: `Work on: ${target.title}`,
-      description: `Weekly goal derived from 90-day target: ${target.title}`,
+      description: `Weekly plan derived from 90-day target: ${target.title}`,
       startDate: currentWeekStart,
       endDate: currentWeekEnd,
       status: 'not_started' as const,
@@ -83,9 +84,9 @@ const WeeklyGoalList: React.FC = () => {
     <div className="flex-1 flex flex-col h-full overflow-hidden">
       <div className="py-4 px-6 flex justify-between items-center border-b border-border sticky top-0 bg-background z-10">
         <div>
-          <h2 className="text-2xl font-semibold">Weekly Goals</h2>
+          <h2 className="text-2xl font-semibold">Plans</h2>
           <p className="text-sm text-muted-foreground mt-1">
-            {currentWeekGoals.length} goals this week
+            {currentWeekGoals.length} plans this week
           </p>
         </div>
         
@@ -96,7 +97,7 @@ const WeeklyGoalList: React.FC = () => {
             disabled={ninetyDayTargets.length === 0}
           >
             <Plus className="h-4 w-4 mr-1" />
-            <span>Add Goal</span>
+            <span>Add Plan</span>
           </Button>
         </div>
       </div>
@@ -141,7 +142,7 @@ const WeeklyGoalList: React.FC = () => {
             </div>
             <h3 className="text-xl font-medium">No 90-day targets yet</h3>
             <p className="text-muted-foreground mt-2 max-w-sm">
-              You need to create 90-day targets before you can plan weekly goals.
+              You need to create 90-day targets before you can create plans.
             </p>
           </div>
         ) : currentWeekGoals.length === 0 && suggestedGoals.length === 0 ? (
@@ -149,13 +150,13 @@ const WeeklyGoalList: React.FC = () => {
             <div className="bg-muted rounded-full p-6 mb-4">
               <Calendar className="h-12 w-12 text-muted-foreground" />
             </div>
-            <h3 className="text-xl font-medium">No goals for this week</h3>
+            <h3 className="text-xl font-medium">No plans for this week</h3>
             <p className="text-muted-foreground mt-2 max-w-sm">
-              Add weekly goals to help you achieve your 90-day targets.
+              Add weekly plans to help you achieve your 90-day targets.
             </p>
             <Button onClick={handleAddGoal} className="mt-6">
               <Plus className="h-4 w-4 mr-1" />
-              <span>Add Goal</span>
+              <span>Add Plan</span>
             </Button>
           </div>
         ) : (
@@ -163,7 +164,7 @@ const WeeklyGoalList: React.FC = () => {
             {/* Current Week Goals */}
             {currentWeekGoals.length > 0 && (
               <div className="p-4">
-                <h3 className="font-medium mb-3">Current Goals</h3>
+                <h3 className="font-medium mb-3">Current Plans</h3>
                 <div className="space-y-2">
                   {currentWeekGoals.map(goal => (
                     <WeeklyGoalItem 
@@ -179,7 +180,7 @@ const WeeklyGoalList: React.FC = () => {
             {/* Suggested Goals */}
             {suggestedGoals.length > 0 && (
               <div className="p-4 bg-muted/20">
-                <h3 className="font-medium mb-3">Suggested Goals</h3>
+                <h3 className="font-medium mb-3">Suggested Plans</h3>
                 <p className="text-sm text-muted-foreground mb-3">
                   Based on your active 90-day targets
                 </p>
