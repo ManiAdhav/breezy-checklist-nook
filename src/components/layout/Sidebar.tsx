@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
@@ -165,7 +164,7 @@ const Sidebar: React.FC = () => {
           
           <div className="flex items-center px-2 py-1 text-xs font-medium text-foreground cursor-pointer mt-2 hover:bg-accent/30 rounded-md" onClick={() => setShowGoals(!showGoals)}>
             {showGoals ? <ChevronDown className="h-3.5 w-3.5 mr-1" /> : <ChevronRight className="h-3.5 w-3.5 mr-1" />}
-            <span>Goals</span>
+            <span>Catalyst</span>
           </div>
           
           {showGoals && <div className="ml-1 space-y-0.5">
