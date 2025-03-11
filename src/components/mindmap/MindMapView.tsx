@@ -17,7 +17,7 @@ import { useVision } from '@/contexts/VisionContext';
 import { ThreeYearGoal } from '@/types/task';
 import MindMapNode from './MindMapNode';
 import MindMapGoalForm from './MindMapGoalForm';
-import { useMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/hooks/use-toast';
 
 const MindMapView: React.FC = () => {
@@ -30,7 +30,7 @@ const MindMapView: React.FC = () => {
   
   const { threeYearGoals, isLoading } = useGoal();
   const { visions } = useVision();
-  const isMobile = useMobile();
+  const isMobile = useIsMobile().isMobile;
   const mapContainerRef = useRef<HTMLDivElement>(null);
   
   // Center the map when goals are loaded

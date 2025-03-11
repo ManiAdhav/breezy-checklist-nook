@@ -23,3 +23,6 @@ export function useIsMobile() {
     setMobileMenuOpen
   }
 }
+
+// Add an alias export for backward compatibility
+export const useMobile = useIsMobile;
