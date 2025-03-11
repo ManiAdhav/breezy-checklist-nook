@@ -209,21 +209,6 @@ const Sidebar: React.FC = () => {
                 </Button>
               </Link>
               
-              <Popover open={actionsPopoverOpen} onOpenChange={setActionsPopoverOpen}>
-                <PopoverTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    className="w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item group ml-4"
-                  >
-                    <ListChecks className="h-3 w-3 mr-1.5 text-muted-foreground" />
-                    <span className="text-[10px]">Quick Actions</span>
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-80 p-0" align="start" sideOffset={5}>
-                  <ActionsList />
-                </PopoverContent>
-              </Popover>
-              
               {goalsWithActions.map(goal => {
                 const goalTasks = tasks.filter(task => {
                   const weeklyGoal = goal.targets
