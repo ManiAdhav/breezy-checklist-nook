@@ -6,6 +6,7 @@ import GoalsPage from './pages/GoalsPage';
 import NinetyDayTargetsPage from './pages/NinetyDayTargetsPage';
 import WeeklyGoalsPage from './pages/WeeklyGoalsPage';
 import CalendarPage from './pages/CalendarPage';
+import VisionPage from './pages/VisionPage';
 import NotFound from './pages/NotFound';
 import { Toaster } from '@/components/ui/toaster';
 
@@ -14,6 +15,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Index />} />
+        <Route path="/vision" element={<VisionPage />} />
         <Route path="/goals" element={<GoalsPage />} />
         <Route path="/targets" element={<NinetyDayTargetsPage />} />
         <Route path="/weekly" element={<WeeklyGoalsPage />} />

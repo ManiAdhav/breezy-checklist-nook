@@ -18,7 +18,8 @@ import {
   CalendarClock, 
   Plus, 
   Play,
-  ListChecks
+  ListChecks,
+  Lightbulb
 } from 'lucide-react';
 import { useTask } from '@/contexts/TaskContext';
 import { Button } from '@/components/ui/button';
@@ -115,9 +116,7 @@ const Sidebar: React.FC = () => {
   ).length;
 
   const goalsWithActions = threeYearGoals.filter(goal => {
-    // Find tasks related to this goal
     const goalTasks = tasks.filter(task => {
-      // Find associated weekly goal
       const weeklyGoal = goal.targets
         ?.flatMap(target => target.weeklyGoals || [])
         .find(wg => wg.id === task.weeklyGoalId);
@@ -131,7 +130,6 @@ const Sidebar: React.FC = () => {
   return <aside className="w-60 border-r border-border h-[calc(100vh-4rem)] flex flex-col overflow-hidden bg-background">
       <div className="flex-1 overflow-y-auto py-2 px-2">
         <div className="mb-2 space-y-0.5">
-          {/* Tasks Section */}
           <div className="flex items-center px-2 py-1 text-xs font-medium text-foreground cursor-pointer mt-2 hover:bg-accent/30 rounded-md" onClick={() => setShowTasks(!showTasks)}>
             {showTasks ? <ChevronDown className="h-3.5 w-3.5 mr-1" /> : <ChevronRight className="h-3.5 w-3.5 mr-1" />}
             <span>Tasks</span>
@@ -164,7 +162,13 @@ const Sidebar: React.FC = () => {
               </Button>
             </div>}
           
-          {/* Goals Section */}
+          <Link to="/vision" className="block mt-2">
+            <Button variant="ghost" className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/vision' ? 'sidebar-item-active' : ''}`}>
+              <Lightbulb className="h-4 w-4 mr-2" />
+              <span>Vision</span>
+            </Button>
+          </Link>
+          
           <div className="flex items-center px-2 py-1 text-xs font-medium text-foreground cursor-pointer mt-2 hover:bg-accent/30 rounded-md" onClick={() => setShowGoals(!showGoals)}>
             {showGoals ? <ChevronDown className="h-3.5 w-3.5 mr-1" /> : <ChevronRight className="h-3.5 w-3.5 mr-1" />}
             <span>Goals</span>
@@ -190,7 +194,6 @@ const Sidebar: React.FC = () => {
                 </Button>
               </Link>
               
-              {/* Actions section - moved below Goals */}
               <Popover open={actionsPopoverOpen} onOpenChange={setActionsPopoverOpen}>
                 <PopoverTrigger asChild>
                   <Button 
@@ -211,11 +214,8 @@ const Sidebar: React.FC = () => {
                 </PopoverContent>
               </Popover>
               
-              {/* Goal-specific actions */}
               {goalsWithActions.map(goal => {
-                // Find tasks related to this goal
                 const goalTasks = tasks.filter(task => {
-                  // Find associated weekly goal
                   const weeklyGoal = goal.targets
                     ?.flatMap(target => target.weeklyGoals || [])
                     .find(wg => wg.id === task.weeklyGoalId);
@@ -256,7 +256,6 @@ const Sidebar: React.FC = () => {
                                   checked={task.completed}
                                   className="mt-0.5 mr-2"
                                   onCheckedChange={() => {
-                                    // Toggle task completion
                                     toggleTaskCompletion(task.id);
                                   }}
                                   onClick={(e) => e.stopPropagation()}
@@ -282,7 +281,6 @@ const Sidebar: React.FC = () => {
         </div>
       
         <nav className="space-y-0.5 mt-2">
-          {/* Removed the duplicate list items for Inbox, Today, and Planned as they're now in the Tasks section */}
         </nav>
 
         <div className="mt-2">

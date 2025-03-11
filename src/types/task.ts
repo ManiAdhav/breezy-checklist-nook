@@ -1,4 +1,3 @@
-
 export type Priority = 'high' | 'medium' | 'low' | 'none';
 
 export interface List {
@@ -24,6 +23,17 @@ export interface Task {
 }
 
 export type GoalStatus = 'not_started' | 'in_progress' | 'completed' | 'abandoned';
+
+export interface Vision {
+  id: string;
+  title: string;
+  description?: string;
+  areaOfLife: string;
+  targetDate: Date;
+  status: GoalStatus;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export interface ThreeYearGoal {
   id: string;
