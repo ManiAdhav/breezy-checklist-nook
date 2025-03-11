@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useGoal } from '@/contexts/GoalContext';
 import { useVision } from '@/contexts/VisionContext';
-import { GoalStatus, Priority } from '@/types/task';
+import { GoalStatus, Priority, ThreeYearGoal } from '@/types/task';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -39,6 +39,7 @@ interface MindMapGoalFormProps {
   onClose: () => void;
   initialGoalType?: GoalType;
   initialGoalId?: string;
+  editingGoal?: ThreeYearGoal;
   onSave?: () => void;
 }
 
@@ -71,6 +72,7 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
   onClose,
   initialGoalType = 'threeYear',
   initialGoalId,
+  editingGoal,
   onSave,
 }) => {
   const { addThreeYearGoal, updateThreeYearGoal, addNinetyDayTarget, updateNinetyDayTarget, addWeeklyGoal, } = useGoal();
@@ -87,7 +89,14 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
   const [actions, setActions] = useState([{ id: Date.now(), text: '' }]);
   
   useEffect(() => {
-    if (initialGoalId) {
+    if (editingGoal) {
+      setTitle(editingGoal.title);
+      setDescription(editingGoal.description || '');
+      setStartDate(new Date(editingGoal.startDate));
+      setEndDate(new Date(editingGoal.endDate));
+      setStatus(editingGoal.status);
+      setIcon(editingGoal.icon);
+    } else if (initialGoalId) {
       // Fetch goal details based on initialGoalId and initialGoalType
       // For simplicity, let's assume you have functions to fetch goal details
       // and populate the form fields accordingly.
@@ -96,8 +105,10 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
       // setTitle(goal.title);
       // setDescription(goal.description);
       // ...
+    } else {
+      resetForm();
     }
-  }, [initialGoalId, initialGoalType]);
+  }, [editingGoal, initialGoalId]);
   
   const getRandomIcon = () => {
     const icons = iconOptions.map(opt => opt.value);
@@ -163,8 +174,17 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
     };
     
     // Update or create the goal
-    if (initialGoalId) {
-      // For an existing goal, update it
+    if (editingGoal) {
+      // If we have an editingGoal, use its id
+      updateThreeYearGoal(editingGoal.id, goalData);
+      goalId = editingGoal.id;
+      
+      toast({
+        title: "Goal updated",
+        description: "Your goal has been updated in the mind map"
+      });
+    } else if (initialGoalId) {
+      // For an existing goal identified by ID, update it
       if (initialGoalType === 'threeYear') {
         updateThreeYearGoal(initialGoalId, goalData);
       } else {
@@ -184,13 +204,11 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
       try {
         // For a new goal, create it
         const result = await addThreeYearGoal(goalData);
-        if (result) {
-          goalId = result.id;
-          toast({
-            title: "Goal created",
-            description: "Your new goal has been added to the mind map"
-          });
-        }
+        goalId = (await result).id;
+        toast({
+          title: "Goal created",
+          description: "Your new goal has been added to the mind map"
+        });
       } catch (error) {
         console.error("Error creating goal:", error);
         toast({
@@ -217,8 +235,9 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
         };
         
         const weeklyGoalResult = await addWeeklyGoal(weeklyGoalData);
+        const weeklyGoalId = (await weeklyGoalResult).id;
         
-        if (weeklyGoalResult) {
+        if (weeklyGoalId) {
           // Now create tasks for each action
           for (const action of validActions) {
             await addTask({
@@ -226,7 +245,7 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
               completed: false,
               priority: 'medium',
               listId: 'inbox',
-              weeklyGoalId: weeklyGoalResult.id,
+              weeklyGoalId: weeklyGoalId,
               startDate: new Date(),
               dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
               isAction: true,
@@ -251,13 +270,14 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
     // Reset form and close
     resetForm();
     if (onSave) onSave();
+    onClose();
   };
   
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[625px]">
         <DialogHeader>
-          <DialogTitle>{initialGoalId ? 'Edit Goal' : 'Add New Goal'}</DialogTitle>
+          <DialogTitle>{editingGoal || initialGoalId ? 'Edit Goal' : 'Add New Goal'}</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -409,7 +429,7 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
               Cancel
             </Button>
             <Button type="submit">
-              {initialGoalId ? 'Update Goal' : 'Create Goal'}
+              {editingGoal || initialGoalId ? 'Update Goal' : 'Create Goal'}
             </Button>
           </DialogFooter>
         </form>
