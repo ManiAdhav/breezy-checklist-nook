@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ActionsList from '@/components/actions/ActionsList';
 
 const ActionsView: React.FC = () => {
   const { tasks, toggleTaskCompletion } = useTask();
@@ -71,7 +72,7 @@ const ActionsView: React.FC = () => {
         onValueChange={setActiveTab}
         className="mt-4"
       >
-        <TabsList>
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="actions">Actions</TabsTrigger>
           <TabsTrigger value="plans">Plans</TabsTrigger>
         </TabsList>
@@ -145,10 +146,7 @@ const ActionsView: React.FC = () => {
         </TabsContent>
         
         <TabsContent value="plans" className="mt-4">
-          <div className="text-center p-8 text-muted-foreground border rounded-lg">
-            <h3 className="text-lg font-medium mb-1">Plans View</h3>
-            <p className="text-sm">Create plans for achieving your goals.</p>
-          </div>
+          <ActionsList />
         </TabsContent>
       </Tabs>
     </div>
