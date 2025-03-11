@@ -7,13 +7,13 @@ interface GoalContextType {
   threeYearGoals: ThreeYearGoal[];
   ninetyDayTargets: NinetyDayTarget[];
   weeklyGoals: WeeklyGoal[];
-  addThreeYearGoal: (goal: Omit<ThreeYearGoal, 'id' | 'createdAt' | 'updatedAt'>) => ThreeYearGoal | undefined;
+  addThreeYearGoal: (goal: Omit<ThreeYearGoal, 'id' | 'createdAt' | 'updatedAt'>) => Promise<ThreeYearGoal | undefined>;
   updateThreeYearGoal: (id: string, updates: Partial<ThreeYearGoal>) => void;
   deleteThreeYearGoal: (id: string) => void;
-  addNinetyDayTarget: (target: Omit<NinetyDayTarget, 'id' | 'createdAt' | 'updatedAt'>) => NinetyDayTarget | undefined;
+  addNinetyDayTarget: (target: Omit<NinetyDayTarget, 'id' | 'createdAt' | 'updatedAt'>) => Promise<NinetyDayTarget | undefined>;
   updateNinetyDayTarget: (id: string, updates: Partial<NinetyDayTarget>) => void;
   deleteNinetyDayTarget: (id: string) => void;
-  addWeeklyGoal: (goal: Omit<WeeklyGoal, 'id' | 'createdAt' | 'updatedAt'>) => WeeklyGoal | undefined;
+  addWeeklyGoal: (goal: Omit<WeeklyGoal, 'id' | 'createdAt' | 'updatedAt'>) => Promise<WeeklyGoal | undefined>;
   updateWeeklyGoal: (id: string, updates: Partial<WeeklyGoal>) => void;
   deleteWeeklyGoal: (id: string) => void;
   isLoading: boolean;

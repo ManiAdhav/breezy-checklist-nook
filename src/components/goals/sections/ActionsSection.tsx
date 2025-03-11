@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useTask } from '@/contexts/TaskContext';
 import { useGoal } from '@/contexts/GoalContext';
@@ -44,7 +43,7 @@ interface ActionsSectionProps {
 
 const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
   const { tasks, addTask, toggleTaskCompletion } = useTask();
-  const { threeYearGoals, weeklyGoals } = useGoal();
+  const { threeYearGoals, weeklyGoals, ninetyDayTargets } = useGoal();
   
   const [isAddActionOpen, setIsAddActionOpen] = useState(false);
   const [newActionTitle, setNewActionTitle] = useState('');
@@ -54,26 +53,25 @@ const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [selectedTab, setSelectedTab] = useState<string>('milestones');
   
-  // Get the goal
   const goal = threeYearGoals.find(g => g.id === goalId);
   
-  // Get all actions associated with this goal
   const goalActions = tasks.filter(task => {
-    // Find the weekly goal associated with this task
-    const weeklyGoal = goal?.targets
-      ?.flatMap(target => target.weeklyGoals || [])
-      .find(wg => wg.id === task.weeklyGoalId);
+    const weeklyGoalsForThisGoal = weeklyGoals.filter(wg => {
+      const targetForWeeklyGoal = ninetyDayTargets.find(
+        target => target.id === wg.ninetyDayTargetId
+      );
+      return targetForWeeklyGoal?.threeYearGoalId === goalId;
+    });
     
-    return weeklyGoal && task.isAction && !task.completed;
+    const weeklyGoalIds = weeklyGoalsForThisGoal.map(wg => wg.id);
+    return task.isAction && weeklyGoalIds.includes(task.weeklyGoalId || '');
   });
   
-  // Get all the weekly goals for this goal
   const getWeeklyGoalsForGoal = () => {
     if (!goal) return [];
     return goal.targets?.flatMap(target => target.weeklyGoals || []) || [];
   };
   
-  // Add new action
   const handleAddAction = () => {
     if (!newActionTitle.trim()) {
       toast({
@@ -122,7 +120,6 @@ const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
     setIsAddActionOpen(false);
   };
   
-  // Toggle task details expansion
   const toggleTaskDetails = (taskId: string) => {
     if (expandedTaskId === taskId) {
       setExpandedTaskId(null);
@@ -192,22 +189,18 @@ const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
                     </TabsList>
                     
                     <TabsContent value="milestones" className="p-2">
-                      {/* Show milestones associated with this action */}
                       <p className="text-muted-foreground">Associated milestones will appear here.</p>
                     </TabsContent>
                     
                     <TabsContent value="plans" className="p-2">
-                      {/* Show plans associated with this action */}
                       <p className="text-muted-foreground">Associated plans will appear here.</p>
                     </TabsContent>
                     
                     <TabsContent value="tasks" className="p-2">
-                      {/* Show tasks associated with this action */}
                       <p className="text-muted-foreground">Associated tasks will appear here.</p>
                     </TabsContent>
                     
                     <TabsContent value="habits" className="p-2">
-                      {/* Show habits associated with this action */}
                       <p className="text-muted-foreground">Associated habits will appear here.</p>
                     </TabsContent>
                   </Tabs>
@@ -222,7 +215,6 @@ const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
         )}
       </div>
       
-      {/* Add Action Dialog */}
       <Dialog open={isAddActionOpen} onOpenChange={setIsAddActionOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
