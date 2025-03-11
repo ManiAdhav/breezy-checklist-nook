@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useGoal } from '@/contexts/GoalContext';
 import { useVision } from '@/contexts/VisionContext';
+import { useTask } from '@/contexts/TaskContext';
 import { ThreeYearGoal, GoalStatus, Vision } from '@/types/task';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -60,8 +61,9 @@ interface ActionItem {
 }
 
 const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({ isOpen, onClose, editingGoal }) => {
-  const { addThreeYearGoal, updateThreeYearGoal } = useGoal();
+  const { addThreeYearGoal, updateThreeYearGoal, weeklyGoals, addWeeklyGoal } = useGoal();
   const { visions, addVision } = useVision();
+  const { addTask } = useTask();
   
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -158,21 +160,63 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({ isOpen, onClose, edit
       endDate,
       status,
       icon: selectedIcon,
-      // We don't actually save actions here as they would be tasks in the real app
     };
+    
+    let goalId = '';
     
     if (editingGoal) {
       updateThreeYearGoal(editingGoal.id, goalData);
+      goalId = editingGoal.id;
       toast({
         title: "Goal updated",
         description: "Your goal has been updated in the mind map"
       });
     } else {
-      addThreeYearGoal(goalData);
+      const result = addThreeYearGoal(goalData);
+      if (result && result.id) {
+        goalId = result.id;
+      }
       toast({
         title: "Goal created",
         description: "Your new goal has been added to the mind map"
       });
+    }
+    
+    // Create a weekly goal for this 3-year goal if we have a valid goal ID
+    if (goalId && validActions.length > 0) {
+      // Create a weekly goal to associate with the actions
+      const weeklyGoalData = {
+        title: `Weekly plan for ${title}`,
+        description: `Initial weekly plan for achieving ${title}`,
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
+        status: 'not_started' as GoalStatus,
+        ninetyDayTargetId: "", // This would normally be set to a real 90-day target
+        icon: "Target"
+      };
+      
+      const weeklyGoalResult = addWeeklyGoal(weeklyGoalData);
+      
+      if (weeklyGoalResult && weeklyGoalResult.id) {
+        // Now create tasks for each action
+        validActions.forEach(action => {
+          addTask({
+            title: action.text,
+            completed: false,
+            priority: 'medium',
+            listId: 'inbox',
+            weeklyGoalId: weeklyGoalResult.id,
+            startDate: new Date(),
+            dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
+            isAction: true,
+          });
+        });
+        
+        toast({
+          title: "Actions created",
+          description: `${validActions.length} action(s) have been added to your tasks`
+        });
+      }
     }
     
     onClose();

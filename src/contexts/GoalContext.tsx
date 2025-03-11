@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { ThreeYearGoal, NinetyDayTarget, WeeklyGoal, GoalStatus } from '@/types/task';
 import { toast } from '@/hooks/use-toast';
@@ -8,13 +7,13 @@ interface GoalContextType {
   threeYearGoals: ThreeYearGoal[];
   ninetyDayTargets: NinetyDayTarget[];
   weeklyGoals: WeeklyGoal[];
-  addThreeYearGoal: (goal: Omit<ThreeYearGoal, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  addThreeYearGoal: (goal: Omit<ThreeYearGoal, 'id' | 'createdAt' | 'updatedAt'>) => ThreeYearGoal | undefined;
   updateThreeYearGoal: (id: string, updates: Partial<ThreeYearGoal>) => void;
   deleteThreeYearGoal: (id: string) => void;
-  addNinetyDayTarget: (target: Omit<NinetyDayTarget, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  addNinetyDayTarget: (target: Omit<NinetyDayTarget, 'id' | 'createdAt' | 'updatedAt'>) => NinetyDayTarget | undefined;
   updateNinetyDayTarget: (id: string, updates: Partial<NinetyDayTarget>) => void;
   deleteNinetyDayTarget: (id: string) => void;
-  addWeeklyGoal: (goal: Omit<WeeklyGoal, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  addWeeklyGoal: (goal: Omit<WeeklyGoal, 'id' | 'createdAt' | 'updatedAt'>) => WeeklyGoal | undefined;
   updateWeeklyGoal: (id: string, updates: Partial<WeeklyGoal>) => void;
   deleteWeeklyGoal: (id: string) => void;
   isLoading: boolean;
@@ -28,7 +27,6 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [weeklyGoals, setWeeklyGoals] = useState<WeeklyGoal[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // Load data when component mounts
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -65,7 +63,6 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children
     fetchData();
   }, []);
 
-  // Three Year Goal operations
   const addThreeYearGoal = async (goal: Omit<ThreeYearGoal, 'id' | 'createdAt' | 'updatedAt'>) => {
     setIsLoading(true);
     try {
@@ -77,6 +74,7 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children
           title: "Goal added",
           description: "Your three-year goal was added successfully.",
         });
+        return response.data;
       } else {
         throw new Error(response.error || 'Failed to add goal');
       }
@@ -87,6 +85,7 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: "Failed to add goal",
         variant: "destructive",
       });
+      return undefined;
     } finally {
       setIsLoading(false);
     }
@@ -130,7 +129,6 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (response.success) {
         setThreeYearGoals(prevGoals => prevGoals.filter(goal => goal.id !== id));
         
-        // Also delete related targets from the state
         setNinetyDayTargets(prevTargets => prevTargets.filter(target => target.threeYearGoalId !== id));
         
         toast({
@@ -153,7 +151,6 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // 90-Day Target operations
   const addNinetyDayTarget = async (target: Omit<NinetyDayTarget, 'id' | 'createdAt' | 'updatedAt'>) => {
     setIsLoading(true);
     try {
@@ -165,6 +162,7 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children
           title: "Target added",
           description: "Your 90-day target was added successfully.",
         });
+        return response.data;
       } else {
         throw new Error(response.error || 'Failed to add target');
       }
@@ -175,6 +173,7 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: "Failed to add target",
         variant: "destructive",
       });
+      return undefined;
     } finally {
       setIsLoading(false);
     }
@@ -218,7 +217,6 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (response.success) {
         setNinetyDayTargets(prevTargets => prevTargets.filter(target => target.id !== id));
         
-        // Also delete related weekly goals from the state
         setWeeklyGoals(prevGoals => prevGoals.filter(goal => goal.ninetyDayTargetId !== id));
         
         toast({
@@ -241,7 +239,6 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Weekly Goal operations
   const addWeeklyGoal = async (goal: Omit<WeeklyGoal, 'id' | 'createdAt' | 'updatedAt'>) => {
     setIsLoading(true);
     try {
@@ -253,6 +250,7 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children
           title: "Goal added",
           description: "Your weekly goal was added successfully.",
         });
+        return response.data;
       } else {
         throw new Error(response.error || 'Failed to add goal');
       }
@@ -263,6 +261,7 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: "Failed to add goal",
         variant: "destructive",
       });
+      return undefined;
     } finally {
       setIsLoading(false);
     }
