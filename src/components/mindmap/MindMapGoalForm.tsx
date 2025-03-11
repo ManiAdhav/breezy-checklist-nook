@@ -32,6 +32,7 @@ import { format } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
 import { useTask } from '@/contexts/TaskContext';
 import { cn } from '@/lib/utils';
+import DynamicIcon from '@/components/ui/dynamic-icon';
 
 type GoalType = 'threeYear' | 'ninetyDay';
 
@@ -82,8 +83,8 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
   
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [startDate, setStartDate] = useState<Date | undefined>(new Date());
+  const [endDate, setEndDate] = useState<Date | undefined>(new Date(Date.now() + 90 * 24 * 60 * 60 * 1000));
   const [status, setStatus] = useState<string>('not_started');
   const [icon, setIcon] = useState<string | undefined>('Target');
   const [threeYearGoalId, setThreeYearGoalId] = useState('');
@@ -135,8 +136,8 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
   const resetForm = () => {
     setTitle('');
     setDescription('');
-    setStartDate(undefined);
-    setEndDate(undefined);
+    setStartDate(new Date());
+    setEndDate(new Date(Date.now() + 90 * 24 * 60 * 60 * 1000));
     setStatus('not_started');
     setIcon('Target');
     setActions([{ id: Date.now(), text: '' }]);
@@ -286,50 +287,64 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-1/4">
-                <Label htmlFor="goal-icon">Icon</Label>
-                <Select value={icon} onValueChange={setIcon}>
-                  <SelectTrigger id="goal-icon" className="w-full">
-                    <SelectValue placeholder="Icon" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {iconOptions.map(option => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
+          <div className="flex items-center space-x-3">
+            <div className="flex-shrink-0">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    className="h-10 w-10 rounded-md"
+                  >
+                    <DynamicIcon name={icon || 'Target'} className="h-5 w-5" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-60 p-2">
+                  <div className="grid grid-cols-5 gap-2">
+                    {iconOptions.map((iconOption) => (
+                      <Button
+                        key={iconOption.value}
+                        variant={icon === iconOption.value ? "default" : "outline"}
+                        size="icon"
+                        className="h-9 w-9"
+                        onClick={() => {
+                          setIcon(iconOption.value);
+                        }}
+                        type="button"
+                      >
+                        <DynamicIcon name={iconOption.value} className="h-5 w-5" />
+                      </Button>
                     ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="w-3/4">
-                <Label htmlFor="goal-title">Goal Title</Label>
-                <Input
-                  id="goal-title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Enter goal title"
-                />
-              </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
             
-            <div>
-              <Label htmlFor="goal-status">Status</Label>
-              <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger id="goal-status">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {statusOptions.map(option => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="flex-1">
+              <Input
+                id="goal-title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Goal title"
+                className="text-lg"
+              />
             </div>
+          </div>
+          
+          <div>
+            <Label htmlFor="goal-status">Status</Label>
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger id="goal-status">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                {statusOptions.map(option => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -348,13 +363,15 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
                     {startDate ? format(startDate, 'PPP') : <span>Pick a date</span>}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0 z-50" align="start">
                   <Calendar
                     mode="single"
                     selected={startDate}
                     onSelect={(date) => {
-                      setStartDate(date);
-                      setStartDateOpen(false);
+                      if (date) {
+                        setStartDate(date);
+                        setStartDateOpen(false);
+                      }
                     }}
                     disabled={date =>
                       date > (endDate ? endDate : new Date('2100-01-01'))
@@ -380,13 +397,15 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
                     {endDate ? format(endDate, 'PPP') : <span>Pick a date</span>}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0 z-50" align="start">
                   <Calendar
                     mode="single"
                     selected={endDate}
                     onSelect={(date) => {
-                      setEndDate(date);
-                      setEndDateOpen(false);
+                      if (date) {
+                        setEndDate(date);
+                        setEndDateOpen(false);
+                      }
                     }}
                     disabled={date =>
                       date < (startDate ? startDate : new Date('1900-01-01'))

@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { format } from 'date-fns';
 import { CalendarIcon, Target } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { cn } from '@/lib/utils';
+import DynamicIcon from '@/components/ui/dynamic-icon';
 
 interface NinetyDayTargetFormProps {
   isOpen: boolean;
@@ -27,6 +29,8 @@ const NinetyDayTargetForm: React.FC<NinetyDayTargetFormProps> = ({ isOpen, onClo
   const [endDate, setEndDate] = useState<Date>(new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)); // 90 days from now
   const [status, setStatus] = useState<GoalStatus>('not_started');
   const [threeYearGoalId, setThreeYearGoalId] = useState<string>('');
+  const [startDateOpen, setStartDateOpen] = useState(false);
+  const [endDateOpen, setEndDateOpen] = useState(false);
   
   // Reset form when dialog opens/closes or editing target changes
   useEffect(() => {
@@ -116,14 +120,28 @@ const NinetyDayTargetForm: React.FC<NinetyDayTargetFormProps> = ({ isOpen, onClo
               </Select>
             </div>
             
-            <Input
-              placeholder="Target title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="text-lg font-medium"
-              autoFocus
-              required
-            />
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0">
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="h-10 w-10 rounded-md pointer-events-none"
+                >
+                  <Target className="h-5 w-5" />
+                </Button>
+              </div>
+              
+              <div className="flex-1">
+                <Input
+                  placeholder="Target title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="text-lg font-medium"
+                  autoFocus
+                  required
+                />
+              </div>
+            </div>
             
             <Textarea
               placeholder="Description (optional)"
@@ -132,24 +150,29 @@ const NinetyDayTargetForm: React.FC<NinetyDayTargetFormProps> = ({ isOpen, onClo
               className="min-h-24 resize-none"
             />
             
-            <div className="flex flex-wrap gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <div className="text-sm font-medium">Start Date</div>
-                <Popover>
+                <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-[180px] justify-start text-left font-normal"
+                      className="w-full justify-start text-left font-normal"
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {format(startDate, 'PPP')}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
+                  <PopoverContent className="w-auto p-0 z-50" align="start">
                     <Calendar
                       mode="single"
                       selected={startDate}
-                      onSelect={(date) => date && setStartDate(date)}
+                      onSelect={(date) => {
+                        if (date) {
+                          setStartDate(date);
+                          setStartDateOpen(false);
+                        }
+                      }}
                       initialFocus
                     />
                   </PopoverContent>
@@ -158,21 +181,26 @@ const NinetyDayTargetForm: React.FC<NinetyDayTargetFormProps> = ({ isOpen, onClo
               
               <div className="space-y-2">
                 <div className="text-sm font-medium">End Date</div>
-                <Popover>
+                <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-[180px] justify-start text-left font-normal"
+                      className="w-full justify-start text-left font-normal"
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {format(endDate, 'PPP')}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
+                  <PopoverContent className="w-auto p-0 z-50" align="start">
                     <Calendar
                       mode="single"
                       selected={endDate}
-                      onSelect={(date) => date && setEndDate(date)}
+                      onSelect={(date) => {
+                        if (date) {
+                          setEndDate(date);
+                          setEndDateOpen(false);
+                        }
+                      }}
                       initialFocus
                     />
                   </PopoverContent>
@@ -185,7 +213,7 @@ const NinetyDayTargetForm: React.FC<NinetyDayTargetFormProps> = ({ isOpen, onClo
                   value={status}
                   onValueChange={(value) => setStatus(value as GoalStatus)}
                 >
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

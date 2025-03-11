@@ -21,8 +21,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Calendar as CalendarIcon } from 'lucide-react';
+import { Calendar as CalendarIcon, CheckSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import DynamicIcon from '@/components/ui/dynamic-icon';
 
 interface WeeklyGoalFormProps {
   isOpen: boolean;
@@ -102,15 +103,26 @@ const WeeklyGoalForm: React.FC<WeeklyGoalFormProps> = ({
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="title">Title</Label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter goal title"
-              required
-            />
+          <div className="flex items-center space-x-3">
+            <div className="flex-shrink-0">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="h-10 w-10 rounded-md pointer-events-none"
+              >
+                <CheckSquare className="h-5 w-5" />
+              </Button>
+            </div>
+            
+            <div className="flex-1">
+              <Input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Weekly goal title"
+                className="text-lg"
+                required
+              />
+            </div>
           </div>
           
           <div className="space-y-2">
@@ -178,13 +190,15 @@ const WeeklyGoalForm: React.FC<WeeklyGoalFormProps> = ({
                     {startDate ? format(startDate, 'PPP') : <span>Pick a date</span>}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0 z-50" align="start">
                   <Calendar
                     mode="single"
                     selected={startDate}
                     onSelect={(date) => {
-                      setStartDate(date);
-                      setStartDateOpen(false);
+                      if (date) {
+                        setStartDate(date);
+                        setStartDateOpen(false);
+                      }
                     }}
                     disabled={date =>
                       date > (endDate ? endDate : new Date('2100-01-01'))
@@ -210,13 +224,15 @@ const WeeklyGoalForm: React.FC<WeeklyGoalFormProps> = ({
                     {endDate ? format(endDate, 'PPP') : <span>Pick a date</span>}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0 z-50" align="start">
                   <Calendar
                     mode="single"
                     selected={endDate}
                     onSelect={(date) => {
-                      setEndDate(date);
-                      setEndDateOpen(false);
+                      if (date) {
+                        setEndDate(date);
+                        setEndDateOpen(false);
+                      }
                     }}
                     disabled={date =>
                       date < (startDate ? startDate : new Date('1900-01-01'))
