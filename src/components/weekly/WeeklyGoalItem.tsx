@@ -1,20 +1,20 @@
 
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { WeeklyGoal, GoalStatus } from '@/types/task';
+import { Plan, GoalStatus } from '@/types/task';
 import { useGoal } from '@/contexts/GoalContext';
 import { Pencil, Trash2, CheckCircle, Clock, Target, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Tag from '@/components/ui/Tag';
 
 interface WeeklyGoalItemProps {
-  goal: WeeklyGoal;
-  onEdit: (goal: WeeklyGoal) => void;
-  onView: (goal: WeeklyGoal) => void;
+  goal: Plan;
+  onEdit: (goal: Plan) => void;
+  onView: (goal: Plan) => void;
 }
 
 const WeeklyGoalItem: React.FC<WeeklyGoalItemProps> = ({ goal, onEdit, onView }) => {
-  const { deleteWeeklyGoal, updateWeeklyGoal, ninetyDayTargets } = useGoal();
+  const { deletePlan, updatePlan, ninetyDayTargets } = useGoal();
   const [isHovered, setIsHovered] = useState(false);
 
   const getStatusColor = (status: GoalStatus): string => {
@@ -43,12 +43,12 @@ const WeeklyGoalItem: React.FC<WeeklyGoalItemProps> = ({ goal, onEdit, onView })
   const toggleComplete = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent clicking through to the view
     const newStatus = goal.status === 'completed' ? 'in_progress' : 'completed';
-    updateWeeklyGoal(goal.id, { status: newStatus });
+    updatePlan(goal.id, { status: newStatus });
   };
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent clicking through to the view
-    deleteWeeklyGoal(goal.id);
+    deletePlan(goal.id);
   };
 
   const handleEdit = (e: React.MouseEvent) => {

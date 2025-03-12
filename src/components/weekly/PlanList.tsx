@@ -1,77 +1,81 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
-import { useGoal } from '@/contexts/GoalContext';
 import { Plan } from '@/types/task';
+import { useGoal } from '@/contexts/GoalContext';
 import PlanItem from './PlanItem';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import PlanForm from './PlanForm';
+import { Plus } from 'lucide-react';
 
 interface PlanListProps {
   plans: Plan[];
-  targetId?: string;
 }
 
-const PlanList: React.FC<PlanListProps> = ({ plans, targetId }) => {
+const PlanList: React.FC<PlanListProps> = ({ plans }) => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [currentPlan, setCurrentPlan] = useState<Plan | null>(null);
   const { ninetyDayTargets } = useGoal();
-  const [showForm, setShowForm] = useState(false);
-  const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
-  const navigate = useNavigate();
 
-  // Filter plans by targetId if provided
-  const filteredPlans = targetId
-    ? plans.filter(plan => plan.ninetyDayTargetId === targetId)
-    : plans;
-
-  const handleEditPlan = (plan: Plan) => {
-    setEditingPlan(plan);
-    setShowForm(true);
+  const handleCreate = () => {
+    setCurrentPlan(null);
+    setIsDialogOpen(true);
   };
 
-  const handleClose = () => {
-    setShowForm(false);
-    setEditingPlan(null);
+  const handleEdit = (plan: Plan) => {
+    setCurrentPlan(plan);
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    setCurrentPlan(null);
+  };
+
+  const getTargetName = (targetId: string): string => {
+    const target = ninetyDayTargets.find(t => t.id === targetId);
+    return target ? target.title : 'Unknown Target';
   };
 
   return (
-    <div className="space-y-4">
-      {showForm ? (
-        <PlanForm 
-          onClose={handleClose}
-          plan={editingPlan}
-          targetId={targetId}
-        />
+    <div className="space-y-6">
+      <div className="flex justify-end">
+        <Button onClick={handleCreate}>
+          <Plus className="h-4 w-4 mr-2" />
+          Add Plan
+        </Button>
+      </div>
+
+      {plans.length === 0 ? (
+        <div className="text-center py-10 border border-dashed rounded-lg border-gray-300">
+          <p className="text-muted-foreground">
+            No plans yet. Click the button above to create one.
+          </p>
+        </div>
       ) : (
-        <>
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">
-              {targetId ? 'Plans for this Target' : 'All Plans'}
-            </h2>
-            <Button onClick={() => setShowForm(true)} size="sm" className="flex items-center gap-1">
-              <Plus className="h-4 w-4" />
-              <span>Add Plan</span>
-            </Button>
-          </div>
-          
-          {filteredPlans.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              No plans found. Click the button above to add one.
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {filteredPlans.map(plan => (
-                <PlanItem 
-                  key={plan.id} 
-                  plan={plan} 
-                  onEdit={() => handleEditPlan(plan)}
-                  targetName={ninetyDayTargets.find(t => t.id === plan.ninetyDayTargetId)?.title || 'Unknown Target'}
-                />
-              ))}
-            </div>
-          )}
-        </>
+        <div className="grid gap-4 md:grid-cols-2">
+          {plans.map((plan) => (
+            <PlanItem 
+              key={plan.id} 
+              plan={plan} 
+              onEdit={() => handleEdit(plan)} 
+              targetName={getTargetName(plan.ninetyDayTargetId)}
+            />
+          ))}
+        </div>
       )}
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>{currentPlan ? 'Edit Plan' : 'Create New Plan'}</DialogTitle>
+          </DialogHeader>
+          <PlanForm 
+            initialPlan={currentPlan} 
+            onClose={handleCloseDialog}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
