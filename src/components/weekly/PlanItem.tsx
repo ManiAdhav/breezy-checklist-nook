@@ -1,11 +1,22 @@
 
 import React from 'react';
-import { Plan } from '@/types/task';
-import { useGoal } from '@/contexts/GoalContext';
+import { Plan, GoalStatus } from '@/types/task';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Pencil, Trash } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { Pencil, Trash2 } from 'lucide-react';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { useGoal } from '@/contexts/GoalContext';
 import { format } from 'date-fns';
 
 interface PlanItemProps {
@@ -15,61 +26,85 @@ interface PlanItemProps {
 }
 
 const PlanItem: React.FC<PlanItemProps> = ({ plan, onEdit, targetName }) => {
-  const { deletePlan, updatePlan } = useGoal();
+  const { deletePlan } = useGoal();
 
-  const getStatusColor = (status: string) => {
+  const getStatusBadge = (status: GoalStatus) => {
     switch (status) {
-      case 'not_started': return 'bg-gray-200 text-gray-800';
-      case 'in_progress': return 'bg-blue-100 text-blue-800';
-      case 'completed': return 'bg-green-100 text-green-800';
-      case 'abandoned': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-200 text-gray-800';
+      case 'not_started':
+        return <Badge variant="outline">Not Started</Badge>;
+      case 'in_progress':
+        return <Badge variant="secondary">In Progress</Badge>;
+      case 'completed':
+        return <Badge variant="success">Completed</Badge>;
+      case 'abandoned':
+        return <Badge variant="destructive">Abandoned</Badge>;
+      default:
+        return null;
     }
   };
 
-  const formatDate = (date: Date | string) => {
+  const handleDelete = async () => {
     try {
-      return format(new Date(date), 'MMM dd, yyyy');
-    } catch (e) {
-      return 'Invalid date';
-    }
-  };
-
-  const handleDelete = () => {
-    if (window.confirm('Are you sure you want to delete this plan?')) {
-      deletePlan(plan.id);
+      await deletePlan(plan.id);
+    } catch (error) {
+      console.error('Error deleting plan:', error);
     }
   };
 
   return (
-    <Card className="shadow-sm">
+    <Card>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
-          <CardTitle className="text-lg">{plan.title}</CardTitle>
-          <Badge className={getStatusColor(plan.status)}>
-            {plan.status.replace('_', ' ')}
-          </Badge>
+          <CardTitle className="text-lg font-semibold">{plan.title}</CardTitle>
+          <div className="flex space-x-1">
+            <Button size="sm" variant="ghost" onClick={onEdit}>
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button size="sm" variant="ghost">
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete the plan.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
         </div>
-        {targetName && <CardDescription>Target: {targetName}</CardDescription>}
       </CardHeader>
-      {plan.description && (
-        <CardContent className="pt-0 pb-2">
-          <p className="text-sm text-muted-foreground">{plan.description}</p>
-        </CardContent>
-      )}
-      <CardFooter className="flex justify-between pt-2">
-        <div className="text-xs text-muted-foreground">
-          {formatDate(plan.startDate)} - {formatDate(plan.endDate)}
+      <CardContent>
+        {plan.description && (
+          <p className="text-sm text-muted-foreground mb-4">{plan.description}</p>
+        )}
+        <div className="grid grid-cols-2 gap-2 text-sm">
+          <div>
+            <p className="text-muted-foreground">Target:</p>
+            <p>{targetName}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">Status:</p>
+            <div className="mt-1">{getStatusBadge(plan.status)}</div>
+          </div>
+          <div>
+            <p className="text-muted-foreground">Start Date:</p>
+            <p>{format(new Date(plan.startDate), 'MMM d, yyyy')}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">End Date:</p>
+            <p>{format(new Date(plan.endDate), 'MMM d, yyyy')}</p>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Button variant="ghost" size="icon" onClick={onEdit} title="Edit">
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={handleDelete} title="Delete">
-            <Trash className="h-4 w-4" />
-          </Button>
-        </div>
-      </CardFooter>
+      </CardContent>
     </Card>
   );
 };

@@ -1,259 +1,214 @@
 
 import React, { useState, useEffect } from 'react';
-import { format } from 'date-fns';
+import { Plan, GoalStatus } from '@/types/task';
 import { useGoal } from '@/contexts/GoalContext';
-import { WeeklyGoal, GoalStatus } from '@/types/task';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Calendar } from '@/components/ui/calendar';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { Calendar as CalendarIcon, CheckSquare } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { format } from 'date-fns';
 
 interface WeeklyGoalFormProps {
-  isOpen: boolean;
+  initialPlan: Plan | null;
   onClose: () => void;
-  editingGoal: WeeklyGoal | null;
-  currentWeekStart: Date;
-  currentWeekEnd: Date;
 }
 
-const WeeklyGoalForm: React.FC<WeeklyGoalFormProps> = ({ 
-  isOpen, 
-  onClose, 
-  editingGoal,
-  currentWeekStart,
-  currentWeekEnd
-}) => {
-  const { addWeeklyGoal, updateWeeklyGoal, ninetyDayTargets } = useGoal();
+const WeeklyGoalForm: React.FC<WeeklyGoalFormProps> = ({ initialPlan, onClose }) => {
+  const { addPlan, updatePlan, ninetyDayTargets } = useGoal();
   
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [status, setStatus] = useState<GoalStatus>('not_started');
-  const [ninetyDayTargetId, setNinetyDayTargetId] = useState('');
-  
-  // States for controlling date popovers
-  const [startDateOpen, setStartDateOpen] = useState(false);
-  const [endDateOpen, setEndDateOpen] = useState(false);
-  const [startDate, setStartDate] = useState<Date>(currentWeekStart);
-  const [endDate, setEndDate] = useState<Date>(currentWeekEnd);
-  
-  // Reset form when editingGoal changes
+  const [targetId, setTargetId] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
   useEffect(() => {
-    if (editingGoal) {
-      setTitle(editingGoal.title);
-      setDescription(editingGoal.description || '');
-      setStatus(editingGoal.status);
-      setNinetyDayTargetId(editingGoal.ninetyDayTargetId);
-      setStartDate(new Date(editingGoal.startDate));
-      setEndDate(new Date(editingGoal.endDate));
+    if (initialPlan) {
+      setTitle(initialPlan.title);
+      setDescription(initialPlan.description || '');
+      setStartDate(format(new Date(initialPlan.startDate), 'yyyy-MM-dd'));
+      setEndDate(format(new Date(initialPlan.endDate), 'yyyy-MM-dd'));
+      setStatus(initialPlan.status);
+      setTargetId(initialPlan.ninetyDayTargetId);
     } else {
+      // Default values for new plan
       setTitle('');
       setDescription('');
+      setStartDate(format(new Date(), 'yyyy-MM-dd'));
+      setEndDate(format(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'));
       setStatus('not_started');
-      setStartDate(currentWeekStart);
-      setEndDate(currentWeekEnd);
-      setNinetyDayTargetId(ninetyDayTargets.length > 0 ? ninetyDayTargets[0].id : '');
+      setTargetId(ninetyDayTargets.length > 0 ? ninetyDayTargets[0].id : '');
     }
-  }, [editingGoal, ninetyDayTargets, currentWeekStart, currentWeekEnd]);
-  
-  const handleSubmit = (e: React.FormEvent) => {
+  }, [initialPlan, ninetyDayTargets]);
+
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+    
+    if (!title.trim()) {
+      newErrors.title = 'Title is required';
+    }
+    
+    if (!targetId) {
+      newErrors.targetId = 'Target is required';
+    }
+    
+    if (!startDate) {
+      newErrors.startDate = 'Start date is required';
+    }
+    
+    if (!endDate) {
+      newErrors.endDate = 'End date is required';
+    } else if (endDate < startDate) {
+      newErrors.endDate = 'End date must be after start date';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const goalData = {
-      title,
-      description: description || undefined,
-      status,
-      startDate,
-      endDate,
-      ninetyDayTargetId,
-    };
-    
-    if (editingGoal && editingGoal.id !== 'temp') {
-      updateWeeklyGoal(editingGoal.id, goalData);
-    } else {
-      addWeeklyGoal(goalData);
+    if (!validateForm()) {
+      return;
     }
     
-    onClose();
+    setIsSubmitting(true);
+    
+    try {
+      const planData = {
+        title,
+        description,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        status,
+        ninetyDayTargetId: targetId,
+      };
+      
+      if (initialPlan) {
+        await updatePlan(initialPlan.id, planData);
+      } else {
+        await addPlan(planData);
+      }
+      
+      onClose();
+    } catch (error) {
+      console.error('Error saving plan:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
-  
+
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>
-            {editingGoal ? 'Edit Plan' : 'Add Plan'}
-          </DialogTitle>
-        </DialogHeader>
+    <form onSubmit={handleSubmit} className="space-y-4 py-4">
+      <div className="space-y-2">
+        <Label htmlFor="title">Title</Label>
+        <Input
+          id="title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Enter plan title"
+          className={errors.title ? 'border-red-500' : ''}
+        />
+        {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="description">Description (optional)</Label>
+        <Textarea
+          id="description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Enter plan description"
+          className="min-h-[100px]"
+        />
+      </div>
+      
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="startDate">Start Date</Label>
+          <Input
+            id="startDate"
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className={errors.startDate ? 'border-red-500' : ''}
+          />
+          {errors.startDate && <p className="text-sm text-red-500">{errors.startDate}</p>}
+        </div>
         
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="flex items-center space-x-3">
-            <div className="flex-shrink-0">
-              <Button 
-                variant="outline" 
-                size="icon" 
-                className="h-10 w-10 rounded-md pointer-events-none"
-              >
-                <CheckSquare className="h-5 w-5" />
-              </Button>
-            </div>
-            
-            <div className="flex-1">
-              <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Plan title"
-                className="text-lg"
-                required
-              />
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="description">Description (Optional)</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter plan description"
-              rows={3}
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="targetId">90-Day Target</Label>
-            <Select
-              value={ninetyDayTargetId}
-              onValueChange={setNinetyDayTargetId}
-              required
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select a 90-day target" />
-              </SelectTrigger>
-              <SelectContent>
-                {ninetyDayTargets.map((target) => (
-                  <SelectItem key={target.id} value={target.id}>
-                    {target.title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
-            <Select
-              value={status}
-              onValueChange={(value) => setStatus(value as GoalStatus)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="not_started">Not Started</SelectItem>
-                <SelectItem value="in_progress">In Progress</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="abandoned">Abandoned</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label>Start Date</Label>
-              <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      'w-full justify-start text-left font-normal',
-                      !startDate && 'text-muted-foreground'
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {startDate ? format(startDate, 'PPP') : <span>Pick a date</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 z-50" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={startDate}
-                    onSelect={(date) => {
-                      if (date) {
-                        setStartDate(date);
-                        setStartDateOpen(false);
-                      }
-                    }}
-                    disabled={date =>
-                      date > (endDate ? endDate : new Date('2100-01-01'))
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-            
-            <div>
-              <Label>End Date</Label>
-              <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      'w-full justify-start text-left font-normal',
-                      !endDate && 'text-muted-foreground'
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {endDate ? format(endDate, 'PPP') : <span>Pick a date</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 z-50" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={endDate}
-                    onSelect={(date) => {
-                      if (date) {
-                        setEndDate(date);
-                        setEndDateOpen(false);
-                      }
-                    }}
-                    disabled={date =>
-                      date < (startDate ? startDate : new Date('1900-01-01'))
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit">
-              {editingGoal ? 'Update Plan' : 'Add Plan'}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        <div className="space-y-2">
+          <Label htmlFor="endDate">End Date</Label>
+          <Input
+            id="endDate"
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className={errors.endDate ? 'border-red-500' : ''}
+          />
+          {errors.endDate && <p className="text-sm text-red-500">{errors.endDate}</p>}
+        </div>
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="status">Status</Label>
+        <Select value={status} onValueChange={(value) => setStatus(value as GoalStatus)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="not_started">Not Started</SelectItem>
+            <SelectItem value="in_progress">In Progress</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+            <SelectItem value="abandoned">Abandoned</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="targetId">90-Day Target</Label>
+        <Select 
+          value={targetId} 
+          onValueChange={setTargetId}
+          disabled={ninetyDayTargets.length === 0}
+        >
+          <SelectTrigger className={errors.targetId ? 'border-red-500' : ''}>
+            <SelectValue placeholder="Select a target" />
+          </SelectTrigger>
+          <SelectContent>
+            {ninetyDayTargets.length === 0 ? (
+              <SelectItem value="none" disabled>No targets available</SelectItem>
+            ) : (
+              ninetyDayTargets.map((target) => (
+                <SelectItem key={target.id} value={target.id}>
+                  {target.title}
+                </SelectItem>
+              ))
+            )}
+          </SelectContent>
+        </Select>
+        {errors.targetId && <p className="text-sm text-red-500">{errors.targetId}</p>}
+        {ninetyDayTargets.length === 0 && (
+          <p className="text-sm text-yellow-600">You need to create a 90-day target first</p>
+        )}
+      </div>
+      
+      <div className="flex justify-end space-x-2 pt-4">
+        <Button type="button" variant="outline" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button 
+          type="submit" 
+          disabled={isSubmitting || ninetyDayTargets.length === 0}
+        >
+          {isSubmitting ? 'Saving...' : initialPlan ? 'Update Plan' : 'Create Plan'}
+        </Button>
+      </div>
+    </form>
   );
 };
 

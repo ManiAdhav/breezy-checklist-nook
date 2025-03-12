@@ -1,8 +1,8 @@
 
 import React from 'react';
-import Layout from '@/components/layout/Layout';
 import { useGoal } from '@/contexts/GoalContext';
 import PlanList from '@/components/weekly/PlanList';
+import Layout from '../components/layout/Layout';
 
 const PlansPage: React.FC = () => {
   const { plans, isLoading } = useGoal();
