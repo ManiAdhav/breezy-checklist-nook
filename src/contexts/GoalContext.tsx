@@ -1,21 +1,21 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { ThreeYearGoal, NinetyDayTarget, WeeklyGoal, GoalStatus } from '@/types/task';
+import { ThreeYearGoal, NinetyDayTarget, Plan, GoalStatus } from '@/types/task';
 import { toast } from '@/hooks/use-toast';
 import * as GoalService from '@/api/goalService';
 
 interface GoalContextType {
   threeYearGoals: ThreeYearGoal[];
   ninetyDayTargets: NinetyDayTarget[];
-  weeklyGoals: WeeklyGoal[];
+  plans: Plan[];
   addThreeYearGoal: (goal: Omit<ThreeYearGoal, 'id' | 'createdAt' | 'updatedAt'>) => Promise<ThreeYearGoal | undefined>;
   updateThreeYearGoal: (id: string, updates: Partial<ThreeYearGoal>) => void;
   deleteThreeYearGoal: (id: string) => void;
   addNinetyDayTarget: (target: Omit<NinetyDayTarget, 'id' | 'createdAt' | 'updatedAt'>) => Promise<NinetyDayTarget | undefined>;
   updateNinetyDayTarget: (id: string, updates: Partial<NinetyDayTarget>) => void;
   deleteNinetyDayTarget: (id: string) => void;
-  addWeeklyGoal: (goal: Omit<WeeklyGoal, 'id' | 'createdAt' | 'updatedAt'>) => Promise<WeeklyGoal | undefined>;
-  updateWeeklyGoal: (id: string, updates: Partial<WeeklyGoal>) => void;
-  deleteWeeklyGoal: (id: string) => void;
+  addPlan: (plan: Omit<Plan, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Plan | undefined>;
+  updatePlan: (id: string, updates: Partial<Plan>) => void;
+  deletePlan: (id: string) => void;
   isLoading: boolean;
 }
 
@@ -24,17 +24,17 @@ const GoalContext = createContext<GoalContextType | undefined>(undefined);
 export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [threeYearGoals, setThreeYearGoals] = useState<ThreeYearGoal[]>([]);
   const [ninetyDayTargets, setNinetyDayTargets] = useState<NinetyDayTarget[]>([]);
-  const [weeklyGoals, setWeeklyGoals] = useState<WeeklyGoal[]>([]);
+  const [plans, setPlans] = useState<Plan[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const [goalsResponse, targetsResponse, weeklyResponse] = await Promise.all([
+        const [goalsResponse, targetsResponse, plansResponse] = await Promise.all([
           GoalService.getThreeYearGoals(),
           GoalService.getNinetyDayTargets(),
-          GoalService.getWeeklyGoals()
+          GoalService.getPlans()
         ]);
         
         if (goalsResponse.success && goalsResponse.data) {
@@ -45,8 +45,8 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setNinetyDayTargets(targetsResponse.data);
         }
         
-        if (weeklyResponse.success && weeklyResponse.data) {
-          setWeeklyGoals(weeklyResponse.data);
+        if (plansResponse.success && plansResponse.data) {
+          setPlans(plansResponse.data);
         }
       } catch (error) {
         console.error('Error loading goals data:', error);
@@ -217,7 +217,7 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (response.success) {
         setNinetyDayTargets(prevTargets => prevTargets.filter(target => target.id !== id));
         
-        setWeeklyGoals(prevGoals => prevGoals.filter(goal => goal.ninetyDayTargetId !== id));
+        setPlans(prevPlans => prevPlans.filter(plan => plan.ninetyDayTargetId !== id));
         
         toast({
           title: "Target deleted",
@@ -239,26 +239,26 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const addWeeklyGoal = async (goal: Omit<WeeklyGoal, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const addPlan = async (plan: Omit<Plan, 'id' | 'createdAt' | 'updatedAt'>) => {
     setIsLoading(true);
     try {
-      const response = await GoalService.createWeeklyGoal(goal);
+      const response = await GoalService.createPlan(plan);
       
       if (response.success && response.data) {
-        setWeeklyGoals(prevGoals => [...prevGoals, response.data!]);
+        setPlans(prevPlans => [...prevPlans, response.data!]);
         toast({
-          title: "Goal added",
-          description: "Your weekly goal was added successfully.",
+          title: "Plan added",
+          description: "Your plan was added successfully.",
         });
         return response.data;
       } else {
-        throw new Error(response.error || 'Failed to add goal');
+        throw new Error(response.error || 'Failed to add plan');
       }
     } catch (error) {
-      console.error('Error adding goal:', error);
+      console.error('Error adding plan:', error);
       toast({
         title: "Error",
-        description: "Failed to add goal",
+        description: "Failed to add plan",
         variant: "destructive",
       });
       return undefined;
@@ -267,29 +267,29 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const updateWeeklyGoal = async (id: string, updates: Partial<WeeklyGoal>) => {
+  const updatePlan = async (id: string, updates: Partial<Plan>) => {
     setIsLoading(true);
     try {
-      const response = await GoalService.updateWeeklyGoal(id, updates);
+      const response = await GoalService.updatePlan(id, updates);
       
       if (response.success && response.data) {
-        setWeeklyGoals(prevGoals => 
-          prevGoals.map(goal => 
-            goal.id === id ? response.data! : goal
+        setPlans(prevPlans => 
+          prevPlans.map(plan => 
+            plan.id === id ? response.data! : plan
           )
         );
         toast({
-          title: "Goal updated",
-          description: "Your weekly goal was updated successfully.",
+          title: "Plan updated",
+          description: "Your plan was updated successfully.",
         });
       } else {
-        throw new Error(response.error || 'Failed to update goal');
+        throw new Error(response.error || 'Failed to update plan');
       }
     } catch (error) {
-      console.error('Error updating goal:', error);
+      console.error('Error updating plan:', error);
       toast({
         title: "Error",
-        description: "Failed to update goal",
+        description: "Failed to update plan",
         variant: "destructive",
       });
     } finally {
@@ -297,27 +297,27 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const deleteWeeklyGoal = async (id: string) => {
+  const deletePlan = async (id: string) => {
     setIsLoading(true);
     try {
-      const response = await GoalService.deleteWeeklyGoal(id);
+      const response = await GoalService.deletePlan(id);
       
       if (response.success) {
-        setWeeklyGoals(prevGoals => prevGoals.filter(goal => goal.id !== id));
+        setPlans(prevPlans => prevPlans.filter(plan => plan.id !== id));
         
         toast({
-          title: "Goal deleted",
-          description: "Your weekly goal was deleted successfully.",
+          title: "Plan deleted",
+          description: "Your plan was deleted successfully.",
           variant: "destructive",
         });
       } else {
-        throw new Error(response.error || 'Failed to delete goal');
+        throw new Error(response.error || 'Failed to delete plan');
       }
     } catch (error) {
-      console.error('Error deleting goal:', error);
+      console.error('Error deleting plan:', error);
       toast({
         title: "Error",
-        description: "Failed to delete goal",
+        description: "Failed to delete plan",
         variant: "destructive",
       });
     } finally {
@@ -329,16 +329,16 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <GoalContext.Provider value={{
       threeYearGoals,
       ninetyDayTargets,
-      weeklyGoals,
+      plans,
       addThreeYearGoal,
       updateThreeYearGoal,
       deleteThreeYearGoal,
       addNinetyDayTarget,
       updateNinetyDayTarget,
       deleteNinetyDayTarget,
-      addWeeklyGoal,
-      updateWeeklyGoal,
-      deleteWeeklyGoal,
+      addPlan,
+      updatePlan,
+      deletePlan,
       isLoading
     }}>
       {children}

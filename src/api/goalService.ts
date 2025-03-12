@@ -1,12 +1,11 @@
-
-import { ThreeYearGoal, NinetyDayTarget, WeeklyGoal } from '@/types/task';
+import { ThreeYearGoal, NinetyDayTarget, Plan } from '@/types/task';
 import { generateId } from '@/utils/taskUtils';
 import { ApiResponse } from './types';
 
 // Local storage keys
 const THREE_YEAR_GOALS_STORAGE_KEY = 'threeYearGoals';
 const NINETY_DAY_TARGETS_STORAGE_KEY = 'ninetyDayTargets';
-const WEEKLY_GOALS_STORAGE_KEY = 'weeklyGoals';
+const PLANS_STORAGE_KEY = 'plans';
 
 // Helper functions
 const getStoredThreeYearGoals = (): ThreeYearGoal[] => {
@@ -19,9 +18,19 @@ const getStoredNinetyDayTargets = (): NinetyDayTarget[] => {
   return storedTargets ? JSON.parse(storedTargets) : [];
 };
 
-const getStoredWeeklyGoals = (): WeeklyGoal[] => {
-  const storedGoals = localStorage.getItem(WEEKLY_GOALS_STORAGE_KEY);
-  return storedGoals ? JSON.parse(storedGoals) : [];
+const getStoredPlans = (): Plan[] => {
+  const storedPlans = localStorage.getItem(PLANS_STORAGE_KEY);
+  
+  // Migrate from old weeklyGoals to plans if needed
+  if (!storedPlans) {
+    const oldWeeklyGoals = localStorage.getItem('weeklyGoals');
+    if (oldWeeklyGoals) {
+      localStorage.setItem(PLANS_STORAGE_KEY, oldWeeklyGoals);
+      return JSON.parse(oldWeeklyGoals);
+    }
+  }
+  
+  return storedPlans ? JSON.parse(storedPlans) : [];
 };
 
 const storeThreeYearGoals = (goals: ThreeYearGoal[]): void => {
@@ -32,8 +41,8 @@ const storeNinetyDayTargets = (targets: NinetyDayTarget[]): void => {
   localStorage.setItem(NINETY_DAY_TARGETS_STORAGE_KEY, JSON.stringify(targets));
 };
 
-const storeWeeklyGoals = (goals: WeeklyGoal[]): void => {
-  localStorage.setItem(WEEKLY_GOALS_STORAGE_KEY, JSON.stringify(goals));
+const storePlans = (plans: Plan[]): void => {
+  localStorage.setItem(PLANS_STORAGE_KEY, JSON.stringify(plans));
 };
 
 // Three Year Goal API methods
@@ -183,9 +192,9 @@ export const deleteNinetyDayTarget = async (id: string): Promise<ApiResponse<voi
     storeNinetyDayTargets(updatedTargets);
     
     // Delete associated weekly goals
-    const weeklyGoals = getStoredWeeklyGoals();
-    const updatedWeeklyGoals = weeklyGoals.filter(goal => goal.ninetyDayTargetId !== id);
-    storeWeeklyGoals(updatedWeeklyGoals);
+    const plans = getStoredPlans();
+    const updatedPlans = plans.filter(plan => plan.ninetyDayTargetId !== id);
+    storePlans(updatedPlans);
     
     return { success: true };
   } catch (error) {
@@ -194,75 +203,81 @@ export const deleteNinetyDayTarget = async (id: string): Promise<ApiResponse<voi
   }
 };
 
-// Weekly Goal API methods
-export const getWeeklyGoals = async (): Promise<ApiResponse<WeeklyGoal[]>> => {
+// Plan API methods
+export const getPlans = async (): Promise<ApiResponse<Plan[]>> => {
   try {
-    const goals = getStoredWeeklyGoals();
-    return { success: true, data: goals };
+    const plans = getStoredPlans();
+    return { success: true, data: plans };
   } catch (error) {
-    console.error('Error fetching weekly goals:', error);
-    return { success: false, error: 'Failed to fetch weekly goals' };
+    console.error('Error fetching plans:', error);
+    return { success: false, error: 'Failed to fetch plans' };
   }
 };
 
-export const createWeeklyGoal = async (goal: Omit<WeeklyGoal, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<WeeklyGoal>> => {
+export const createPlan = async (plan: Omit<Plan, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Plan>> => {
   try {
-    const goals = getStoredWeeklyGoals();
-    const newGoal: WeeklyGoal = {
-      ...goal,
+    const plans = getStoredPlans();
+    const newPlan: Plan = {
+      ...plan,
       id: generateId(),
       createdAt: new Date(),
       updatedAt: new Date()
     };
     
-    const updatedGoals = [...goals, newGoal];
-    storeWeeklyGoals(updatedGoals);
+    const updatedPlans = [...plans, newPlan];
+    storePlans(updatedPlans);
     
-    return { success: true, data: newGoal };
+    return { success: true, data: newPlan };
   } catch (error) {
-    console.error('Error creating weekly goal:', error);
-    return { success: false, error: 'Failed to create weekly goal' };
+    console.error('Error creating plan:', error);
+    return { success: false, error: 'Failed to create plan' };
   }
 };
 
-export const updateWeeklyGoal = async (id: string, updates: Partial<WeeklyGoal>): Promise<ApiResponse<WeeklyGoal>> => {
+export const updatePlan = async (id: string, updates: Partial<Plan>): Promise<ApiResponse<Plan>> => {
   try {
-    const goals = getStoredWeeklyGoals();
-    const goalIndex = goals.findIndex(goal => goal.id === id);
+    const plans = getStoredPlans();
+    const planIndex = plans.findIndex(plan => plan.id === id);
     
-    if (goalIndex === -1) {
-      return { success: false, error: 'Weekly goal not found' };
+    if (planIndex === -1) {
+      return { success: false, error: 'Plan not found' };
     }
     
-    const updatedGoal = { 
-      ...goals[goalIndex], 
+    const updatedPlan = { 
+      ...plans[planIndex], 
       ...updates, 
       updatedAt: new Date() 
     };
     
-    goals[goalIndex] = updatedGoal;
-    storeWeeklyGoals(goals);
+    plans[planIndex] = updatedPlan;
+    storePlans(plans);
     
-    return { success: true, data: updatedGoal };
+    return { success: true, data: updatedPlan };
   } catch (error) {
-    console.error('Error updating weekly goal:', error);
-    return { success: false, error: 'Failed to update weekly goal' };
+    console.error('Error updating plan:', error);
+    return { success: false, error: 'Failed to update plan' };
   }
 };
 
-export const deleteWeeklyGoal = async (id: string): Promise<ApiResponse<void>> => {
+export const deletePlan = async (id: string): Promise<ApiResponse<void>> => {
   try {
-    const goals = getStoredWeeklyGoals();
-    const updatedGoals = goals.filter(goal => goal.id !== id);
+    const plans = getStoredPlans();
+    const updatedPlans = plans.filter(plan => plan.id !== id);
     
-    if (updatedGoals.length === goals.length) {
-      return { success: false, error: 'Weekly goal not found' };
+    if (updatedPlans.length === plans.length) {
+      return { success: false, error: 'Plan not found' };
     }
     
-    storeWeeklyGoals(updatedGoals);
+    storePlans(updatedPlans);
     return { success: true };
   } catch (error) {
-    console.error('Error deleting weekly goal:', error);
-    return { success: false, error: 'Failed to delete weekly goal' };
+    console.error('Error deleting plan:', error);
+    return { success: false, error: 'Failed to delete plan' };
   }
 };
+
+// For backwards compatibility - these will call the Plan methods
+export const getWeeklyGoals = getPlans;
+export const createWeeklyGoal = createPlan;
+export const updateWeeklyGoal = updatePlan;
+export const deleteWeeklyGoal = deletePlan;

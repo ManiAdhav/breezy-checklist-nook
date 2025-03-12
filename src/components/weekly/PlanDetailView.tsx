@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 import { useGoal } from '@/contexts/GoalContext';
 import { useTask } from '@/contexts/TaskContext';
 import { format } from 'date-fns';
-import { WeeklyGoal, GoalStatus, Task } from '@/types/task';
+import { Plan, GoalStatus, Task } from '@/types/task';
 import { 
   ArrowLeft, CheckCircle, Clock, Target, Calendar, 
   Edit, Trash2, PlusCircle, CheckSquare 
@@ -19,13 +18,13 @@ import PlanSection from '@/components/goals/sections/PlanSection';
 import { toast } from '@/hooks/use-toast';
 
 interface PlanDetailViewProps {
-  plan: WeeklyGoal;
+  plan: Plan;
   onBack: () => void;
-  onEdit: (goal: WeeklyGoal) => void;
+  onEdit: (plan: Plan) => void;
 }
 
 const PlanDetailView: React.FC<PlanDetailViewProps> = ({ plan, onBack, onEdit }) => {
-  const { ninetyDayTargets, deleteWeeklyGoal, updateWeeklyGoal } = useGoal();
+  const { ninetyDayTargets, deletePlan, updatePlan } = useGoal();
   const { tasks, addTask, toggleTaskCompletion } = useTask();
   
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -37,7 +36,7 @@ const PlanDetailView: React.FC<PlanDetailViewProps> = ({ plan, onBack, onEdit })
   const parentTarget = ninetyDayTargets.find(target => target.id === plan.ninetyDayTargetId);
   
   // Get tasks related to this plan
-  const planTasks = tasks.filter(task => task.weeklyGoalId === plan.id);
+  const planTasks = tasks.filter(task => task.planId === plan.id);
   
   const getStatusColor = (status: GoalStatus): string => {
     const colors = {
@@ -60,7 +59,7 @@ const PlanDetailView: React.FC<PlanDetailViewProps> = ({ plan, onBack, onEdit })
   };
   
   const handleStatusChange = (newStatus: GoalStatus) => {
-    updateWeeklyGoal(plan.id, { status: newStatus });
+    updatePlan(plan.id, { status: newStatus });
     toast({
       title: "Plan status updated",
       description: `Plan status changed to ${getStatusLabel(newStatus)}`,
@@ -68,7 +67,7 @@ const PlanDetailView: React.FC<PlanDetailViewProps> = ({ plan, onBack, onEdit })
   };
   
   const handleDelete = () => {
-    deleteWeeklyGoal(plan.id);
+    deletePlan(plan.id);
     setIsDeleteConfirmOpen(false);
     onBack();
     toast({
@@ -94,7 +93,7 @@ const PlanDetailView: React.FC<PlanDetailViewProps> = ({ plan, onBack, onEdit })
       completed: false,
       priority: 'medium',
       listId: 'inbox',
-      weeklyGoalId: plan.id,
+      planId: plan.id,
       isAction: true
     });
     

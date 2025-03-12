@@ -18,7 +18,7 @@ export interface Task {
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
-  weeklyGoalId?: string;
+  planId?: string;
   isAction?: boolean; // New field to identify action items
   startDate?: Date;  // New field specific to actions
 }
@@ -58,12 +58,12 @@ export interface NinetyDayTarget {
   status: GoalStatus;
   threeYearGoalId: string;
   icon?: string;
-  weeklyGoals?: WeeklyGoal[];
+  plans?: Plan[];
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface WeeklyGoal {
+export interface Plan {
   id: string;
   title: string;
   description?: string;

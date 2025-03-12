@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useTask } from '@/contexts/TaskContext';
 import { useGoal } from '@/contexts/GoalContext';
@@ -44,11 +43,11 @@ interface ActionsSectionProps {
 
 const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
   const { tasks, addTask, toggleTaskCompletion } = useTask();
-  const { threeYearGoals, weeklyGoals, ninetyDayTargets } = useGoal();
+  const { threeYearGoals, plans, ninetyDayTargets } = useGoal();
   
   const [isAddActionOpen, setIsAddActionOpen] = useState(false);
   const [newActionTitle, setNewActionTitle] = useState('');
-  const [selectedWeeklyGoalId, setSelectedWeeklyGoalId] = useState('');
+  const [selectedPlanId, setSelectedPlanId] = useState('');
   const [actionStartDate, setActionStartDate] = useState<Date>(new Date());
   const [actionEndDate, setActionEndDate] = useState<Date>(addDays(new Date(), 7));
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
@@ -58,13 +57,13 @@ const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
   
   // Improved filtering of actions for this goal
   const goalActions = tasks.filter(task => {
-    // If task has a weeklyGoalId
-    if (task.isAction && task.weeklyGoalId) {
-      // Find the associated weekly goal
-      const weeklyGoal = weeklyGoals.find(wg => wg.id === task.weeklyGoalId);
-      if (weeklyGoal) {
-        // Find the target associated with this weekly goal
-        const target = ninetyDayTargets.find(t => t.id === weeklyGoal.ninetyDayTargetId);
+    // If task has a planId
+    if (task.isAction && task.planId) {
+      // Find the associated plan
+      const plan = plans.find(p => p.id === task.planId);
+      if (plan) {
+        // Find the target associated with this plan
+        const target = ninetyDayTargets.find(t => t.id === plan.ninetyDayTargetId);
         // Check if this target belongs to our goal
         return target?.threeYearGoalId === goalId;
       }
@@ -72,7 +71,7 @@ const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
     return false;
   });
   
-  const getWeeklyGoalsForGoal = () => {
+  const getPlansForGoal = () => {
     if (!goal) return [];
     
     // Get all targets for this goal
@@ -80,12 +79,12 @@ const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
       target.threeYearGoalId === goalId
     );
     
-    // Get all weekly goals for these targets
-    const weeklyGoalsForTargets = weeklyGoals.filter(weekly => 
-      targetsForGoal.some(target => target.id === weekly.ninetyDayTargetId)
+    // Get all plans for these targets
+    const plansForTargets = plans.filter(plan => 
+      targetsForGoal.some(target => target.id === plan.ninetyDayTargetId)
     );
     
-    return weeklyGoalsForTargets;
+    return plansForTargets;
   };
   
   const handleAddAction = async () => {
@@ -98,7 +97,7 @@ const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
       return;
     }
 
-    if (!selectedWeeklyGoalId) {
+    if (!selectedPlanId) {
       toast({
         title: "Error",
         description: "Please select a plan for this action",
@@ -112,7 +111,7 @@ const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
       completed: false,
       priority: 'medium',
       listId: 'inbox',
-      weeklyGoalId: selectedWeeklyGoalId,
+      planId: selectedPlanId,
       startDate: actionStartDate,
       dueDate: actionEndDate,
       isAction: true,
@@ -139,7 +138,7 @@ const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
   
   const resetForm = () => {
     setNewActionTitle('');
-    setSelectedWeeklyGoalId('');
+    setSelectedPlanId('');
     setActionStartDate(new Date());
     setActionEndDate(addDays(new Date(), 7));
     setIsAddActionOpen(false);
@@ -260,15 +259,15 @@ const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
             <div className="space-y-2">
               <Label htmlFor="plan-select">Associated Plan</Label>
               <Select 
-                value={selectedWeeklyGoalId} 
-                onValueChange={setSelectedWeeklyGoalId}
+                value={selectedPlanId} 
+                onValueChange={setSelectedPlanId}
               >
                 <SelectTrigger id="plan-select">
                   <SelectValue placeholder="Select a plan" />
                 </SelectTrigger>
                 <SelectContent>
-                  {getWeeklyGoalsForGoal().map(weeklyGoal => (
-                    <SelectItem key={weeklyGoal.id} value={weeklyGoal.id}>{weeklyGoal.title}</SelectItem>
+                  {getPlansForGoal().map(plan => (
+                    <SelectItem key={plan.id} value={plan.id}>{plan.title}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
