@@ -1,26 +1,24 @@
 
 import React from 'react';
-import { GoalProvider } from '@/contexts/GoalContext';
-import { TaskProvider } from '@/contexts/TaskContext';
-import Header from '@/components/layout/Header';
-import Sidebar from '@/components/layout/Sidebar';
+import Layout from '@/components/layout/Layout';
 import ActionsView from '@/components/actions/ActionsView';
+import { useTask } from '@/contexts/TaskContext';
 
 const ActionsPage: React.FC = () => {
+  const { tasks, isLoading } = useTask();
+  
   return (
-    <TaskProvider>
-      <GoalProvider>
-        <div className="min-h-screen flex flex-col bg-background">
-          <Header />
-          <div className="flex flex-1 overflow-hidden">
-            <Sidebar />
-            <main className="flex-1 overflow-y-auto">
-              <ActionsView />
-            </main>
-          </div>
-        </div>
-      </GoalProvider>
-    </TaskProvider>
+    <Layout>
+      <div className="container mx-auto p-4 max-w-4xl">
+        <h1 className="text-2xl font-bold mb-6">Actions</h1>
+        
+        {isLoading ? (
+          <div className="text-center py-10">Loading actions...</div>
+        ) : (
+          <ActionsView tasks={tasks} />
+        )}
+      </div>
+    </Layout>
   );
 };
 

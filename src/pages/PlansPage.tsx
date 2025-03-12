@@ -11,7 +11,7 @@ const PlansPage: React.FC = () => {
     <Layout>
       <div className="container mx-auto max-w-4xl p-4">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Plans</h1>
+          <h1 className="text-2xl font-bold">Weekly Plans</h1>
         </div>
         
         {isLoading ? (
