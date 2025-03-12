@@ -1,27 +1,27 @@
 
 import React from 'react';
-import { GoalProvider } from '@/contexts/GoalContext';
-import { TaskProvider } from '@/contexts/TaskContext';
-import Header from '@/components/layout/Header';
-import Sidebar from '@/components/layout/Sidebar';
-import WeeklyGoalList from '@/components/weekly/WeeklyGoalList';
-import FloatingActionButton from '@/components/fab/FloatingActionButton';
+import Layout from '@/components/layout/Layout';
+import { useGoal } from '@/contexts/GoalContext';
+import PlanList from '@/components/weekly/PlanList';
 
-const WeeklyGoalsPage: React.FC = () => {
+const PlansPage: React.FC = () => {
+  const { plans, isLoading } = useGoal();
+
   return (
-    <TaskProvider>
-      <GoalProvider>
-        <div className="min-h-screen flex flex-col bg-background">
-          <Header />
-          <div className="flex flex-1 overflow-hidden">
-            <Sidebar />
-            <WeeklyGoalList />
-          </div>
-          <FloatingActionButton />
+    <Layout>
+      <div className="container mx-auto max-w-4xl p-4">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Plans</h1>
         </div>
-      </GoalProvider>
-    </TaskProvider>
+        
+        {isLoading ? (
+          <div className="text-center py-10">Loading plans...</div>
+        ) : (
+          <PlanList plans={plans} />
+        )}
+      </div>
+    </Layout>
   );
 };
 
-export default WeeklyGoalsPage;
+export default PlansPage;

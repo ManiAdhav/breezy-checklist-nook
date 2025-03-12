@@ -1,131 +1,99 @@
 
-import React, { useState } from 'react';
-import { format } from 'date-fns';
-import { Plan, GoalStatus } from '@/types/task';
-import { useGoal } from '@/contexts/GoalContext';
-import { Pencil, Trash2, CheckCircle, Clock, Target, Calendar } from 'lucide-react';
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import Tag from '@/components/ui/Tag';
+import { MoreVertical, Calendar, CircleCheck, CircleDashed, CheckCircle2, XCircle } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { format } from 'date-fns';
+import { useGoal } from '@/contexts/GoalContext';
+import { Plan } from '@/types/task';
+import { Badge } from '@/components/ui/badge';
+import { Link } from 'react-router-dom';
 
 interface PlanItemProps {
   plan: Plan;
-  onEdit: (plan: Plan) => void;
-  onView: (plan: Plan) => void;
+  onEdit: () => void;
+  targetName?: string;
 }
 
-const PlanItem: React.FC<PlanItemProps> = ({ plan, onEdit, onView }) => {
-  const { deletePlan, updatePlan, ninetyDayTargets } = useGoal();
-  const [isHovered, setIsHovered] = useState(false);
+const PlanItem: React.FC<PlanItemProps> = ({ plan, onEdit, targetName }) => {
+  const { deletePlan, updatePlan } = useGoal();
 
-  const getStatusColor = (status: GoalStatus): string => {
-    const colors = {
-      not_started: '#6B7280', // gray
-      in_progress: '#60A5FA', // blue
-      completed: '#34D399', // green
-      abandoned: '#F87171', // red
-    };
-    return colors[status];
+  const getStatusIcon = () => {
+    switch (plan.status) {
+      case 'completed':
+        return <CheckCircle2 className="h-4 w-4 text-green-500" />;
+      case 'in_progress':
+        return <CircleDashed className="h-4 w-4 text-blue-500" />;
+      case 'abandoned':
+        return <XCircle className="h-4 w-4 text-red-500" />;
+      default:
+        return <CircleDashed className="h-4 w-4 text-gray-500" />;
+    }
   };
 
-  const getStatusLabel = (status: GoalStatus): string => {
-    const labels = {
-      not_started: 'Not Started',
-      in_progress: 'In Progress',
-      completed: 'Completed',
-      abandoned: 'Abandoned',
-    };
-    return labels[status];
-  };
-
-  // Find the parent target
-  const parentTarget = ninetyDayTargets.find(target => target.id === plan.ninetyDayTargetId);
-
-  const toggleComplete = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent clicking through to the view
-    const newStatus = plan.status === 'completed' ? 'in_progress' : 'completed';
-    updatePlan(plan.id, { status: newStatus });
-  };
-
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent clicking through to the view
-    deletePlan(plan.id);
-  };
-
-  const handleEdit = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent clicking through to the view
-    onEdit(plan);
+  const handleStatusChange = (status: 'not_started' | 'in_progress' | 'completed' | 'abandoned') => {
+    updatePlan(plan.id, { status });
   };
 
   return (
-    <div 
-      className={`group p-3 border border-border rounded-lg transition-colors duration-150 ${
-        isHovered ? 'bg-card/80' : 'bg-card'
-      } ${plan.status === 'completed' ? 'border-green-200 bg-green-50/30' : ''} cursor-pointer`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={() => onView(plan)}
-    >
-      <div className="flex items-start">
-        <Button
-          variant="ghost"
-          size="icon"
-          className={`h-6 w-6 mr-2 rounded-full ${plan.status === 'completed' ? 'text-green-500' : 'text-muted-foreground'}`}
-          onClick={toggleComplete}
-        >
-          <CheckCircle className={`h-5 w-5 ${plan.status === 'completed' ? 'fill-green-500' : ''}`} />
-        </Button>
-        
-        <div className="flex-1 min-w-0 mr-2">
-          <div className={`font-medium ${plan.status === 'completed' ? 'line-through text-muted-foreground' : ''}`}>
-            {plan.title}
-          </div>
-          
-          {plan.description && (
-            <div className="text-sm text-muted-foreground mt-1">
-              {plan.description}
-            </div>
+    <Card className="border shadow-sm">
+      <CardHeader className="py-4 px-4 flex flex-row items-start justify-between space-y-0">
+        <div className="space-y-1">
+          <CardTitle className="flex items-center gap-2 text-base">
+            {getStatusIcon()}
+            <span>{plan.title}</span>
+          </CardTitle>
+          {targetName && (
+            <CardDescription>
+              <Link to={`/targets?targetId=${plan.ninetyDayTargetId}`}>
+                <Badge variant="outline" className="hover:bg-secondary transition-colors">
+                  {targetName}
+                </Badge>
+              </Link>
+            </CardDescription>
           )}
-
-          {parentTarget && (
-            <div className="flex items-center mt-2 text-xs text-muted-foreground">
-              <Target className="h-3.5 w-3.5 mr-1" />
-              <span>From target: {parentTarget.title}</span>
-            </div>
-          )}
-          
-          <div className="flex flex-wrap items-center gap-2 mt-2">
-            <Tag 
-              text={getStatusLabel(plan.status)} 
-              color={getStatusColor(plan.status)}
-            />
-            
-            <div className="flex items-center text-xs text-muted-foreground">
-              <Calendar className="h-3.5 w-3.5 mr-1" />
-              <span>{format(new Date(plan.startDate), 'MMM d')} - {format(new Date(plan.endDate), 'MMM d')}</span>
-            </div>
-          </div>
         </div>
-        
-        <div className={`flex items-center space-x-1 transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 rounded-full"
-            onClick={handleEdit}
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 rounded-full text-destructive hover:text-destructive"
-            onClick={handleDelete}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <MoreVertical className="h-4 w-4" />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-[180px]">
+            <DropdownMenuItem onClick={onEdit}>Edit</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleStatusChange('not_started')}>
+              Mark as Not Started
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleStatusChange('in_progress')}>
+              Mark as In Progress
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleStatusChange('completed')}>
+              Mark as Completed
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleStatusChange('abandoned')}>
+              Mark as Abandoned
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              className="text-destructive focus:text-destructive" 
+              onClick={() => deletePlan(plan.id)}
+            >
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </CardHeader>
+      <CardContent className="px-4 pb-4 pt-0 text-sm space-y-2">
+        {plan.description && <p className="text-muted-foreground">{plan.description}</p>}
+        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <Calendar className="h-3.5 w-3.5" />
+          <span>
+            {format(new Date(plan.startDate), 'MMM d, yyyy')} - {format(new Date(plan.endDate), 'MMM d, yyyy')}
+          </span>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

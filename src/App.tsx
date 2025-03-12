@@ -4,7 +4,7 @@ import './App.css';
 import Index from './pages/Index';
 import GoalsPage from './pages/GoalsPage';
 import NinetyDayTargetsPage from './pages/NinetyDayTargetsPage';
-import PlansPage from './pages/WeeklyGoalsPage';
+import PlansPage from './pages/PlansPage';
 import CalendarPage from './pages/CalendarPage';
 import VisionPage from './pages/VisionPage';
 import MindMapPage from './pages/MindMapPage';
