@@ -77,7 +77,7 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
   editingGoal,
   onSave,
 }) => {
-  const { addThreeYearGoal, updateThreeYearGoal, addNinetyDayTarget, updateNinetyDayTarget, addWeeklyGoal, } = useGoal();
+  const { addThreeYearGoal, updateThreeYearGoal, addNinetyDayTarget, updateNinetyDayTarget, addPlan } = useGoal();
   const { visions } = useVision();
   const { addTask } = useTask();
   
@@ -231,8 +231,8 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
     // Create a weekly goal for this 3-year goal if we have a valid goal ID
     if (goalId && validActions.length > 0) {
       try {
-        // Create a weekly goal to associate with the actions
-        const weeklyGoalData = {
+        // Create a plan to associate with the actions
+        const planData = {
           title: `Weekly plan for ${title}`,
           description: `Initial weekly plan for achieving ${title}`,
           startDate: new Date(),
@@ -242,10 +242,10 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
           icon: "Target" as keyof typeof icons
         };
         
-        const weeklyGoalResult = await addWeeklyGoal(weeklyGoalData);
-        const weeklyGoalId = (await weeklyGoalResult).id;
+        const planResult = await addPlan(planData);
+        const planId = planResult?.id;
         
-        if (weeklyGoalId) {
+        if (planId) {
           // Now create tasks for each action
           for (const action of validActions) {
             await addTask({
@@ -253,7 +253,7 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
               completed: false,
               priority: 'medium',
               listId: 'inbox',
-              weeklyGoalId: weeklyGoalId,
+              planId: planId,
               startDate: new Date(),
               dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
               isAction: true,
@@ -266,7 +266,7 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
           });
         }
       } catch (error) {
-        console.error("Error creating weekly goal or actions:", error);
+        console.error("Error creating plan or actions:", error);
         toast({
           title: "Error",
           description: "Failed to create actions",

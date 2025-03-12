@@ -48,7 +48,7 @@ const Sidebar: React.FC = () => {
     toggleTaskCompletion
   } = useTask();
   
-  const { weeklyGoals, threeYearGoals } = useGoal();
+  const { plans, threeYearGoals } = useGoal();
   
   const [showCustomLists, setShowCustomLists] = useState(true);
   const [showGoals, setShowGoals] = useState(true);
@@ -108,7 +108,7 @@ const Sidebar: React.FC = () => {
     navigate('/');
   };
 
-  const activeWeeklyGoals = weeklyGoals.filter(goal => goal.status !== 'completed' && goal.status !== 'abandoned');
+  const activePlans = plans.filter(plan => plan.status !== 'completed' && plan.status !== 'abandoned');
 
   const actionTasksCount = tasks.filter(task => 
     task.isAction && 
@@ -117,11 +117,11 @@ const Sidebar: React.FC = () => {
 
   const goalsWithActions = threeYearGoals.filter(goal => {
     const goalTasks = tasks.filter(task => {
-      const weeklyGoal = goal.targets
-        ?.flatMap(target => target.weeklyGoals || [])
-        .find(wg => wg.id === task.weeklyGoalId);
+      const plan = goal.targets
+        ?.flatMap(target => target.plans || [])
+        .find(p => p.id === task.planId);
       
-      return weeklyGoal && !task.completed;
+      return plan && !task.completed;
     });
     
     return goalTasks.length > 0;
@@ -211,11 +211,11 @@ const Sidebar: React.FC = () => {
               
               {goalsWithActions.map(goal => {
                 const goalTasks = tasks.filter(task => {
-                  const weeklyGoal = goal.targets
-                    ?.flatMap(target => target.weeklyGoals || [])
-                    .find(wg => wg.id === task.weeklyGoalId);
+                  const plan = goal.targets
+                    ?.flatMap(target => target.plans || [])
+                    .find(p => p.id === task.planId);
                   
-                  return weeklyGoal && !task.completed;
+                  return plan && !task.completed;
                 });
                 
                 if (goalTasks.length === 0) return null;
@@ -254,7 +254,7 @@ const Sidebar: React.FC = () => {
                                     toggleTaskCompletion(task.id);
                                   }}
                                   onClick={(e) => e.stopPropagation()}
-                                />
+                              />
                                 <div>{task.title}</div>
                               </div>
                             ))}
