@@ -8,6 +8,7 @@ import { WeeklyGoal, NinetyDayTarget } from '@/types/task';
 import { Plus, Calendar, Target } from 'lucide-react';
 import { startOfWeek, endOfWeek, format, addDays } from 'date-fns';
 import { Progress } from '@/components/ui/progress';
+import PlanDetailView from './PlanDetailView';
 
 const WeeklyGoalList: React.FC = () => {
   const { weeklyGoals, ninetyDayTargets } = useGoal();
@@ -16,6 +17,7 @@ const WeeklyGoalList: React.FC = () => {
   const [editingGoal, setEditingGoal] = useState<WeeklyGoal | null>(null);
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [suggestedGoals, setSuggestedGoals] = useState<Array<Omit<WeeklyGoal, 'id' | 'createdAt' | 'updatedAt'>>>([]);
+  const [selectedPlan, setSelectedPlan] = useState<WeeklyGoal | null>(null);
   
   // Calculate the current week's end date
   const currentWeekEnd = endOfWeek(currentWeekStart, { weekStartsOn: 1 });
@@ -72,6 +74,10 @@ const WeeklyGoalList: React.FC = () => {
     setIsGoalFormOpen(true);
   };
   
+  const handleViewPlan = (plan: WeeklyGoal) => {
+    setSelectedPlan(plan);
+  };
+  
   const previousWeek = () => {
     setCurrentWeekStart(prev => addDays(prev, -7));
   };
@@ -79,6 +85,17 @@ const WeeklyGoalList: React.FC = () => {
   const nextWeek = () => {
     setCurrentWeekStart(prev => addDays(prev, 7));
   };
+  
+  // If a plan is selected, render the plan detail view
+  if (selectedPlan) {
+    return (
+      <PlanDetailView 
+        plan={selectedPlan} 
+        onBack={() => setSelectedPlan(null)}
+        onEdit={handleEditGoal}
+      />
+    );
+  }
   
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
@@ -171,6 +188,7 @@ const WeeklyGoalList: React.FC = () => {
                       key={goal.id} 
                       goal={goal} 
                       onEdit={handleEditGoal}
+                      onView={() => handleViewPlan(goal)}
                     />
                   ))}
                 </div>

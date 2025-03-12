@@ -10,9 +10,10 @@ import Tag from '@/components/ui/Tag';
 interface WeeklyGoalItemProps {
   goal: WeeklyGoal;
   onEdit: (goal: WeeklyGoal) => void;
+  onView: (goal: WeeklyGoal) => void;  // Add this prop
 }
 
-const WeeklyGoalItem: React.FC<WeeklyGoalItemProps> = ({ goal, onEdit }) => {
+const WeeklyGoalItem: React.FC<WeeklyGoalItemProps> = ({ goal, onEdit, onView }) => {
   const { deleteWeeklyGoal, updateWeeklyGoal, ninetyDayTargets } = useGoal();
   const [isHovered, setIsHovered] = useState(false);
 
@@ -39,18 +40,30 @@ const WeeklyGoalItem: React.FC<WeeklyGoalItemProps> = ({ goal, onEdit }) => {
   // Find the parent target
   const parentTarget = ninetyDayTargets.find(target => target.id === goal.ninetyDayTargetId);
 
-  const toggleComplete = () => {
+  const toggleComplete = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent clicking through to the view
     const newStatus = goal.status === 'completed' ? 'in_progress' : 'completed';
     updateWeeklyGoal(goal.id, { status: newStatus });
+  };
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent clicking through to the view
+    deleteWeeklyGoal(goal.id);
+  };
+
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent clicking through to the view
+    onEdit(goal);
   };
 
   return (
     <div 
       className={`group p-3 border border-border rounded-lg transition-colors duration-150 ${
         isHovered ? 'bg-card/80' : 'bg-card'
-      } ${goal.status === 'completed' ? 'border-green-200 bg-green-50/30' : ''}`}
+      } ${goal.status === 'completed' ? 'border-green-200 bg-green-50/30' : ''} cursor-pointer`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={() => onView(goal)}
     >
       <div className="flex items-start">
         <Button
@@ -98,7 +111,7 @@ const WeeklyGoalItem: React.FC<WeeklyGoalItemProps> = ({ goal, onEdit }) => {
             variant="ghost"
             size="icon"
             className="h-7 w-7 rounded-full"
-            onClick={() => onEdit(goal)}
+            onClick={handleEdit}
           >
             <Pencil className="h-4 w-4" />
           </Button>
@@ -106,7 +119,7 @@ const WeeklyGoalItem: React.FC<WeeklyGoalItemProps> = ({ goal, onEdit }) => {
             variant="ghost"
             size="icon"
             className="h-7 w-7 rounded-full text-destructive hover:text-destructive"
-            onClick={() => deleteWeeklyGoal(goal.id)}
+            onClick={handleDelete}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
