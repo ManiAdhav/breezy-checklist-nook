@@ -88,7 +88,7 @@ const PlanItem: React.FC<PlanItemProps> = ({ plan, onEdit, targetName }) => {
         )}
         <div className="grid grid-cols-2 gap-2 text-sm">
           <div>
-            <p className="text-muted-foreground">Target:</p>
+            <p className="text-muted-foreground">Milestone:</p>
             <p>{targetName}</p>
           </div>
           <div>

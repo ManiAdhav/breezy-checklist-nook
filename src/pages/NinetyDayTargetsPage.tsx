@@ -4,7 +4,7 @@ import { GoalProvider } from '@/contexts/GoalContext';
 import { TaskProvider } from '@/contexts/TaskContext';
 import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
-import NinetyDayTargetList from '@/components/targets/NinetyDayTargetList';
+import MilestoneList from '@/components/targets/MilestoneList';
 import FloatingActionButton from '@/components/fab/FloatingActionButton';
 
 const NinetyDayTargetsPage: React.FC = () => {
@@ -15,7 +15,7 @@ const NinetyDayTargetsPage: React.FC = () => {
           <Header />
           <div className="flex flex-1 overflow-hidden">
             <Sidebar />
-            <NinetyDayTargetList />
+            <MilestoneList />
           </div>
           <FloatingActionButton />
         </div>

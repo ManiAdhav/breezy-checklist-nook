@@ -34,7 +34,7 @@ const PlanList: React.FC<PlanListProps> = ({ plans }) => {
 
   const getTargetName = (targetId: string): string => {
     const target = ninetyDayTargets.find(t => t.id === targetId);
-    return target ? target.title : 'Unknown Target';
+    return target ? target.title : 'Unknown Milestone';
   };
 
   return (

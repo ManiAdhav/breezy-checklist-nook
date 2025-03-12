@@ -53,7 +53,7 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onClose }) => {
     }
     
     if (!targetId) {
-      newErrors.targetId = 'Target is required';
+      newErrors.targetId = 'Milestone is required';
     }
     
     if (!startDate) {
@@ -170,18 +170,18 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onClose }) => {
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="targetId">90-Day Target</Label>
+        <Label htmlFor="targetId">Milestone</Label>
         <Select 
           value={targetId} 
           onValueChange={setTargetId}
           disabled={ninetyDayTargets.length === 0}
         >
           <SelectTrigger className={errors.targetId ? 'border-red-500' : ''}>
-            <SelectValue placeholder="Select a target" />
+            <SelectValue placeholder="Select a milestone" />
           </SelectTrigger>
           <SelectContent>
             {ninetyDayTargets.length === 0 ? (
-              <SelectItem value="none" disabled>No targets available</SelectItem>
+              <SelectItem value="none" disabled>No milestones available</SelectItem>
             ) : (
               ninetyDayTargets.map((target) => (
                 <SelectItem key={target.id} value={target.id}>
@@ -193,7 +193,7 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onClose }) => {
         </Select>
         {errors.targetId && <p className="text-sm text-red-500">{errors.targetId}</p>}
         {ninetyDayTargets.length === 0 && (
-          <p className="text-sm text-yellow-600">You need to create a 90-day target first</p>
+          <p className="text-sm text-yellow-600">You need to create a milestone first</p>
         )}
       </div>
       
