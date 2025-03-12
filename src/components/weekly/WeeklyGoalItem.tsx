@@ -10,7 +10,7 @@ import Tag from '@/components/ui/Tag';
 interface WeeklyGoalItemProps {
   goal: WeeklyGoal;
   onEdit: (goal: WeeklyGoal) => void;
-  onView: (goal: WeeklyGoal) => void;  // Add this prop
+  onView: (goal: WeeklyGoal) => void;
 }
 
 const WeeklyGoalItem: React.FC<WeeklyGoalItemProps> = ({ goal, onEdit, onView }) => {

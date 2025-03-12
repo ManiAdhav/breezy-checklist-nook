@@ -23,7 +23,6 @@ import {
 } from '@/components/ui/popover';
 import { Calendar as CalendarIcon, CheckSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import DynamicIcon from '@/components/ui/dynamic-icon';
 
 interface WeeklyGoalFormProps {
   isOpen: boolean;
