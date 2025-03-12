@@ -11,22 +11,25 @@ import MindMapPage from './pages/MindMapPage';
 import ActionsPage from './pages/ActionsPage';
 import NotFound from './pages/NotFound';
 import { Toaster } from '@/components/ui/toaster';
+import { GoalProvider } from '@/contexts/GoalContext';
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/vision" element={<VisionPage />} />
-        <Route path="/goals" element={<GoalsPage />} />
-        <Route path="/targets" element={<NinetyDayTargetsPage />} />
-        <Route path="/weekly" element={<PlansPage />} />
-        <Route path="/calendar" element={<CalendarPage />} />
-        <Route path="/mindmap" element={<MindMapPage />} />
-        <Route path="/actions" element={<ActionsPage />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-      <Toaster />
+      <GoalProvider>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/vision" element={<VisionPage />} />
+          <Route path="/goals" element={<GoalsPage />} />
+          <Route path="/targets" element={<NinetyDayTargetsPage />} />
+          <Route path="/weekly" element={<PlansPage />} />
+          <Route path="/calendar" element={<CalendarPage />} />
+          <Route path="/mindmap" element={<MindMapPage />} />
+          <Route path="/actions" element={<ActionsPage />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <Toaster />
+      </GoalProvider>
     </Router>
   );
 }
