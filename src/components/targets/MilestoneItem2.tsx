@@ -7,12 +7,12 @@ import { Pencil, Trash2, Calendar, Clock, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Tag from '@/components/ui/Tag';
 
-interface NinetyDayTargetItemProps {
+interface MilestoneItemProps {
   target: NinetyDayTarget;
   onEdit: (target: NinetyDayTarget) => void;
 }
 
-const NinetyDayTargetItem: React.FC<NinetyDayTargetItemProps> = ({ target, onEdit }) => {
+const MilestoneItem2: React.FC<MilestoneItemProps> = ({ target, onEdit }) => {
   const { deleteNinetyDayTarget, threeYearGoals } = useGoal();
   const [isHovered, setIsHovered] = useState(false);
 
@@ -105,4 +105,4 @@ const NinetyDayTargetItem: React.FC<NinetyDayTargetItemProps> = ({ target, onEdi
   );
 };
 
-export default NinetyDayTargetItem;
+export default MilestoneItem2;

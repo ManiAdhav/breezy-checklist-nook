@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import Index from './pages/Index';
 import GoalsPage from './pages/GoalsPage';
-import NinetyDayTargetsPage from './pages/NinetyDayTargetsPage';
+import MilestonePage from './pages/MilestonePage';
 import PlansPage from './pages/PlansPage';
 import CalendarPage from './pages/CalendarPage';
 import VisionPage from './pages/VisionPage';
@@ -23,7 +23,7 @@ function App() {
             <Route path="/" element={<Index />} />
             <Route path="/vision" element={<VisionPage />} />
             <Route path="/goals" element={<GoalsPage />} />
-            <Route path="/targets" element={<NinetyDayTargetsPage />} />
+            <Route path="/targets" element={<MilestonePage />} />
             <Route path="/weekly" element={<PlansPage />} />
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/mindmap" element={<MindMapPage />} />

@@ -2,17 +2,17 @@
 import React from 'react';
 import { NinetyDayTarget } from '@/types/task';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import NinetyDayTargetFormContent from './NinetyDayTargetFormContent';
+import MilestoneFormContent2 from './MilestoneFormContent2';
 import { useNinetyDayTargetForm } from './hooks/useNinetyDayTargetForm';
 
-interface NinetyDayTargetFormProps {
+interface MilestoneFormProps {
   isOpen: boolean;
   onClose: () => void;
   editingTarget: NinetyDayTarget | null;
   user?: any;
 }
 
-const NinetyDayTargetForm: React.FC<NinetyDayTargetFormProps> = ({ isOpen, onClose, editingTarget, user }) => {
+const MilestoneForm2: React.FC<MilestoneFormProps> = ({ isOpen, onClose, editingTarget, user }) => {
   const {
     title,
     setTitle,
@@ -38,13 +38,13 @@ const NinetyDayTargetForm: React.FC<NinetyDayTargetFormProps> = ({ isOpen, onClo
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[550px] animate-scale-in">
         <DialogHeader>
-          <DialogTitle>{editingTarget ? 'Edit 90-Day Target' : 'Add 90-Day Target'}</DialogTitle>
+          <DialogTitle>{editingTarget ? 'Edit Milestone' : 'Add Milestone'}</DialogTitle>
           <DialogDescription>
-            90-day targets help break down your three-year goals into manageable chunks.
+            Milestones help break down your three-year goals into manageable chunks.
           </DialogDescription>
         </DialogHeader>
         
-        <NinetyDayTargetFormContent
+        <MilestoneFormContent2
           title={title}
           setTitle={setTitle}
           description={description}
@@ -71,4 +71,4 @@ const NinetyDayTargetForm: React.FC<NinetyDayTargetFormProps> = ({ isOpen, onClo
   );
 };
 
-export default NinetyDayTargetForm;
+export default MilestoneForm2;

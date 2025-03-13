@@ -4,7 +4,7 @@ import TargetsLayout from '@/components/targets/TargetsLayout';
 import { useAuth } from '@/hooks/useAuth';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
-const NinetyDayTargetsPage: React.FC = () => {
+const MilestonePage: React.FC = () => {
   const { user, loading, handleSignOut } = useAuth();
   
   if (loading) {
@@ -14,4 +14,4 @@ const NinetyDayTargetsPage: React.FC = () => {
   return <TargetsLayout user={user} onSignOut={handleSignOut} />;
 };
 
-export default NinetyDayTargetsPage;
+export default MilestonePage;

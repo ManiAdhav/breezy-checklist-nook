@@ -8,7 +8,7 @@ import StatusField from './form-fields/StatusField';
 import GoalSelectorField from './form-fields/GoalSelectorField';
 import FormActions from './form-fields/FormActions';
 
-interface NinetyDayTargetFormContentProps {
+interface MilestoneFormContentProps {
   title: string;
   setTitle: (value: string) => void;
   description: string;
@@ -31,7 +31,7 @@ interface NinetyDayTargetFormContentProps {
   threeYearGoals: ThreeYearGoal[];
 }
 
-const NinetyDayTargetFormContent: React.FC<NinetyDayTargetFormContentProps> = ({
+const MilestoneFormContent2: React.FC<MilestoneFormContentProps> = ({
   title,
   setTitle,
   description,
@@ -65,7 +65,7 @@ const NinetyDayTargetFormContent: React.FC<NinetyDayTargetFormContentProps> = ({
         <TitleField
           title={title}
           setTitle={setTitle}
-          placeholder="Target title"
+          placeholder="Milestone title"
         />
         
         <DescriptionField
@@ -100,10 +100,10 @@ const NinetyDayTargetFormContent: React.FC<NinetyDayTargetFormContentProps> = ({
       <FormActions
         onCancel={onClose}
         isEditing={isEditing}
-        submitLabel={isEditing ? 'Save Target' : 'Add Target'}
+        submitLabel={isEditing ? 'Save Milestone' : 'Add Milestone'}
       />
     </form>
   );
 };
 
-export default NinetyDayTargetFormContent;
+export default MilestoneFormContent2;

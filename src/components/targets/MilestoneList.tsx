@@ -109,10 +109,10 @@ const MilestoneList: React.FC<MilestoneListProps> = ({ user }) => {
   return (
     <div className="flex flex-col flex-1 p-6 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">90-Day Targets</h2>
+        <h2 className="text-2xl font-bold">Milestones</h2>
         <Button onClick={handleAddMilestone}>
           <Plus className="w-4 h-4 mr-2" />
-          Add Target
+          Add Milestone
         </Button>
       </div>
       
