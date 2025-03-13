@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useGoal } from '@/contexts/GoalContext';
 import { useVision } from '@/contexts/VisionContext';
@@ -88,6 +89,7 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
   const [status, setStatus] = useState<string>('not_started');
   const [icon, setIcon] = useState<keyof typeof icons>('Target');
   const [threeYearGoalId, setThreeYearGoalId] = useState('');
+  const [visionId, setVisionId] = useState('');
   const [actions, setActions] = useState([{ id: Date.now(), text: '' }]);
   
   // Control state for calendar popovers
@@ -101,6 +103,7 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
       setStartDate(new Date(editingGoal.startDate));
       setEndDate(new Date(editingGoal.endDate));
       setStatus(editingGoal.status);
+      setVisionId(editingGoal.visionId || '');
       // Make sure the icon is valid
       if (editingGoal.icon && editingGoal.icon in icons) {
         setIcon(editingGoal.icon as keyof typeof icons);
@@ -145,6 +148,7 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
     setEndDate(new Date(Date.now() + 90 * 24 * 60 * 60 * 1000));
     setStatus('not_started');
     setIcon('Target');
+    setVisionId('');
     setActions([{ id: Date.now(), text: '' }]);
   };
   
@@ -182,6 +186,7 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
       endDate,
       status: status as GoalStatus,
       icon,
+      visionId: visionId || undefined,
     };
     
     // Update or create the goal
@@ -212,7 +217,7 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
     } else {
       try {
         const result = await addThreeYearGoal(goalData);
-        goalId = (await result).id;
+        goalId = result?.id;
         toast({
           title: "Goal created",
           description: "Your new goal has been added to the mind map"
@@ -343,6 +348,23 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
                 {statusOptions.map(option => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="vision-select">Map to Vision (optional)</Label>
+            <Select value={visionId} onValueChange={setVisionId}>
+              <SelectTrigger id="vision-select">
+                <SelectValue placeholder="Select a vision" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">None</SelectItem>
+                {visions.map((vision) => (
+                  <SelectItem key={vision.id} value={vision.id}>
+                    {vision.title}
                   </SelectItem>
                 ))}
               </SelectContent>

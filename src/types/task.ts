@@ -44,6 +44,7 @@ export interface ThreeYearGoal {
   endDate: Date;
   status: GoalStatus;
   icon?: string;
+  visionId?: string; // Add visionId to map goal to vision
   targets?: NinetyDayTarget[];
   createdAt: Date;
   updatedAt: Date;

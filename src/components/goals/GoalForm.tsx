@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useGoal } from '@/contexts/GoalContext';
+import { useVision } from '@/contexts/VisionContext';
 import { ThreeYearGoal, GoalStatus } from '@/types/task';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,6 +38,7 @@ const iconOptions = [
 
 const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => {
   const { addThreeYearGoal, updateThreeYearGoal } = useGoal();
+  const { visions } = useVision();
   
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -45,6 +47,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
   const [status, setStatus] = useState<GoalStatus>('not_started');
   const [selectedIcon, setSelectedIcon] = useState<string>('Target');
   const [iconPopoverOpen, setIconPopoverOpen] = useState(false);
+  const [visionId, setVisionId] = useState<string>('');
   
   // Reset form and pick random icon when dialog opens/closes or editing goal changes
   useEffect(() => {
@@ -56,6 +59,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
         setEndDate(new Date(editingGoal.endDate));
         setStatus(editingGoal.status);
         setSelectedIcon(editingGoal.icon || getRandomIcon());
+        setVisionId(editingGoal.visionId || '');
       } else {
         setTitle('');
         setDescription('');
@@ -63,6 +67,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
         setEndDate(new Date(Date.now() + 3 * 365 * 24 * 60 * 60 * 1000));
         setStatus('not_started');
         setSelectedIcon(getRandomIcon());
+        setVisionId('');
       }
     }
   }, [isOpen, editingGoal]);
@@ -90,7 +95,8 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
       startDate,
       endDate,
       status,
-      icon: selectedIcon
+      icon: selectedIcon,
+      visionId: visionId || undefined
     };
     
     if (editingGoal) {
@@ -190,6 +196,23 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
               onChange={(e) => setDescription(e.target.value)}
               className="min-h-24 resize-none"
             />
+            
+            <div className="space-y-2">
+              <Label htmlFor="vision-select">Map to Vision (optional)</Label>
+              <Select value={visionId} onValueChange={(value) => setVisionId(value)}>
+                <SelectTrigger id="vision-select">
+                  <SelectValue placeholder="Select a vision to map" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">None</SelectItem>
+                  {visions.map((vision) => (
+                    <SelectItem key={vision.id} value={vision.id}>
+                      {vision.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
