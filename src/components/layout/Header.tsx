@@ -6,7 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Input } from '@/components/ui/input';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  user?: any;
+  onSignOut?: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
   const { setSearchQuery, searchQuery } = useTask();
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
@@ -70,7 +75,15 @@ const Header: React.FC = () => {
               size="icon" 
               className="rounded-full h-9 w-9 transition-all hover:bg-secondary overflow-hidden ml-1"
             >
-              <User className="h-5 w-5" />
+              {user?.user_metadata?.avatar_url ? (
+                <img 
+                  src={user.user_metadata.avatar_url} 
+                  alt="User avatar" 
+                  className="h-9 w-9 object-cover rounded-full"
+                />
+              ) : (
+                <User className="h-5 w-5" />
+              )}
             </Button>
           </PopoverTrigger>
           <PopoverContent 
@@ -80,16 +93,16 @@ const Header: React.FC = () => {
             <div className="bg-primary/5 p-4 border-b">
               <div className="flex items-center space-x-3">
                 <div className="bg-primary text-primary-foreground rounded-full h-10 w-10 flex items-center justify-center text-sm font-medium">
-                  U
+                  {user?.email?.[0]?.toUpperCase() || 'U'}
                 </div>
                 <div>
-                  <p className="text-sm font-medium">User</p>
-                  <p className="text-xs text-muted-foreground">user@example.com</p>
+                  <p className="text-sm font-medium">{user?.user_metadata?.full_name || 'User'}</p>
+                  <p className="text-xs text-muted-foreground">{user?.email || 'user@example.com'}</p>
                 </div>
               </div>
             </div>
             <div className="p-2">
-              <Button variant="outline" size="sm" className="w-full">
+              <Button variant="outline" size="sm" className="w-full" onClick={onSignOut}>
                 Log out
               </Button>
             </div>
