@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Target, ArrowRight } from 'lucide-react';
 import { format } from 'date-fns';
-import { useMobileCheck } from '@/hooks/use-mobile';
+import { useMobile } from '@/hooks/use-mobile';
 import DynamicIcon from '@/components/ui/dynamic-icon';
 
 interface VisionGoalListProps {
@@ -15,7 +15,7 @@ interface VisionGoalListProps {
 
 const VisionGoalList: React.FC<VisionGoalListProps> = ({ goals }) => {
   const navigate = useNavigate();
-  const isMobile = useMobileCheck();
+  const { isMobile } = useMobile();
   
   if (goals.length === 0) {
     return (
@@ -54,7 +54,7 @@ const VisionGoalList: React.FC<VisionGoalListProps> = ({ goals }) => {
             <CardHeader className="pb-2 flex flex-row items-center">
               {goal.icon ? (
                 <DynamicIcon 
-                  name={goal.icon} 
+                  name={goal.icon as keyof typeof import('lucide-react').icons} 
                   className="h-5 w-5 mr-2 text-primary" 
                 />
               ) : (
