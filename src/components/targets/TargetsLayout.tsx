@@ -9,7 +9,7 @@ import MilestoneList from '@/components/targets/MilestoneList';
 import FloatingActionButton from '@/components/fab/FloatingActionButton';
 
 interface TargetsLayoutProps {
-  user: any;
+  user: any | null;
   onSignOut: () => void;
 }
 

@@ -8,18 +8,12 @@ import Sidebar from '@/components/layout/Sidebar';
 import VisionList from '@/components/vision/VisionList';
 import { useAuth } from '@/hooks/useAuth';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
-import AuthForm from '@/components/auth/AuthForm';
 
 const VisionPage: React.FC = () => {
-  const { user, loading, handleSignOut, setUser } = useAuth();
+  const { user, loading, handleSignOut } = useAuth();
   
   if (loading) {
     return <LoadingSpinner />;
-  }
-  
-  // If user is not logged in, show auth screen
-  if (!user) {
-    return <AuthForm onSignInSuccess={setUser} />;
   }
   
   return (
