@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useGoal } from '@/contexts/GoalContext';
 import { NinetyDayTarget, GoalStatus, ThreeYearGoal } from '@/types/task';
@@ -13,14 +12,16 @@ import { CalendarIcon, Target } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import DynamicIcon from '@/components/ui/dynamic-icon';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MilestoneFormProps {
   isOpen: boolean;
   onClose: () => void;
   editingTarget: NinetyDayTarget | null;
+  user?: any; // Add user prop
 }
 
-const MilestoneForm: React.FC<MilestoneFormProps> = ({ isOpen, onClose, editingTarget }) => {
+const MilestoneForm: React.FC<MilestoneFormProps> = ({ isOpen, onClose, editingTarget, user }) => {
   const { addNinetyDayTarget, updateNinetyDayTarget, threeYearGoals } = useGoal();
   
   const [title, setTitle] = useState('');
@@ -58,7 +59,7 @@ const MilestoneForm: React.FC<MilestoneFormProps> = ({ isOpen, onClose, editingT
     }
   }, [isOpen, editingTarget, threeYearGoals]);
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!title.trim() || !threeYearGoalId) return;
@@ -72,13 +73,45 @@ const MilestoneForm: React.FC<MilestoneFormProps> = ({ isOpen, onClose, editingT
       threeYearGoalId
     };
     
-    if (editingTarget) {
-      updateNinetyDayTarget(editingTarget.id, targetData);
-    } else {
-      addNinetyDayTarget(targetData);
+    try {
+      // Update local state
+      let targetId;
+      
+      if (editingTarget) {
+        updateNinetyDayTarget(editingTarget.id, targetData);
+        targetId = editingTarget.id;
+      } else {
+        const newTarget = await addNinetyDayTarget(targetData);
+        targetId = newTarget?.id;
+      }
+      
+      // If user is logged in, save to Supabase
+      if (user && targetId) {
+        await supabase.from('user_entries').insert({
+          user_id: user.id,
+          content: JSON.stringify({
+            action: editingTarget ? 'update' : 'create',
+            target_id: targetId,
+            target_data: targetData
+          }),
+          entry_type: editingTarget ? 'milestone_update' : 'milestone_create',
+        });
+        
+        toast({
+          title: editingTarget ? 'Milestone updated' : 'Milestone created',
+          description: 'Your changes were saved and synced to the cloud',
+        });
+      }
+      
+      onClose();
+    } catch (error) {
+      console.error('Error saving milestone:', error);
+      toast({
+        title: 'Error',
+        description: 'There was a problem saving your milestone',
+        variant: 'destructive',
+      });
     }
-    
-    onClose();
   };
   
   const statusOptions = [
