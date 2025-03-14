@@ -181,19 +181,8 @@ const Sidebar: React.FC = () => {
                   <span>Goals</span>
                 </Button>
               </Link>
-              <Link to="/targets" className="block">
-                <Button variant="ghost" className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/targets' ? 'sidebar-item-active' : ''}`}>
-                  <Archive className="h-4 w-4 mr-2" />
-                  <span>Milestone</span>
-                </Button>
-              </Link>
-              <Link to="/weekly" className="block">
-                <Button variant="ghost" className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/weekly' ? 'sidebar-item-active font-medium' : ''}`}>
-                  <Calendar className="h-4 w-4 mr-2" />
-                  <span>Plan</span>
-                </Button>
-              </Link>
-              
+
+              {/* Moved Actions link right after Goals */}
               <Link to="/actions" className="block">
                 <Button 
                   variant="ghost" 
@@ -208,6 +197,21 @@ const Sidebar: React.FC = () => {
                   )}
                 </Button>
               </Link>
+              
+              <Link to="/targets" className="block">
+                <Button variant="ghost" className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/targets' ? 'sidebar-item-active' : ''}`}>
+                  <Archive className="h-4 w-4 mr-2" />
+                  <span>Milestone</span>
+                </Button>
+              </Link>
+              <Link to="/weekly" className="block">
+                <Button variant="ghost" className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/weekly' ? 'sidebar-item-active font-medium' : ''}`}>
+                  <Calendar className="h-4 w-4 mr-2" />
+                  <span>Plan</span>
+                </Button>
+              </Link>
+              
+              {/* Actions link was moved up */}
               
               {goalsWithActions.map(goal => {
                 const goalTasks = tasks.filter(task => {
