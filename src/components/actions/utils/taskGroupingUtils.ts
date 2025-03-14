@@ -1,6 +1,4 @@
-
-import { Task } from '@/types/task';
-import { NinetyDayTarget, Plan, ThreeYearGoal } from '@/contexts/goal/types';
+import { Task, ThreeYearGoal, NinetyDayTarget, Plan } from '@/types/task';
 
 export interface PlanDetails {
   planTitle: string;
