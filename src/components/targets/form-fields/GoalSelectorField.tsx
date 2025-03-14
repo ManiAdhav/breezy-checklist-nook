@@ -16,7 +16,7 @@ const GoalSelectorField: React.FC<GoalSelectorFieldProps> = ({
 }) => {
   return (
     <div className="space-y-2">
-      <div className="text-sm font-medium">Parent Three-Year Goal</div>
+      <div className="text-sm font-medium">Goal</div>
       <Select
         value={selectedGoalId}
         onValueChange={setSelectedGoalId}
