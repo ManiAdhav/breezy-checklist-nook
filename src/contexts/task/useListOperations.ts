@@ -7,7 +7,9 @@ export const useListOperations = (
   setCustomLists: React.Dispatch<React.SetStateAction<List[]>>,
   setTasks: React.Dispatch<React.SetStateAction<any[]>>,
   setSelectedListId: React.Dispatch<React.SetStateAction<string>>,
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  customLists: List[], // Add missing customLists parameter
+  selectedListId: string // Add missing selectedListId parameter
 ) => {
   // List operations
   const addList = async (list: Omit<List, 'id'>) => {

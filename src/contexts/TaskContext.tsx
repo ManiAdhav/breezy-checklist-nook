@@ -41,7 +41,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCustomLists, 
     setTasks, 
     setSelectedListId,
-    setIsLoading
+    setIsLoading,
+    customLists, // Pass customLists as a parameter
+    selectedListId // Pass selectedListId as a parameter
   );
 
   // Data fetching
