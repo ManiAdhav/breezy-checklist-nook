@@ -19,10 +19,8 @@ const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
   
   // Filter actions for this goal
   const goalActions = tasks.filter(task => {
-    if (task.isAction && task.planId) {
-      return task.goalId === goalId;
-    }
-    return false;
+    // Check if the task is an action and has the correct goalId
+    return task.isAction && task.goalId === goalId;
   });
   
   const toggleTaskDetails = (taskId: string) => {
@@ -36,7 +34,12 @@ const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-sm font-medium">Actions</h3>
+        <div className="flex items-center">
+          <h3 className="text-sm font-medium">Actions</h3>
+          <span className="ml-2 text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+            {goalActions.length}
+          </span>
+        </div>
         <Button 
           variant="outline" 
           size="sm" 

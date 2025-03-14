@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Calendar, Edit } from 'lucide-react';
 import { ThreeYearGoal, GoalStatus } from '@/types/task';
 import { useGoal } from '@/hooks/useGoalContext';
+import { useTask } from '@/contexts/TaskContext';
 import { toast } from '@/hooks/use-toast';
 
 interface GoalHeaderProps {
@@ -14,7 +15,21 @@ interface GoalHeaderProps {
 }
 
 const GoalHeader: React.FC<GoalHeaderProps> = ({ goal, onBack, onEdit }) => {
-  const { updateThreeYearGoal } = useGoal();
+  const { updateThreeYearGoal, ninetyDayTargets, plans } = useGoal();
+  const { tasks } = useTask();
+  
+  // Count associated items
+  const milestoneCount = ninetyDayTargets.filter(
+    target => target.threeYearGoalId === goal.id
+  ).length;
+  
+  const planCount = plans.filter(plan => 
+    ninetyDayTargets.some(
+      target => target.threeYearGoalId === goal.id && target.id === plan.ninetyDayTargetId
+    )
+  ).length;
+  
+  const taskCount = tasks.filter(task => task.goalId === goal.id).length;
   
   // Get the icon component based on the goal's icon value
   const getStatusLabel = (status: GoalStatus): string => {
@@ -49,6 +64,17 @@ const GoalHeader: React.FC<GoalHeaderProps> = ({ goal, onBack, onEdit }) => {
       <div className="flex-1">
         <h2 className="text-xl font-semibold tracking-tight flex items-center">
           {goal.title}
+          <div className="flex ml-3 space-x-1.5">
+            <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100 rounded-full">
+              {milestoneCount} Milestones
+            </span>
+            <span className="text-xs px-2 py-0.5 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 rounded-full">
+              {planCount} Plans
+            </span>
+            <span className="text-xs px-2 py-0.5 bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100 rounded-full">
+              {taskCount} Tasks
+            </span>
+          </div>
         </h2>
         <p className="text-sm text-muted-foreground mt-1 flex items-center">
           <Calendar className="h-3.5 w-3.5 mr-1.5 opacity-70" />
