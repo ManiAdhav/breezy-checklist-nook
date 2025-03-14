@@ -140,10 +140,10 @@ const ActionItem: React.FC<ActionItemProps> = ({
             
             <TabsContent value="details" className="p-2">
               <div className="space-y-2">
-                {action.description && (
+                {action.notes && (
                   <div>
                     <div className="font-medium mb-1">Description</div>
-                    <p className="text-muted-foreground">{action.description}</p>
+                    <p className="text-muted-foreground">{action.notes}</p>
                   </div>
                 )}
                 <div>
