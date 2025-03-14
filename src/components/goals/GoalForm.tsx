@@ -204,7 +204,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => 
                   <SelectValue placeholder="Select a vision to map" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  {/* Removing the empty value option which was causing the error */}
                   {visions.map((vision) => (
                     <SelectItem key={vision.id} value={vision.id}>
                       {vision.title}
