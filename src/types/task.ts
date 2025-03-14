@@ -1,4 +1,3 @@
-
 export type Priority = 'high' | 'medium' | 'low' | 'none';
 
 export interface List {
@@ -19,6 +18,7 @@ export interface Task {
   createdAt: Date;
   updatedAt: Date;
   planId?: string;
+  goalId?: string; // Added field to associate actions directly with goals
   isAction?: boolean; // New field to identify action items
   startDate?: Date;  // New field specific to actions
 }

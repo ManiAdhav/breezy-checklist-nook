@@ -40,6 +40,7 @@ const AddActionDialog: React.FC<AddActionDialogProps> = ({ open, onOpenChange })
   
   const [newActionTitle, setNewActionTitle] = useState('');
   const [selectedPlanId, setSelectedPlanId] = useState('');
+  const [selectedGoalId, setSelectedGoalId] = useState('');
   const [actionStartDate, setActionStartDate] = useState<Date>(new Date());
   const [actionEndDate, setActionEndDate] = useState<Date>(addDays(new Date(), 7));
   
@@ -62,6 +63,7 @@ const AddActionDialog: React.FC<AddActionDialogProps> = ({ open, onOpenChange })
   const resetForm = () => {
     setNewActionTitle('');
     setSelectedPlanId('');
+    setSelectedGoalId('');
     setActionStartDate(new Date());
     setActionEndDate(addDays(new Date(), 7));
   };
@@ -76,10 +78,11 @@ const AddActionDialog: React.FC<AddActionDialogProps> = ({ open, onOpenChange })
       return;
     }
 
-    if (!selectedPlanId) {
+    // Check if either plan or goal is selected
+    if (!selectedPlanId && !selectedGoalId) {
       toast({
         title: "Error",
-        description: "Please select a plan for this action",
+        description: "Please select either a plan or a goal for this action",
         variant: "destructive",
       });
       return;
@@ -90,7 +93,8 @@ const AddActionDialog: React.FC<AddActionDialogProps> = ({ open, onOpenChange })
       completed: false,
       priority: 'medium',
       listId: 'inbox',
-      planId: selectedPlanId,
+      planId: selectedPlanId || undefined,
+      goalId: selectedGoalId || undefined,
       startDate: actionStartDate,
       dueDate: actionEndDate,
       isAction: true,
@@ -139,13 +143,32 @@ const AddActionDialog: React.FC<AddActionDialogProps> = ({ open, onOpenChange })
           </div>
           
           <div className="space-y-2">
+            <Label htmlFor="goal-select">Associated Goal</Label>
+            <Select 
+              value={selectedGoalId} 
+              onValueChange={setSelectedGoalId}
+            >
+              <SelectTrigger id="goal-select">
+                <SelectValue placeholder="Select a goal (optional)" />
+              </SelectTrigger>
+              <SelectContent>
+                {threeYearGoals.map(goal => (
+                  <SelectItem key={goal.id} value={goal.id}>
+                    {goal.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
             <Label htmlFor="plan-select">Associated Plan</Label>
             <Select 
               value={selectedPlanId} 
               onValueChange={setSelectedPlanId}
             >
               <SelectTrigger id="plan-select">
-                <SelectValue placeholder="Select a plan" />
+                <SelectValue placeholder="Select a plan (optional)" />
               </SelectTrigger>
               <SelectContent>
                 {getPlansForSelect().map(plan => (
