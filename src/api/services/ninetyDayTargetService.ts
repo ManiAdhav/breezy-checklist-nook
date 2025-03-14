@@ -1,5 +1,5 @@
 
-import { NinetyDayTarget } from '@/types/task';
+import { NinetyDayTarget, Plan } from '@/types/task';
 import { ApiResponse } from '../types';
 import { generateId } from '@/utils/taskUtils';
 import { 
@@ -65,7 +65,7 @@ export const updateNinetyDayTarget = async (id: string, updates: Partial<NinetyD
 export const deleteNinetyDayTarget = async (id: string): Promise<ApiResponse<void>> => {
   try {
     const targets = getStoredData<NinetyDayTarget>(NINETY_DAY_TARGETS_STORAGE_KEY);
-    const plans = getStoredData(PLANS_STORAGE_KEY);
+    const plans = getStoredData<Plan>(PLANS_STORAGE_KEY);
     
     const updatedTargets = targets.filter(target => target.id !== id);
     const updatedPlans = plans.filter(plan => plan.ninetyDayTargetId !== id);

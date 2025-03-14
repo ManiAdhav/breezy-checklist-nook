@@ -1,5 +1,5 @@
 
-import { ThreeYearGoal } from '@/types/task';
+import { ThreeYearGoal, NinetyDayTarget } from '@/types/task';
 import { ApiResponse } from '../types';
 import { generateId } from '@/utils/taskUtils';
 import { 
@@ -65,7 +65,7 @@ export const updateThreeYearGoal = async (id: string, updates: Partial<ThreeYear
 export const deleteThreeYearGoal = async (id: string): Promise<ApiResponse<void>> => {
   try {
     const goals = getStoredData<ThreeYearGoal>(THREE_YEAR_GOALS_STORAGE_KEY);
-    const targets = getStoredData(NINETY_DAY_TARGETS_STORAGE_KEY);
+    const targets = getStoredData<NinetyDayTarget>(NINETY_DAY_TARGETS_STORAGE_KEY);
     
     const updatedGoals = goals.filter(goal => goal.id !== id);
     const updatedTargets = targets.filter(target => target.threeYearGoalId !== id);
