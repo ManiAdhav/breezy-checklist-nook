@@ -15,7 +15,7 @@ interface PlanFormProps {
 }
 
 const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onClose }) => {
-  const { addPlan, updatePlan, ninetyDayTargets } = useGoal();
+  const { addPlan, updatePlan, ninetyDayTargets, threeYearGoals } = useGoal();
   
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -23,8 +23,14 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onClose }) => {
   const [endDate, setEndDate] = useState('');
   const [status, setStatus] = useState<GoalStatus>('not_started');
   const [targetId, setTargetId] = useState('');
+  const [selectedGoalId, setSelectedGoalId] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Filter targets based on selected goal
+  const filteredTargets = selectedGoalId 
+    ? ninetyDayTargets.filter(target => target.threeYearGoalId === selectedGoalId)
+    : ninetyDayTargets;
 
   useEffect(() => {
     if (initialPlan) {
@@ -34,6 +40,12 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onClose }) => {
       setEndDate(format(new Date(initialPlan.endDate), 'yyyy-MM-dd'));
       setStatus(initialPlan.status);
       setTargetId(initialPlan.ninetyDayTargetId);
+      
+      // Find the goal ID for the selected target
+      const target = ninetyDayTargets.find(t => t.id === initialPlan.ninetyDayTargetId);
+      if (target) {
+        setSelectedGoalId(target.threeYearGoalId);
+      }
     } else {
       // Default values for new plan
       setTitle('');
@@ -41,9 +53,22 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onClose }) => {
       setStartDate(format(new Date(), 'yyyy-MM-dd'));
       setEndDate(format(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'));
       setStatus('not_started');
-      setTargetId(ninetyDayTargets.length > 0 ? ninetyDayTargets[0].id : '');
+      setSelectedGoalId(threeYearGoals.length > 0 ? threeYearGoals[0].id : '');
+      setTargetId('');
     }
-  }, [initialPlan, ninetyDayTargets]);
+  }, [initialPlan, ninetyDayTargets, threeYearGoals]);
+
+  // When goal changes, reset the target selection
+  useEffect(() => {
+    if (selectedGoalId) {
+      const targetsForGoal = ninetyDayTargets.filter(target => target.threeYearGoalId === selectedGoalId);
+      if (targetsForGoal.length > 0) {
+        setTargetId(targetsForGoal[0].id);
+      } else {
+        setTargetId('');
+      }
+    }
+  }, [selectedGoalId, ninetyDayTargets]);
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -170,20 +195,39 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onClose }) => {
       </div>
       
       <div className="space-y-2">
+        <Label htmlFor="goalId">Goal</Label>
+        <Select 
+          value={selectedGoalId} 
+          onValueChange={setSelectedGoalId}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select a goal" />
+          </SelectTrigger>
+          <SelectContent>
+            {threeYearGoals.map((goal) => (
+              <SelectItem key={goal.id} value={goal.id}>
+                {goal.title}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      
+      <div className="space-y-2">
         <Label htmlFor="targetId">Milestone</Label>
         <Select 
           value={targetId} 
           onValueChange={setTargetId}
-          disabled={ninetyDayTargets.length === 0}
+          disabled={filteredTargets.length === 0}
         >
           <SelectTrigger className={errors.targetId ? 'border-red-500' : ''}>
             <SelectValue placeholder="Select a milestone" />
           </SelectTrigger>
           <SelectContent>
-            {ninetyDayTargets.length === 0 ? (
-              <SelectItem value="none" disabled>No milestones available</SelectItem>
+            {filteredTargets.length === 0 ? (
+              <SelectItem value="none" disabled>No milestones available for selected goal</SelectItem>
             ) : (
-              ninetyDayTargets.map((target) => (
+              filteredTargets.map((target) => (
                 <SelectItem key={target.id} value={target.id}>
                   {target.title}
                 </SelectItem>
@@ -192,8 +236,8 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onClose }) => {
           </SelectContent>
         </Select>
         {errors.targetId && <p className="text-sm text-red-500">{errors.targetId}</p>}
-        {ninetyDayTargets.length === 0 && (
-          <p className="text-sm text-yellow-600">You need to create a milestone first</p>
+        {filteredTargets.length === 0 && (
+          <p className="text-sm text-yellow-600">You need to create a milestone for this goal first</p>
         )}
       </div>
       
@@ -203,7 +247,7 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onClose }) => {
         </Button>
         <Button 
           type="submit" 
-          disabled={isSubmitting || ninetyDayTargets.length === 0}
+          disabled={isSubmitting || filteredTargets.length === 0}
         >
           {isSubmitting ? 'Saving...' : initialPlan ? 'Update Plan' : 'Create Plan'}
         </Button>

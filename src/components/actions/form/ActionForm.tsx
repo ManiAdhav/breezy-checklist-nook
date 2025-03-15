@@ -26,6 +26,12 @@ const ActionForm: React.FC<ActionFormProps> = ({ onSuccess, onCancel }) => {
   const [actionStartDate, setActionStartDate] = useState<Date>(new Date());
   const [actionEndDate, setActionEndDate] = useState<Date>(addDays(new Date(), 7));
 
+  const handleGoalChange = (goalId: string) => {
+    setSelectedGoalId(goalId);
+    // When the goal changes, reset the plan since plans are goal-specific
+    setSelectedPlanId('');
+  };
+
   const handleAddAction = async () => {
     if (!newActionTitle.trim()) {
       toast({
@@ -92,10 +98,11 @@ const ActionForm: React.FC<ActionFormProps> = ({ onSuccess, onCancel }) => {
         
         <ActionGoalSelector 
           selectedGoalId={selectedGoalId} 
-          onGoalChange={setSelectedGoalId} 
+          onGoalChange={handleGoalChange} 
         />
         
         <ActionPlanSelector 
+          selectedGoalId={selectedGoalId}
           selectedPlanId={selectedPlanId} 
           onPlanChange={setSelectedPlanId} 
         />
