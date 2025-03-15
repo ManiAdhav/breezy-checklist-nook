@@ -75,7 +75,7 @@ const ActionPlanSelector: React.FC<ActionPlanSelectorProps> = ({
           ) : (
             getPlansForSelect().map(plan => (
               <SelectItem key={plan.id} value={plan.id}>
-                {plan.title} ({plan.goalName} → {plan.targetName})
+                {plan.title}
               </SelectItem>
             ))
           )}
