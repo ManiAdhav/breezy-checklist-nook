@@ -29,8 +29,8 @@ const MilestoneItem: React.FC<MilestoneItemProps> = ({
 }) => {
   const { plans } = useGoal();
   
-  // Get plans associated with this milestone
-  const milestonePlans = plans.filter(plan => plan.ninetyDayTargetId === milestone.id);
+  // Get plans associated with this milestone, safely handle undefined
+  const milestonePlans = plans?.filter(plan => plan.ninetyDayTargetId === milestone.id) || [];
   
   return (
     <div 
