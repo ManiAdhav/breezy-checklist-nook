@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useGoal } from '@/hooks/useGoalContext';
 
 interface MilestoneItemProps {
   milestone: NinetyDayTarget;
@@ -26,6 +27,11 @@ const MilestoneItem: React.FC<MilestoneItemProps> = ({
   onDelete,
   getStatusClasses
 }) => {
+  const { plans } = useGoal();
+  
+  // Get plans associated with this milestone
+  const milestonePlans = plans.filter(plan => plan.ninetyDayTargetId === milestone.id);
+  
   return (
     <div 
       className="flex items-start p-3 border border-border rounded-md bg-card"
@@ -74,6 +80,20 @@ const MilestoneItem: React.FC<MilestoneItemProps> = ({
             milestone.status === 'completed' ? 'Completed' : 'Abandoned'}
           </span>
         </div>
+        
+        {/* Display associated plans */}
+        {milestonePlans.length > 0 && (
+          <div className="mt-2 pt-2 border-t border-border">
+            <div className="text-xs font-medium text-muted-foreground mb-1">Associated Plans:</div>
+            <div className="space-y-1">
+              {milestonePlans.map(plan => (
+                <div key={plan.id} className="text-xs bg-muted/40 px-2 py-1 rounded">
+                  {plan.title}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
       
       <DropdownMenu>
