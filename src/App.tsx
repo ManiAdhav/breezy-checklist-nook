@@ -1,10 +1,11 @@
+
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { TaskProvider } from './contexts/TaskContext';
 import { GoalProvider } from './contexts/GoalContext';
-import Index from './pages';
+import Index from './pages/Index';
 import GoalsPage from './pages/GoalsPage';
-import GoalDetailView from './pages/GoalDetailView';
+import GoalDetailView from './components/goals/GoalDetailView';
 import MilestonePage from './pages/MilestonePage';
 import VisionPage from './pages/VisionPage';
 import PlansPage from './pages/PlansPage';

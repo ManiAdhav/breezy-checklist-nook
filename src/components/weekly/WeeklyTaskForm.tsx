@@ -53,12 +53,12 @@ const WeeklyTaskForm: React.FC<WeeklyTaskFormProps> = ({ planId, date, onClose }
     try {
       const taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'> = {
         title: values.title,
-        description: values.description || '',
-        priority: values.priority as Priority,
         completed: false,
+        priority: values.priority as Priority,
         dueDate: date,
         listId: 'inbox',
         planId: planId,
+        notes: values.description || '',
       };
       
       await addTask(taskData);
