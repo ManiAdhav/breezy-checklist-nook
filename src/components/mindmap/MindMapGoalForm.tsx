@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -291,6 +292,7 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
       <DialogContent className="sm:max-w-[625px]">
         <DialogHeader>
           <DialogTitle>{editingGoal || initialGoalId ? 'Edit Goal' : 'Add New Goal'}</DialogTitle>
+          <DialogDescription>Create a meaningful goal to track your progress</DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -361,7 +363,7 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
                 <SelectValue placeholder="Select a vision" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">None</SelectItem>
+                <SelectItem key="none" value="none">None</SelectItem>
                 {visions.map((vision) => (
                   <SelectItem key={vision.id} value={vision.id}>
                     {vision.title}
