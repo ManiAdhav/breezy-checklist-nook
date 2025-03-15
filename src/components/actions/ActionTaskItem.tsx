@@ -34,7 +34,7 @@ const ActionTaskItem: React.FC<ActionTaskItemProps> = ({ task, toggleTaskComplet
         
         <div className="flex items-center">
           {task.dueDate && (
-            <span className="text-sm text-muted-foreground mr-3">
+            <span className="text-xs text-muted-foreground mr-3">
               {format(new Date(task.dueDate), 'MMM d')}
             </span>
           )}

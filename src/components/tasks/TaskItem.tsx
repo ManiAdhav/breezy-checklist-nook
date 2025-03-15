@@ -36,14 +36,14 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit }) => {
             className={`mr-3 transition-transform ${task.completed ? 'checkbox-animation' : ''}`}
           />
           
-          <div className={`font-medium ${task.completed ? 'task-complete' : ''}`}>
+          <div className={`text-sm font-medium ${task.completed ? 'task-complete' : ''}`}>
             {task.title}
           </div>
         </div>
         
         <div className="flex items-center">
           {task.dueDate && (
-            <div className="text-sm text-muted-foreground mr-4">
+            <div className="text-xs text-muted-foreground mr-4">
               {format(new Date(task.dueDate), 'MMM d')}
             </div>
           )}
