@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
 import { TaskProvider } from './contexts/TaskContext';
 import { GoalProvider } from './contexts/GoalContext';
 import Index from './pages/Index';
@@ -15,6 +15,14 @@ import ActionsPage from './pages/ActionsPage';
 import NotFound from './pages/NotFound';
 import WeeklyPlanPage from './pages/WeeklyPlanPage';
 
+// Wrapper component to provide props to GoalDetailView
+const GoalDetailViewWrapper = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  
+  return <GoalDetailView goalId={id || ''} onBack={() => navigate('/goals')} />;
+};
+
 function App() {
   return (
     <GoalProvider>
@@ -22,7 +30,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/goals" element={<GoalsPage />} />
-          <Route path="/goals/:id" element={<GoalDetailView />} />
+          <Route path="/goals/:id" element={<GoalDetailViewWrapper />} />
           <Route path="/milestones" element={<MilestonePage />} />
           <Route path="/vision" element={<VisionPage />} />
           <Route path="/plans" element={<PlansPage />} />

@@ -26,10 +26,13 @@ interface WeeklyTaskFormProps {
   onClose: () => void;
 }
 
+// Define a type for valid priorities that excludes 'none'
+type ValidPriority = Exclude<Priority, 'none'>;
+
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().optional(),
-  priority: z.enum(['low', 'medium', 'high']),
+  priority: z.enum(['low', 'medium', 'high'] as const),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -43,7 +46,7 @@ const WeeklyTaskForm: React.FC<WeeklyTaskFormProps> = ({ planId, date, onClose }
     defaultValues: {
       title: '',
       description: '',
-      priority: 'medium' as Priority,
+      priority: 'medium' as ValidPriority,
     },
   });
 
