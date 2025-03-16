@@ -1,8 +1,15 @@
 
 #root {
-  margin: 0 auto;
+  margin: 0;
+  padding: 0;
   width: 100%;
-  text-align: center;
+  height: 100vh;
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  padding: 0;
 }
 
 @keyframes logo-spin {
