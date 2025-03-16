@@ -75,8 +75,8 @@ const CatalystSection: React.FC = () => {
             </Button>
           </Link>
           
-          <Link to="/targets" className="block">
-            <Button variant="ghost" className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/targets' ? 'sidebar-item-active' : ''}`}>
+          <Link to="/milestones" className="block">
+            <Button variant="ghost" className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/milestones' ? 'sidebar-item-active' : ''}`}>
               <Archive className="h-4 w-4 mr-2" />
               <span>Milestone</span>
             </Button>
