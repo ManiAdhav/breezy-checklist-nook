@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { icons } from 'lucide-react';
-import { GoalStatus, Priority, ThreeYearGoal } from '@/types/task';
+import { GoalStatus, Priority, Goals } from '@/types/task';
 
 import { VisionSelector } from '@/components/goals/form';
 import StatusSelector from '@/components/goals/form/StatusSelector';

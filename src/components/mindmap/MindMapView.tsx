@@ -1,7 +1,6 @@
-
 import React, { useRef, useEffect } from 'react';
 import { useGoal } from '@/contexts/GoalContext';
-import { ThreeYearGoal } from '@/types/task';
+import { Goals } from '@/types/task';
 import MindMapGoalForm from './MindMapGoalForm';
 import MindMapHeader from './view/MindMapHeader';
 import MindMapControls from './view/MindMapControls';
@@ -10,7 +9,7 @@ import { useMindMapControls } from './view/useMindMapControls';
 
 const MindMapView: React.FC = () => {
   const [isFormOpen, setIsFormOpen] = React.useState(false);
-  const [editingGoal, setEditingGoal] = React.useState<ThreeYearGoal | null>(null);
+  const [editingGoal, setEditingGoal] = React.useState<Goals | null>(null);
   
   const { threeYearGoals, isLoading } = useGoal();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -42,7 +41,7 @@ const MindMapView: React.FC = () => {
     setIsFormOpen(true);
   };
   
-  const handleEditGoal = (goal: ThreeYearGoal) => {
+  const handleEditGoal = (goal: Goals) => {
     setEditingGoal(goal);
     setIsFormOpen(true);
   };

@@ -1,108 +1,33 @@
 import { useState, useEffect } from 'react';
-import { useGoal } from '@/contexts/GoalContext';
-import { NinetyDayTarget, GoalStatus, ThreeYearGoal } from '@/types/task';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
+import { NinetyDayTarget, GoalStatus, Goals } from '@/types/task';
 
 interface UseNinetyDayTargetFormProps {
-  editingTarget: NinetyDayTarget | null;
-  onClose: () => void;
-  user?: any;
-  isOpen: boolean;
+  initialTarget?: NinetyDayTarget;
+  threeYearGoals: Goals[];
 }
 
-export const useNinetyDayTargetForm = ({ editingTarget, onClose, user, isOpen }: UseNinetyDayTargetFormProps) => {
-  const { addNinetyDayTarget, updateNinetyDayTarget, threeYearGoals } = useGoal();
-  
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [startDate, setStartDate] = useState<Date>(new Date());
-  const [endDate, setEndDate] = useState<Date>(new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)); // 90 days from now
-  const [status, setStatus] = useState<GoalStatus>('not_started');
-  const [threeYearGoalId, setThreeYearGoalId] = useState<string>('');
+const useNinetyDayTargetForm = ({ initialTarget, threeYearGoals }: UseNinetyDayTargetFormProps) => {
+  const [title, setTitle] = useState(initialTarget?.title || '');
+  const [description, setDescription] = useState(initialTarget?.description || '');
+  const [startDate, setStartDate] = useState(initialTarget?.startDate ? new Date(initialTarget.startDate) : new Date());
+  const [endDate, setEndDate] = useState(initialTarget?.endDate ? new Date(initialTarget.endDate) : new Date());
+  const [status, setStatus] = useState<GoalStatus>(initialTarget?.status || 'not_started');
+  const [threeYearGoalId, setThreeYearGoalId] = useState(initialTarget?.threeYearGoalId || (threeYearGoals.length > 0 ? threeYearGoals[0].id : ''));
   const [startDateOpen, setStartDateOpen] = useState(false);
   const [endDateOpen, setEndDateOpen] = useState(false);
-  
-  // Reset form when dialog opens/closes or editing target changes
+
   useEffect(() => {
-    if (isOpen) {
-      if (editingTarget) {
-        setTitle(editingTarget.title);
-        setDescription(editingTarget.description || '');
-        setStartDate(new Date(editingTarget.startDate));
-        setEndDate(new Date(editingTarget.endDate));
-        setStatus(editingTarget.status);
-        setThreeYearGoalId(editingTarget.threeYearGoalId);
-      } else {
-        setTitle('');
-        setDescription('');
-        setStartDate(new Date());
-        setEndDate(new Date(Date.now() + 90 * 24 * 60 * 60 * 1000));
-        setStatus('not_started');
-        // Set default parent goal if available
-        if (threeYearGoals.length > 0) {
-          setThreeYearGoalId(threeYearGoals[0].id);
-        } else {
-          setThreeYearGoalId('');
-        }
-      }
+    if (initialTarget) {
+      setTitle(initialTarget.title);
+      setDescription(initialTarget.description || '');
+      setStartDate(new Date(initialTarget.startDate));
+      setEndDate(new Date(initialTarget.endDate));
+      setStatus(initialTarget.status);
+      setThreeYearGoalId(initialTarget.threeYearGoalId);
+    } else if (threeYearGoals.length > 0) {
+      setThreeYearGoalId(threeYearGoals[0].id);
     }
-  }, [isOpen, editingTarget, threeYearGoals]);
-  
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!title.trim() || !threeYearGoalId) return;
-    
-    const targetData = {
-      title: title.trim(),
-      description: description.trim() || undefined,
-      startDate,
-      endDate,
-      status,
-      threeYearGoalId
-    };
-    
-    try {
-      // Update local state
-      let targetId;
-      
-      if (editingTarget) {
-        updateNinetyDayTarget(editingTarget.id, targetData);
-        targetId = editingTarget.id;
-      } else {
-        const newTarget = await addNinetyDayTarget(targetData);
-        targetId = newTarget?.id;
-      }
-      
-      // If user is logged in, save to Supabase
-      if (user && targetId) {
-        await supabase.from('user_entries').insert({
-          user_id: user.id,
-          content: JSON.stringify({
-            action: editingTarget ? 'update' : 'create',
-            target_id: targetId,
-            target_data: targetData
-          }),
-          entry_type: editingTarget ? 'target_update' : 'target_create',
-        });
-        
-        toast({
-          title: editingTarget ? 'Target updated' : 'Target created',
-          description: 'Your changes were saved and synced to the cloud',
-        });
-      }
-      
-      onClose();
-    } catch (error) {
-      console.error('Error saving target:', error);
-      toast({
-        title: 'Error',
-        description: 'There was a problem saving your target',
-        variant: 'destructive',
-      });
-    }
-  };
+  }, [initialTarget, threeYearGoals]);
 
   return {
     title,
@@ -111,7 +36,7 @@ export const useNinetyDayTargetForm = ({ editingTarget, onClose, user, isOpen }:
     setDescription,
     startDate,
     setStartDate,
-    endDate, 
+    endDate,
     setEndDate,
     status,
     setStatus,
@@ -121,7 +46,7 @@ export const useNinetyDayTargetForm = ({ editingTarget, onClose, user, isOpen }:
     setStartDateOpen,
     endDateOpen,
     setEndDateOpen,
-    handleSubmit,
-    threeYearGoals
   };
 };
+
+export default useNinetyDayTargetForm;

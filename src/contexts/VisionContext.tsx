@@ -1,6 +1,5 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Vision, GoalStatus, ThreeYearGoal } from '@/types/task';
+import { Vision, GoalStatus, Goals } from '@/types/task';
 import { v4 as uuidv4 } from 'uuid';
 import { useGoal } from './GoalContext';
 
@@ -12,7 +11,7 @@ interface VisionContextType {
   selectedVisionId: string | null;
   setSelectedVisionId: (id: string | null) => void;
   areasOfLife: string[];
-  getVisionGoals: (visionId: string) => ThreeYearGoal[];
+  getVisionGoals: (visionId: string) => Goals[];
 }
 
 const VisionContext = createContext<VisionContextType | undefined>(undefined);
@@ -110,7 +109,7 @@ export const VisionProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setVisions((prev) => prev.filter((vision) => vision.id !== id));
   };
   
-  const getVisionGoals = (visionId: string): ThreeYearGoal[] => {
+  const getVisionGoals = (visionId: string): Goals[] => {
     return threeYearGoals.filter(goal => goal.visionId === visionId);
   };
 

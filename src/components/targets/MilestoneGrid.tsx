@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { format } from 'date-fns';
-import { NinetyDayTarget, ThreeYearGoal, GoalStatus } from '@/types/task';
+import { NinetyDayTarget, Goals, GoalStatus } from '@/types/task';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal } from 'lucide-react';
 import {
@@ -15,7 +15,7 @@ import { toast } from '@/hooks/use-toast';
 
 interface MilestoneGridProps {
   filteredTargets: NinetyDayTarget[];
-  threeYearGoals: ThreeYearGoal[];
+  threeYearGoals: Goals[];
   onEdit: (target: NinetyDayTarget) => void;
   onDelete: (id: string) => void;
   onStatusChange: (target: NinetyDayTarget, status: GoalStatus) => void;

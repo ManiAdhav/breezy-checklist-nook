@@ -1,4 +1,5 @@
-import { Task, ThreeYearGoal, NinetyDayTarget, Plan } from '@/types/task';
+
+import { Task, Goals, NinetyDayTarget, Plan } from '@/types/task';
 
 export interface PlanDetails {
   planTitle: string;
@@ -20,7 +21,7 @@ export const getPlanDetails = (
   planId: string,
   plans: Plan[],
   ninetyDayTargets: NinetyDayTarget[],
-  threeYearGoals: ThreeYearGoal[]
+  threeYearGoals: Goals[]
 ): PlanDetails => {
   const plan = plans.find(p => p.id === planId);
   if (!plan) return { planTitle: 'Unknown Plan', targetTitle: '', goalTitle: '', goalId: '' };
@@ -42,7 +43,7 @@ export const groupTasksByGoal = (
   tasks: Task[],
   plans: Plan[],
   ninetyDayTargets: NinetyDayTarget[],
-  threeYearGoals: ThreeYearGoal[]
+  threeYearGoals: Goals[]
 ): TasksByGoal => {
   const tasksByGoal: TasksByGoal = {};
   

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ThreeYearGoal, GoalStatus } from '@/types/task';
+import { Goals, GoalStatus } from '@/types/task';
 import TitleField from './form-fields/TitleField';
 import DescriptionField from './form-fields/DescriptionField';
 import DatePickerField from './form-fields/DatePickerField';
@@ -28,7 +28,7 @@ interface MilestoneFormContentProps {
   handleSubmit: (e: React.FormEvent) => void;
   onClose: () => void;
   isEditing: boolean;
-  threeYearGoals: ThreeYearGoal[];
+  threeYearGoals: Goals[];
 }
 
 const MilestoneFormContent2: React.FC<MilestoneFormContentProps> = ({

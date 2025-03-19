@@ -1,11 +1,11 @@
 
 import React, { useRef } from 'react';
 import { Motion, spring } from 'react-motion';
-import { ThreeYearGoal } from '@/types/task';
+import { Goals } from '@/types/task';
 import MindMapNode from '../MindMapNode';
 
 interface MindMapCanvasProps {
-  threeYearGoals: ThreeYearGoal[];
+  threeYearGoals: Goals[];
   pan: { x: number; y: number };
   zoomLevel: number;
   isPanning: boolean;
@@ -15,7 +15,7 @@ interface MindMapCanvasProps {
   onTouchStart: (e: React.TouchEvent) => void;
   onTouchMove: (e: React.TouchEvent) => void;
   onTouchEnd: () => void;
-  onEditGoal: (goal: ThreeYearGoal) => void;
+  onEditGoal: (goal: Goals) => void;
 }
 
 const MindMapCanvas: React.FC<MindMapCanvasProps> = ({
