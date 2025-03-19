@@ -19,6 +19,7 @@ import StatusSelector from '@/components/goals/form/StatusSelector';
 import DatePicker from '@/components/goals/form/DatePicker';
 import IconSelector from './IconSelector';
 import ActionsList from './ActionsList';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export interface Action {
   id: number;
@@ -78,14 +79,16 @@ const GoalForm: React.FC<GoalFormProps> = ({
   onCancel,
   onSubmit,
 }) => {
+  const { isMobile } = useIsMobile();
+  
   return (
-    <DialogContent className="sm:max-w-[625px]">
+    <DialogContent className={`sm:max-w-[625px] ${isMobile ? 'h-[90vh]' : 'max-h-[90vh]'} overflow-hidden flex flex-col`}>
       <DialogHeader>
         <DialogTitle>{isEditing ? 'Edit Goal' : 'Add New Goal'}</DialogTitle>
         <DialogDescription>Create a meaningful goal to track your progress</DialogDescription>
       </DialogHeader>
       
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-4 flex-1 overflow-y-auto pr-1">
         <div className="flex items-center space-x-3">
           <div className="flex-shrink-0">
             <IconSelector 
@@ -133,6 +136,7 @@ const GoalForm: React.FC<GoalFormProps> = ({
             value={description}
             onChange={(e) => onDescriptionChange(e.target.value)}
             placeholder="Enter goal description"
+            className={isMobile ? "min-h-20" : "min-h-24"}
           />
         </div>
         
@@ -142,16 +146,19 @@ const GoalForm: React.FC<GoalFormProps> = ({
           onUpdateAction={onUpdateAction}
           onRemoveAction={onRemoveAction}
         />
-        
-        <DialogFooter>
-          <Button type="button" variant="outline" onClick={onCancel}>
-            Cancel
-          </Button>
-          <Button type="submit">
-            {isEditing ? 'Update Goal' : 'Create Goal'}
-          </Button>
-        </DialogFooter>
       </form>
+      
+      <DialogFooter className="mt-2 pt-2 border-t">
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button 
+          type="button" 
+          onClick={(e) => onSubmit(e as unknown as React.FormEvent)}
+        >
+          {isEditing ? 'Update Goal' : 'Create Goal'}
+        </Button>
+      </DialogFooter>
     </DialogContent>
   );
 };
