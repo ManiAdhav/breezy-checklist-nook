@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Plus, Save, Target } from 'lucide-react';
 import { useTask } from '@/contexts/TaskContext';
 import { useGoal } from '@/contexts/GoalContext';
 import { format } from 'date-fns';
 import { parseNaturalLanguageTask } from '@/utils/dateParser';
-import { Priority, ThreeYearGoal } from '@/types/task';
+import { Priority, Goals } from '@/types/task';
 import { toast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { useLocation } from 'react-router-dom';
@@ -170,7 +171,7 @@ const FloatingActionButton: React.FC = () => {
       const threeYearsFromNow = new Date();
       threeYearsFromNow.setFullYear(now.getFullYear() + 3); // Set end date to 3 years from now
       
-      const newGoal: Omit<ThreeYearGoal, 'id' | 'createdAt' | 'updatedAt'> = {
+      const newGoal: Omit<Goals, 'id' | 'createdAt' | 'updatedAt'> = {
         title: goalTitle,
         status: 'not_started',
         startDate: now, // Add the required startDate

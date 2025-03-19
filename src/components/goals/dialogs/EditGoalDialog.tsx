@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { ThreeYearGoal, GoalStatus } from '@/types/task';
+import { Goals, GoalStatus } from '@/types/task';
 import { useGoal } from '@/hooks/useGoalContext';
 import { toast } from '@/hooks/use-toast';
 import { Input } from "@/components/ui/input";
@@ -26,7 +26,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface EditGoalDialogProps {
-  goal: ThreeYearGoal;
+  goal: Goals;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
 }

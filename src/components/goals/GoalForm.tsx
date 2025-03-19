@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { useGoal } from '@/contexts/GoalContext';
 import { useVision } from '@/contexts/VisionContext';
-import { ThreeYearGoal, GoalStatus } from '@/types/task';
+import { Goals, GoalStatus } from '@/types/task';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -17,7 +16,7 @@ import FormHeader from './form/FormHeader';
 interface GoalFormProps {
   isOpen: boolean;
   onClose: () => void;
-  editingGoal: ThreeYearGoal | null;
+  editingGoal: Goals | null;
 }
 
 const GoalForm: React.FC<GoalFormProps> = ({ isOpen, onClose, editingGoal }) => {

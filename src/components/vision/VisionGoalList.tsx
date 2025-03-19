@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ThreeYearGoal } from '@/types/task';
+import { Goals } from '@/types/task';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Target, ArrowRight } from 'lucide-react';
@@ -10,7 +10,7 @@ import { useMobile } from '@/hooks/use-mobile';
 import DynamicIcon from '@/components/ui/dynamic-icon';
 
 interface VisionGoalListProps {
-  goals: ThreeYearGoal[];
+  goals: Goals[];
 }
 
 const VisionGoalList: React.FC<VisionGoalListProps> = ({ goals }) => {

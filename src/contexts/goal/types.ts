@@ -1,12 +1,12 @@
 
-import { ThreeYearGoal, NinetyDayTarget, Plan } from '@/types/task';
+import { Goals, NinetyDayTarget, Plan } from '@/types/task';
 
 export interface GoalContextType {
-  threeYearGoals: ThreeYearGoal[];
+  threeYearGoals: Goals[];
   ninetyDayTargets: NinetyDayTarget[];
   plans: Plan[];
-  addThreeYearGoal: (goal: Omit<ThreeYearGoal, 'id' | 'createdAt' | 'updatedAt'>) => Promise<ThreeYearGoal | undefined>;
-  updateThreeYearGoal: (id: string, updates: Partial<ThreeYearGoal>) => void;
+  addThreeYearGoal: (goal: Omit<Goals, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Goals | undefined>;
+  updateThreeYearGoal: (id: string, updates: Partial<Goals>) => void;
   deleteThreeYearGoal: (id: string) => void;
   addNinetyDayTarget: (target: Omit<NinetyDayTarget, 'id' | 'createdAt' | 'updatedAt'>) => Promise<NinetyDayTarget | undefined>;
   updateNinetyDayTarget: (id: string, updates: Partial<NinetyDayTarget>) => void;

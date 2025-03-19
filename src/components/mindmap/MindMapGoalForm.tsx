@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useGoal } from '@/contexts/GoalContext';
 import { useVision } from '@/contexts/VisionContext';
-import { GoalStatus, ThreeYearGoal } from '@/types/task';
+import { GoalStatus, Goals } from '@/types/task';
 import { Dialog } from '@/components/ui/dialog';
 import { icons } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
@@ -18,7 +18,7 @@ interface MindMapGoalFormProps {
   onClose: () => void;
   initialGoalType?: GoalType;
   initialGoalId?: string;
-  editingGoal?: ThreeYearGoal;
+  editingGoal?: Goals;
   onSave?: () => void;
 }
 

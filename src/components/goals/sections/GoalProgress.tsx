@@ -1,12 +1,12 @@
 
 import React from 'react';
 import { Progress } from '@/components/ui/progress';
-import { ThreeYearGoal, GoalStatus } from '@/types/task';
+import { Goals, GoalStatus } from '@/types/task';
 import { useTask } from '@/contexts/TaskContext';
 import { useGoal } from '@/hooks/useGoalContext';
 
 interface GoalProgressProps {
-  goal: ThreeYearGoal;
+  goal: Goals;
 }
 
 const GoalProgress: React.FC<GoalProgressProps> = ({ goal }) => {

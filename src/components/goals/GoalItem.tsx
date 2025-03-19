@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { ThreeYearGoal, GoalStatus } from '@/types/task';
+import { Goals, GoalStatus } from '@/types/task';
 import { useGoal } from '@/contexts/GoalContext';
 import { Pencil, Trash2, Calendar, MoreHorizontal, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -14,8 +13,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 interface GoalItemProps {
-  goal: ThreeYearGoal;
-  onEdit: (goal: ThreeYearGoal) => void;
+  goal: Goals;
+  onEdit: (goal: Goals) => void;
   onView: () => void;
 }
 

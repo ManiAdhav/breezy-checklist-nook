@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Edit, Trash } from 'lucide-react';
-import { ThreeYearGoal } from '@/types/task';
+import { Goals } from '@/types/task';
 import { Button } from '@/components/ui/button';
 import { useGoal } from '@/contexts/GoalContext';
 import { cn } from '@/lib/utils';
@@ -11,7 +11,7 @@ import DynamicIcon from '@/components/ui/dynamic-icon';
 import { icons } from 'lucide-react';
 
 interface MindMapNodeProps {
-  goal: ThreeYearGoal;
+  goal: Goals;
   position: { x: number; y: number };
   onEdit: () => void;
 }

@@ -1,5 +1,5 @@
 
-import { ThreeYearGoal, NinetyDayTarget } from '@/types/task';
+import { Goals, NinetyDayTarget } from '@/types/task';
 import { ApiResponse } from '../types';
 import { generateId } from '@/utils/taskUtils';
 import { 
@@ -10,19 +10,19 @@ import {
   handleServiceError
 } from './baseService';
 
-export const getThreeYearGoals = async (): Promise<ApiResponse<ThreeYearGoal[]>> => {
+export const getThreeYearGoals = async (): Promise<ApiResponse<Goals[]>> => {
   try {
-    const goals = getStoredData<ThreeYearGoal>(THREE_YEAR_GOALS_STORAGE_KEY);
+    const goals = getStoredData<Goals>(THREE_YEAR_GOALS_STORAGE_KEY);
     return { success: true, data: goals };
   } catch (error) {
-    return handleServiceError<ThreeYearGoal[]>(error, 'Failed to fetch three-year goals');
+    return handleServiceError<Goals[]>(error, 'Failed to fetch goals');
   }
 };
 
-export const createThreeYearGoal = async (goal: Omit<ThreeYearGoal, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<ThreeYearGoal>> => {
+export const createThreeYearGoal = async (goal: Omit<Goals, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Goals>> => {
   try {
-    const goals = getStoredData<ThreeYearGoal>(THREE_YEAR_GOALS_STORAGE_KEY);
-    const newGoal: ThreeYearGoal = {
+    const goals = getStoredData<Goals>(THREE_YEAR_GOALS_STORAGE_KEY);
+    const newGoal: Goals = {
       ...goal,
       id: generateId(),
       createdAt: new Date(),
@@ -34,17 +34,17 @@ export const createThreeYearGoal = async (goal: Omit<ThreeYearGoal, 'id' | 'crea
     
     return { success: true, data: newGoal };
   } catch (error) {
-    return handleServiceError<ThreeYearGoal>(error, 'Failed to create three-year goal');
+    return handleServiceError<Goals>(error, 'Failed to create goal');
   }
 };
 
-export const updateThreeYearGoal = async (id: string, updates: Partial<ThreeYearGoal>): Promise<ApiResponse<ThreeYearGoal>> => {
+export const updateThreeYearGoal = async (id: string, updates: Partial<Goals>): Promise<ApiResponse<Goals>> => {
   try {
-    const goals = getStoredData<ThreeYearGoal>(THREE_YEAR_GOALS_STORAGE_KEY);
+    const goals = getStoredData<Goals>(THREE_YEAR_GOALS_STORAGE_KEY);
     const goalIndex = goals.findIndex(goal => goal.id === id);
     
     if (goalIndex === -1) {
-      return { success: false, error: 'Three-year goal not found' };
+      return { success: false, error: 'Goal not found' };
     }
     
     const updatedGoal = { 
@@ -58,20 +58,20 @@ export const updateThreeYearGoal = async (id: string, updates: Partial<ThreeYear
     
     return { success: true, data: updatedGoal };
   } catch (error) {
-    return handleServiceError<ThreeYearGoal>(error, 'Failed to update three-year goal');
+    return handleServiceError<Goals>(error, 'Failed to update goal');
   }
 };
 
 export const deleteThreeYearGoal = async (id: string): Promise<ApiResponse<void>> => {
   try {
-    const goals = getStoredData<ThreeYearGoal>(THREE_YEAR_GOALS_STORAGE_KEY);
+    const goals = getStoredData<Goals>(THREE_YEAR_GOALS_STORAGE_KEY);
     const targets = getStoredData<NinetyDayTarget>(NINETY_DAY_TARGETS_STORAGE_KEY);
     
     const updatedGoals = goals.filter(goal => goal.id !== id);
     const updatedTargets = targets.filter(target => target.threeYearGoalId !== id);
     
     if (updatedGoals.length === goals.length) {
-      return { success: false, error: 'Three-year goal not found' };
+      return { success: false, error: 'Goal not found' };
     }
     
     storeData(THREE_YEAR_GOALS_STORAGE_KEY, updatedGoals);
@@ -79,6 +79,6 @@ export const deleteThreeYearGoal = async (id: string): Promise<ApiResponse<void>
     
     return { success: true };
   } catch (error) {
-    return handleServiceError<void>(error, 'Failed to delete three-year goal');
+    return handleServiceError<void>(error, 'Failed to delete goal');
   }
 };

@@ -1,3 +1,4 @@
+
 export type Priority = 'high' | 'medium' | 'low' | 'none';
 
 export interface List {
@@ -36,7 +37,7 @@ export interface Vision {
   updatedAt: Date;
 }
 
-export interface ThreeYearGoal {
+export interface Goals {
   id: string;
   title: string;
   description?: string;

@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { useGoal } from '@/contexts/GoalContext';
 import GoalItem from './GoalItem';
 import MindMapGoalForm from '../mindmap/MindMapGoalForm';
 import GoalDetailView from './GoalDetailView';
 import { Button } from '@/components/ui/button';
-import { ThreeYearGoal } from '@/types/task';
+import { Goals } from '@/types/task';
 import { Plus, CheckCircle2, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
@@ -13,7 +12,7 @@ const GoalList: React.FC = () => {
   const { threeYearGoals } = useGoal();
   
   const [isGoalFormOpen, setIsGoalFormOpen] = useState(false);
-  const [editingGoal, setEditingGoal] = useState<ThreeYearGoal | null>(null);
+  const [editingGoal, setEditingGoal] = useState<Goals | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
   
@@ -22,7 +21,7 @@ const GoalList: React.FC = () => {
     setIsGoalFormOpen(true);
   };
   
-  const handleEditGoal = (goal: ThreeYearGoal) => {
+  const handleEditGoal = (goal: Goals) => {
     setEditingGoal(goal);
     setIsGoalFormOpen(true);
   };

@@ -1,6 +1,6 @@
 
 import React, { createContext, useState, useEffect } from 'react';
-import { ThreeYearGoal, NinetyDayTarget, Plan } from '@/types/task';
+import { Goals, NinetyDayTarget, Plan } from '@/types/task';
 import { GoalContextType } from './types';
 import { fetchThreeYearGoals, addThreeYearGoal, updateThreeYearGoal, deleteThreeYearGoal } from './threeYearGoals';
 import { fetchNinetyDayTargets, addNinetyDayTarget, updateNinetyDayTarget, deleteNinetyDayTarget } from './ninetyDayTargets';
@@ -9,7 +9,7 @@ import { fetchPlans, addPlan, updatePlan, deletePlan } from './plans';
 export const GoalContext = createContext<GoalContextType | undefined>(undefined);
 
 export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [threeYearGoals, setThreeYearGoals] = useState<ThreeYearGoal[]>([]);
+  const [threeYearGoals, setThreeYearGoals] = useState<Goals[]>([]);
   const [ninetyDayTargets, setNinetyDayTargets] = useState<NinetyDayTarget[]>([]);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);

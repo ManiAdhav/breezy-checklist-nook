@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { useGoal } from '@/hooks/useGoalContext';
-import { ThreeYearGoal } from '@/types/task';
+import { Goals } from '@/types/task';
 import { 
   Target, 
   Flag,
@@ -67,11 +66,11 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-background">
       {/* Header */}
-      <GoalHeader 
+      {goal && <GoalHeader 
         goal={goal} 
         onBack={onBack} 
         onEdit={() => setIsEditGoalDialogOpen(true)} 
-      />
+      />}
       
       <div className="flex-1 overflow-y-auto">
         {/* Goal Description and Progress */}
@@ -173,11 +172,11 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
       </div>
       
       {/* Edit Goal Dialog */}
-      <EditGoalDialog 
+      {goal && <EditGoalDialog 
         goal={goal} 
         isOpen={isEditGoalDialogOpen} 
         onOpenChange={setIsEditGoalDialogOpen} 
-      />
+      />}
       
       {/* Floating Action Button */}
       <div className="fixed bottom-6 right-6">

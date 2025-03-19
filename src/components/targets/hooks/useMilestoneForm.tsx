@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { useGoal } from '@/contexts/GoalContext';
-import { NinetyDayTarget, GoalStatus, ThreeYearGoal } from '@/types/task';
+import { NinetyDayTarget, GoalStatus, Goals } from '@/types/task';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 

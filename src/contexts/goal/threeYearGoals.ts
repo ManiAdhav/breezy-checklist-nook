@@ -1,9 +1,10 @@
-import { ThreeYearGoal, NinetyDayTarget } from '@/types/task';
+
+import { Goals, NinetyDayTarget } from '@/types/task';
 import * as GoalService from '@/api/goalService';
 import { toast } from '@/hooks/use-toast';
 
 export const fetchThreeYearGoals = async (
-  setThreeYearGoals: React.Dispatch<React.SetStateAction<ThreeYearGoal[]>>,
+  setThreeYearGoals: React.Dispatch<React.SetStateAction<Goals[]>>,
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   setIsLoading(true);
@@ -25,8 +26,8 @@ export const fetchThreeYearGoals = async (
 };
 
 export const addThreeYearGoal = async (
-  goal: Omit<ThreeYearGoal, 'id' | 'createdAt' | 'updatedAt'>,
-  setThreeYearGoals: React.Dispatch<React.SetStateAction<ThreeYearGoal[]>>,
+  goal: Omit<Goals, 'id' | 'createdAt' | 'updatedAt'>,
+  setThreeYearGoals: React.Dispatch<React.SetStateAction<Goals[]>>,
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   setIsLoading(true);
@@ -37,7 +38,7 @@ export const addThreeYearGoal = async (
       setThreeYearGoals(prevGoals => [...prevGoals, response.data!]);
       toast({
         title: "Goal added",
-        description: "Your three-year goal was added successfully.",
+        description: "Your goal was added successfully.",
       });
       return response.data;
     } else {
@@ -58,8 +59,8 @@ export const addThreeYearGoal = async (
 
 export const updateThreeYearGoal = async (
   id: string, 
-  updates: Partial<ThreeYearGoal>,
-  setThreeYearGoals: React.Dispatch<React.SetStateAction<ThreeYearGoal[]>>,
+  updates: Partial<Goals>,
+  setThreeYearGoals: React.Dispatch<React.SetStateAction<Goals[]>>,
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   setIsLoading(true);
@@ -74,7 +75,7 @@ export const updateThreeYearGoal = async (
       );
       toast({
         title: "Goal updated",
-        description: "Your three-year goal was updated successfully.",
+        description: "Your goal was updated successfully.",
       });
     } else {
       throw new Error(response.error || 'Failed to update goal');
@@ -93,7 +94,7 @@ export const updateThreeYearGoal = async (
 
 export const deleteThreeYearGoal = async (
   id: string,
-  setThreeYearGoals: React.Dispatch<React.SetStateAction<ThreeYearGoal[]>>,
+  setThreeYearGoals: React.Dispatch<React.SetStateAction<Goals[]>>,
   setNinetyDayTargets: React.Dispatch<React.SetStateAction<NinetyDayTarget[]>>,
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
@@ -108,7 +109,7 @@ export const deleteThreeYearGoal = async (
       
       toast({
         title: "Goal deleted",
-        description: "Your three-year goal was deleted successfully.",
+        description: "Your goal was deleted successfully.",
         variant: "destructive",
       });
     } else {

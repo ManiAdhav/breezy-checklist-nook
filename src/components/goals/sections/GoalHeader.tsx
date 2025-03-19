@@ -3,13 +3,13 @@ import React from 'react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Calendar, Edit } from 'lucide-react';
-import { ThreeYearGoal, GoalStatus } from '@/types/task';
+import { Goals, GoalStatus } from '@/types/task';
 import { useGoal } from '@/hooks/useGoalContext';
 import { useTask } from '@/contexts/TaskContext';
 import { toast } from '@/hooks/use-toast';
 
 interface GoalHeaderProps {
-  goal: ThreeYearGoal;
+  goal: Goals;
   onBack: () => void;
   onEdit: () => void;
 }
