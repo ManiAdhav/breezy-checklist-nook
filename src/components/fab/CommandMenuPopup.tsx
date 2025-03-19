@@ -1,6 +1,6 @@
 
 import React, { useRef, useEffect } from 'react';
-import { Target, Plus } from 'lucide-react';
+import { Target } from 'lucide-react';
 import { Goals } from '@/types/task';
 import {
   Command,
