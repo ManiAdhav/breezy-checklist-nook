@@ -1,87 +1,42 @@
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Save, Target } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Plus, Save } from 'lucide-react';
 import { useTask } from '@/contexts/TaskContext';
 import { useGoal } from '@/contexts/GoalContext';
-import { format } from 'date-fns';
-import { parseNaturalLanguageTask } from '@/utils/dateParser';
-import { Priority, Goals } from '@/types/task';
+import { useLocation } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
-import { useLocation } from 'react-router-dom';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
+import { Priority } from '@/types/task';
+import CommandMenuPopup from './CommandMenuPopup';
+import TaskPreview from './TaskPreview';
+import SelectedGoalBadge from './SelectedGoalBadge';
+import { useFabInput } from './useFabInput';
 
 const FloatingActionButton: React.FC = () => {
-  
   const location = useLocation();
   const { addTask } = useTask();
   const { threeYearGoals } = useGoal();
   
   const [isExpanded, setIsExpanded] = useState(false);
-  const [inputValue, setInputValue] = useState('');
-  const [showCommandMenu, setShowCommandMenu] = useState(false);
-  const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
-  const [selectedGoalTitle, setSelectedGoalTitle] = useState<string | null>(null);
-  const [filteredGoals, setFilteredGoals] = useState<Goals[]>([]);
-  
-  const [parsedTask, setParsedTask] = useState<{
-    title: string;
-    dueDate: Date | null;
-    recurring: boolean;
-    recurringPattern?: 'daily' | 'weekly' | 'monthly' | 'yearly';
-  }>({
-    title: '',
-    dueDate: null,
-    recurring: false
-  });
   
   const inputRef = useRef<HTMLInputElement>(null);
   const fabRef = useRef<HTMLDivElement>(null);
   const commandRef = useRef<HTMLDivElement>(null);
   
+  const {
+    inputValue,
+    setInputValue,
+    showCommandMenu,
+    setShowCommandMenu,
+    selectedGoalId,
+    selectedGoalTitle,
+    filteredGoals,
+    parsedTask,
+    handleGoalSelect
+  } = useFabInput({ threeYearGoals });
+  
   // Determine if we're on the calendar page
   const isCalendarPage = location.pathname.includes('calendar');
-  
-  // Filter goals based on user input after /g command
-  useEffect(() => {
-    const gCommandRegex = /^\/g\s+(.+)$/i;
-    const match = inputValue.match(gCommandRegex);
-    
-    if (match) {
-      const searchTerm = match[1].toLowerCase();
-      setShowCommandMenu(true);
-      const filtered = threeYearGoals.filter(goal => 
-        goal.title.toLowerCase().includes(searchTerm)
-      );
-      setFilteredGoals(filtered);
-    } else if (inputValue === '/g' || inputValue === '/g ') {
-      setShowCommandMenu(true);
-      setFilteredGoals(threeYearGoals);
-    } else {
-      setShowCommandMenu(false);
-    }
-  }, [inputValue, threeYearGoals]);
-  
-  useEffect(() => {
-    // Parse the input value on change
-    if (inputValue.trim() && !inputValue.startsWith('/g')) {
-      const result = parseNaturalLanguageTask(inputValue);
-      setParsedTask(result);
-    } else {
-      setParsedTask({
-        title: '',
-        dueDate: null,
-        recurring: false
-      });
-    }
-  }, [inputValue]);
   
   useEffect(() => {
     // Focus the input when the FAB is expanded
@@ -166,27 +121,7 @@ const FloatingActionButton: React.FC = () => {
     
     // Reset the input and close the FAB
     setInputValue('');
-    setSelectedGoalId(null);
-    setSelectedGoalTitle(null);
     setIsExpanded(false);
-  };
-  
-  const handleGoalSelect = (goalId: string, goalTitle: string) => {
-    // Extract the task title without the /g command
-    const originalTaskText = inputValue.replace(/^\/g\s+.+$/i, '').trim();
-    
-    // If there's a task description first, keep it, otherwise just clear the command
-    const updatedInputValue = originalTaskText || '';
-    
-    setInputValue(updatedInputValue);
-    setSelectedGoalId(goalId);
-    setSelectedGoalTitle(goalTitle);
-    setShowCommandMenu(false);
-    
-    toast({
-      title: "Goal selected",
-      description: `Task will be associated with "${goalTitle}"`,
-    });
   };
   
   // Adjusted styles for calendar page if needed
@@ -224,12 +159,7 @@ const FloatingActionButton: React.FC = () => {
               autoFocus
             />
             
-            {selectedGoalTitle && (
-              <div className="absolute top-1 right-12 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full flex items-center">
-                <Target className="w-3 h-3 mr-1" />
-                {selectedGoalTitle}
-              </div>
-            )}
+            <SelectedGoalBadge goalTitle={selectedGoalTitle || ''} />
             
             <button
               onClick={handleSave}
@@ -243,37 +173,12 @@ const FloatingActionButton: React.FC = () => {
             </button>
             
             {showCommandMenu && (
-              <div 
-                className="absolute z-50 w-full bottom-full mb-2 bg-white rounded-md shadow-lg border"
-                ref={commandRef}
-              >
-                <Command className="rounded-lg border shadow-md">
-                  <CommandInput 
-                    placeholder="Search goals..." 
-                    value={inputValue.replace(/^\/g\s*/i, '')}
-                    onValueChange={(value) => setInputValue(`/g ${value}`)}
-                    className="h-9"
-                  />
-                  <CommandList>
-                    <CommandEmpty>
-                      No matching goals found
-                    </CommandEmpty>
-                    
-                    <CommandGroup heading="Goals">
-                      {filteredGoals.map(goal => (
-                        <CommandItem 
-                          key={goal.id}
-                          onSelect={() => handleGoalSelect(goal.id, goal.title)}
-                          className="cursor-pointer"
-                        >
-                          <Target className="w-4 h-4 mr-2 text-primary" />
-                          {goal.title}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </div>
+              <CommandMenuPopup 
+                inputValue={inputValue}
+                filteredGoals={filteredGoals}
+                onGoalSelect={handleGoalSelect}
+                commandRef={commandRef}
+              />
             )}
           </div>
         ) : (
@@ -289,20 +194,11 @@ const FloatingActionButton: React.FC = () => {
       
       {/* Task preview when date/time is detected */}
       {isExpanded && parsedTask.dueDate && !showCommandMenu && (
-        <div className="mt-2 bg-white/95 backdrop-blur-sm rounded-md p-3 shadow-sm animate-fade-in absolute bottom-full mb-2 left-0 right-0">
-          <div className="text-sm text-gray-500">Task will be scheduled for:</div>
-          <div className="font-medium">
-            {format(parsedTask.dueDate, 'PPP')}
-            {parsedTask.dueDate.getHours() !== 0 && (
-              <span className="ml-2">{format(parsedTask.dueDate, 'p')}</span>
-            )}
-          </div>
-          {parsedTask.recurring && (
-            <div className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full inline-block mt-1">
-              Recurring: {parsedTask.recurringPattern}
-            </div>
-          )}
-        </div>
+        <TaskPreview 
+          dueDate={parsedTask.dueDate}
+          recurring={parsedTask.recurring}
+          recurringPattern={parsedTask.recurringPattern}
+        />
       )}
     </div>
   );
