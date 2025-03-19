@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Plus, Save, Target } from 'lucide-react';
 import { useTask } from '@/contexts/TaskContext';
@@ -12,6 +11,7 @@ import { useLocation } from 'react-router-dom';
 import CommandMenu from '@/components/command/CommandMenu';
 
 const FloatingActionButton: React.FC = () => {
+  
   const location = useLocation();
   const { addTask } = useTask();
   const { threeYearGoals, addThreeYearGoal } = useGoal();
@@ -95,6 +95,7 @@ const FloatingActionButton: React.FC = () => {
   };
   
   const handleSave = () => {
+    
     // Don't save if showing command menu
     if (showCommandMenu) return;
     
@@ -144,6 +145,7 @@ const FloatingActionButton: React.FC = () => {
   };
   
   const handleGoalSelect = (goalId: string, goalTitle: string) => {
+    
     // Extract the task title without the /g command
     const originalTaskText = inputValue.replace(/^\/g\s+.+$/i, '').trim();
     
@@ -163,9 +165,16 @@ const FloatingActionButton: React.FC = () => {
   
   const handleCreateNewGoal = async (goalTitle: string) => {
     try {
+      // Create a new goal with all required properties
+      const now = new Date();
+      const threeYearsFromNow = new Date();
+      threeYearsFromNow.setFullYear(now.getFullYear() + 3); // Set end date to 3 years from now
+      
       const newGoal: Omit<ThreeYearGoal, 'id' | 'createdAt' | 'updatedAt'> = {
         title: goalTitle,
-        status: 'not_started', // Changed from 'active' to 'not_started' to fix the error
+        status: 'not_started',
+        startDate: now, // Add the required startDate
+        endDate: threeYearsFromNow, // Add the required endDate
       };
       
       const createdGoal = await addThreeYearGoal(newGoal);
@@ -192,6 +201,7 @@ const FloatingActionButton: React.FC = () => {
       });
     }
   };
+  
   
   // Adjusted styles for calendar page if needed
   const fabPosition = isCalendarPage 
