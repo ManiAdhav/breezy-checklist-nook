@@ -9,19 +9,27 @@ import { Priority, Goals } from '@/types/task';
 import { toast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { useLocation } from 'react-router-dom';
-import CommandMenu from '@/components/command/CommandMenu';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
 
 const FloatingActionButton: React.FC = () => {
   
   const location = useLocation();
   const { addTask } = useTask();
-  const { threeYearGoals, addThreeYearGoal } = useGoal();
+  const { threeYearGoals } = useGoal();
   
   const [isExpanded, setIsExpanded] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [showCommandMenu, setShowCommandMenu] = useState(false);
   const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
   const [selectedGoalTitle, setSelectedGoalTitle] = useState<string | null>(null);
+  const [filteredGoals, setFilteredGoals] = useState<Goals[]>([]);
   
   const [parsedTask, setParsedTask] = useState<{
     title: string;
@@ -36,19 +44,30 @@ const FloatingActionButton: React.FC = () => {
   
   const inputRef = useRef<HTMLInputElement>(null);
   const fabRef = useRef<HTMLDivElement>(null);
+  const commandRef = useRef<HTMLDivElement>(null);
   
   // Determine if we're on the calendar page
   const isCalendarPage = location.pathname.includes('calendar');
   
-  // Check if input contains /g command
+  // Filter goals based on user input after /g command
   useEffect(() => {
     const gCommandRegex = /^\/g\s+(.+)$/i;
-    if (gCommandRegex.test(inputValue)) {
+    const match = inputValue.match(gCommandRegex);
+    
+    if (match) {
+      const searchTerm = match[1].toLowerCase();
       setShowCommandMenu(true);
+      const filtered = threeYearGoals.filter(goal => 
+        goal.title.toLowerCase().includes(searchTerm)
+      );
+      setFilteredGoals(filtered);
+    } else if (inputValue === '/g' || inputValue === '/g ') {
+      setShowCommandMenu(true);
+      setFilteredGoals(threeYearGoals);
     } else {
       setShowCommandMenu(false);
     }
-  }, [inputValue]);
+  }, [inputValue, threeYearGoals]);
   
   useEffect(() => {
     // Parse the input value on change
@@ -92,11 +111,18 @@ const FloatingActionButton: React.FC = () => {
     } else if (e.key === 'Escape') {
       setIsExpanded(false);
       setShowCommandMenu(false);
+    } else if (e.key === 'Tab' && showCommandMenu && filteredGoals.length > 0) {
+      e.preventDefault();
+      handleGoalSelect(filteredGoals[0].id, filteredGoals[0].title);
+    } else if (e.key === 'ArrowDown' && showCommandMenu) {
+      e.preventDefault();
+      const commandList = document.querySelector('[cmdk-list]');
+      const firstItem = commandList?.querySelector('[cmdk-item]') as HTMLElement;
+      if (firstItem) firstItem.focus();
     }
   };
   
   const handleSave = () => {
-    
     // Don't save if showing command menu
     if (showCommandMenu) return;
     
@@ -104,7 +130,7 @@ const FloatingActionButton: React.FC = () => {
     if (inputValue.startsWith('/g')) {
       toast({
         title: "Invalid input",
-        description: "Please select a goal from the list or create a new one",
+        description: "Please select a goal from the list",
         variant: "destructive",
       });
       return;
@@ -146,7 +172,6 @@ const FloatingActionButton: React.FC = () => {
   };
   
   const handleGoalSelect = (goalId: string, goalTitle: string) => {
-    
     // Extract the task title without the /g command
     const originalTaskText = inputValue.replace(/^\/g\s+.+$/i, '').trim();
     
@@ -163,46 +188,6 @@ const FloatingActionButton: React.FC = () => {
       description: `Task will be associated with "${goalTitle}"`,
     });
   };
-  
-  const handleCreateNewGoal = async (goalTitle: string) => {
-    try {
-      // Create a new goal with all required properties
-      const now = new Date();
-      const threeYearsFromNow = new Date();
-      threeYearsFromNow.setFullYear(now.getFullYear() + 3); // Set end date to 3 years from now
-      
-      const newGoal: Omit<Goals, 'id' | 'createdAt' | 'updatedAt'> = {
-        title: goalTitle,
-        status: 'not_started',
-        startDate: now, // Add the required startDate
-        endDate: threeYearsFromNow, // Add the required endDate
-      };
-      
-      const createdGoal = await addThreeYearGoal(newGoal);
-      
-      // Extract the task title without the /g command
-      const originalTaskText = inputValue.replace(/^\/g\s+.+$/i, '').trim();
-      const updatedInputValue = originalTaskText || '';
-      
-      setInputValue(updatedInputValue);
-      setSelectedGoalId(createdGoal.id);
-      setSelectedGoalTitle(createdGoal.title);
-      setShowCommandMenu(false);
-      
-      toast({
-        title: "Goal created",
-        description: `New goal "${goalTitle}" created and selected`,
-      });
-    } catch (error) {
-      console.error("Error creating goal:", error);
-      toast({
-        title: "Error",
-        description: "Failed to create goal",
-        variant: "destructive",
-      });
-    }
-  };
-  
   
   // Adjusted styles for calendar page if needed
   const fabPosition = isCalendarPage 
@@ -258,13 +243,37 @@ const FloatingActionButton: React.FC = () => {
             </button>
             
             {showCommandMenu && (
-              <CommandMenu
-                isOpen={showCommandMenu}
-                searchTerm={inputValue}
-                onSelect={handleGoalSelect}
-                onCreateNew={handleCreateNewGoal}
-                onClose={() => setShowCommandMenu(false)}
-              />
+              <div 
+                className="absolute z-50 w-full bottom-full mb-2 bg-white rounded-md shadow-lg border"
+                ref={commandRef}
+              >
+                <Command className="rounded-lg border shadow-md">
+                  <CommandInput 
+                    placeholder="Search goals..." 
+                    value={inputValue.replace(/^\/g\s*/i, '')}
+                    onValueChange={(value) => setInputValue(`/g ${value}`)}
+                    className="h-9"
+                  />
+                  <CommandList>
+                    <CommandEmpty>
+                      No matching goals found
+                    </CommandEmpty>
+                    
+                    <CommandGroup heading="Goals">
+                      {filteredGoals.map(goal => (
+                        <CommandItem 
+                          key={goal.id}
+                          onSelect={() => handleGoalSelect(goal.id, goal.title)}
+                          className="cursor-pointer"
+                        >
+                          <Target className="w-4 h-4 mr-2 text-primary" />
+                          {goal.title}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </div>
             )}
           </div>
         ) : (
