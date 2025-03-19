@@ -1,16 +1,14 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Plus, Save } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useTask } from '@/contexts/TaskContext';
 import { useGoal } from '@/contexts/GoalContext';
 import { useLocation } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
-import { Input } from '@/components/ui/input';
 import { Priority } from '@/types/task';
-import CommandMenuPopup from './CommandMenuPopup';
 import TaskPreview from './TaskPreview';
-import SelectedGoalBadge from './SelectedGoalBadge';
 import { useFabInput } from './useFabInput';
+import FloatingActionButtonControls from './FloatingActionButtonControls';
 
 const FloatingActionButton: React.FC = () => {
   const location = useLocation();
@@ -145,42 +143,19 @@ const FloatingActionButton: React.FC = () => {
         `}
       >
         {isExpanded ? (
-          <div className="w-full flex items-center p-2 relative">
-            <Input
-              ref={inputRef}
-              type="text"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="w-full border-none focus:ring-0 h-10 text-sm"
-              placeholder={isCalendarPage 
-                ? "Add a task for this date... (Type /g to select a goal)" 
-                : "Add a task... (Type /g to select a goal)"}
-              autoFocus
-            />
-            
-            <SelectedGoalBadge goalTitle={selectedGoalTitle || ''} />
-            
-            <button
-              onClick={handleSave}
-              className={`
-                ml-2 rounded-full p-2 transition-all duration-300
-                ${inputValue.trim() && !showCommandMenu ? 'bg-primary text-white hover:bg-primary/90' : 'bg-gray-100 text-gray-400'}
-              `}
-              disabled={!inputValue.trim() || showCommandMenu}
-            >
-              <Save className="w-4 h-4" />
-            </button>
-            
-            {showCommandMenu && (
-              <CommandMenuPopup 
-                inputValue={inputValue}
-                filteredGoals={filteredGoals}
-                onGoalSelect={handleGoalSelect}
-                commandRef={commandRef}
-              />
-            )}
-          </div>
+          <FloatingActionButtonControls
+            inputRef={inputRef}
+            inputValue={inputValue}
+            setInputValue={setInputValue}
+            handleKeyDown={handleKeyDown}
+            showCommandMenu={showCommandMenu}
+            selectedGoalTitle={selectedGoalTitle}
+            handleSave={handleSave}
+            isCalendarPage={isCalendarPage}
+            filteredGoals={filteredGoals}
+            handleGoalSelect={handleGoalSelect}
+            commandRef={commandRef}
+          />
         ) : (
           <button
             onClick={() => setIsExpanded(true)}
