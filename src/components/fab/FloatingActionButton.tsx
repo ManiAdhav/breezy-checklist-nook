@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Plus, Save, Target } from 'lucide-react';
 import { useTask } from '@/contexts/TaskContext';
@@ -164,7 +165,7 @@ const FloatingActionButton: React.FC = () => {
     try {
       const newGoal: Omit<ThreeYearGoal, 'id' | 'createdAt' | 'updatedAt'> = {
         title: goalTitle,
-        status: 'active',
+        status: 'not_started', // Changed from 'active' to 'not_started' to fix the error
       };
       
       const createdGoal = await addThreeYearGoal(newGoal);
