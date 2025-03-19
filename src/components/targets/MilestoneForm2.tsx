@@ -3,7 +3,7 @@ import React from 'react';
 import { NinetyDayTarget } from '@/types/task';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import MilestoneFormContent2 from './MilestoneFormContent2';
-import { useNinetyDayTargetForm } from './hooks/useNinetyDayTargetForm';
+import useNinetyDayTargetForm from './hooks/useNinetyDayTargetForm';
 
 interface MilestoneFormProps {
   isOpen: boolean;
