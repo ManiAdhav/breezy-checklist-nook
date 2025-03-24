@@ -18,6 +18,7 @@ export const useTaskForm = ({ editingTask, defaultDueDate, onClose }: UseTaskFor
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const [priority, setPriority] = useState<Priority>('none');
   const [listId, setListId] = useState('inbox');
+  const [selectedGoalId, setSelectedGoalId] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Initialize form with editingTask data or defaults
@@ -28,6 +29,7 @@ export const useTaskForm = ({ editingTask, defaultDueDate, onClose }: UseTaskFor
       setDueDate(editingTask.dueDate);
       setPriority(editingTask.priority);
       setListId(editingTask.listId);
+      setSelectedGoalId(editingTask.goalId || '');
     } else {
       // Reset form for new task
       setTitle('');
@@ -35,6 +37,7 @@ export const useTaskForm = ({ editingTask, defaultDueDate, onClose }: UseTaskFor
       setDueDate(defaultDueDate);
       setPriority('none');
       setListId('inbox');
+      setSelectedGoalId('');
     }
   }, [editingTask, defaultDueDate]);
 
@@ -58,6 +61,7 @@ export const useTaskForm = ({ editingTask, defaultDueDate, onClose }: UseTaskFor
       dueDate,
       priority,
       listId,
+      goalId: selectedGoalId || undefined,
       completed: editingTask ? editingTask.completed : false,
     };
     
@@ -101,6 +105,8 @@ export const useTaskForm = ({ editingTask, defaultDueDate, onClose }: UseTaskFor
     setPriority,
     listId,
     setListId,
+    selectedGoalId,
+    setSelectedGoalId,
     isSubmitting,
     handleSubmit,
     allLists,

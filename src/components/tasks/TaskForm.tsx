@@ -17,6 +17,8 @@ import {
   ListField, 
   NotesField 
 } from './form/TaskFormFields';
+import GoalSelectorField from '@/components/targets/form-fields/GoalSelectorField';
+import { useGoal } from '@/contexts/GoalContext';
 
 interface TaskFormProps {
   isOpen: boolean;
@@ -31,6 +33,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
   editingTask,
   defaultDueDate 
 }) => {
+  const { threeYearGoals } = useGoal();
   const {
     title,
     setTitle,
@@ -42,6 +45,8 @@ const TaskForm: React.FC<TaskFormProps> = ({
     setPriority,
     listId,
     setListId,
+    selectedGoalId,
+    setSelectedGoalId,
     isSubmitting,
     handleSubmit,
     allLists,
@@ -70,6 +75,12 @@ const TaskForm: React.FC<TaskFormProps> = ({
               listId={listId} 
               setListId={setListId} 
               allLists={allLists} 
+            />
+            
+            <GoalSelectorField
+              goals={threeYearGoals}
+              selectedGoalId={selectedGoalId}
+              setSelectedGoalId={setSelectedGoalId}
             />
             
             <NotesField notes={notes} setNotes={setNotes} />
