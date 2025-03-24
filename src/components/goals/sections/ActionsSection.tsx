@@ -41,7 +41,7 @@ const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
         </Button>
       </div>
       
-      <div className="space-y-2">
+      <div className="grid gap-3">
         {goalActions.length > 0 ? (
           goalActions.map(action => (
             <ActionCard
