@@ -4,7 +4,7 @@ import { useTask } from '@/contexts/TaskContext';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AddActionDialog from './actions/AddActionDialog';
-import ActionItem from './actions/ActionItem';
+import ActionCard from './actions/ActionCard';
 
 interface ActionsSectionProps {
   goalId: string;
@@ -14,22 +14,12 @@ const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
   const { tasks, toggleTaskCompletion } = useTask();
   
   const [isAddActionOpen, setIsAddActionOpen] = useState(false);
-  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
-  const [selectedTab, setSelectedTab] = useState<string>('milestones');
   
   // Filter actions for this goal
   const goalActions = tasks.filter(task => {
     // Check if the task is an action and has the correct goalId
     return task.isAction && task.goalId === goalId;
   });
-  
-  const toggleTaskDetails = (taskId: string) => {
-    if (expandedTaskId === taskId) {
-      setExpandedTaskId(null);
-    } else {
-      setExpandedTaskId(taskId);
-    }
-  };
   
   return (
     <div>
@@ -54,14 +44,10 @@ const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
       <div className="space-y-2">
         {goalActions.length > 0 ? (
           goalActions.map(action => (
-            <ActionItem
+            <ActionCard
               key={action.id}
               action={action}
-              expandedTaskId={expandedTaskId}
-              selectedTab={selectedTab}
               onToggleTaskCompletion={toggleTaskCompletion}
-              onToggleTaskDetails={toggleTaskDetails}
-              onTabChange={setSelectedTab}
             />
           ))
         ) : (
