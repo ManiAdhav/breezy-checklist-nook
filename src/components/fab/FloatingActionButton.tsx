@@ -79,16 +79,6 @@ const FloatingActionButton: React.FC = () => {
     // Don't save if showing command menu
     if (showCommandMenu) return;
     
-    // Handle /g command format
-    if (inputValue.startsWith('/g')) {
-      toast({
-        title: "Invalid input",
-        description: "Please select a goal from the list",
-        variant: "destructive",
-      });
-      return;
-    }
-    
     if (!parsedTask.title.trim()) {
       toast({
         title: "Task required",

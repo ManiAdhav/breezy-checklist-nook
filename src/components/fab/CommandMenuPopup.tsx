@@ -1,6 +1,6 @@
 
-import React, { useRef, useEffect } from 'react';
-import { Target } from 'lucide-react';
+import React from 'react';
+import { Target, Search } from 'lucide-react';
 import { Goals } from '@/types/task';
 import {
   Command,
@@ -24,8 +24,8 @@ const CommandMenuPopup: React.FC<CommandMenuPopupProps> = ({
   onGoalSelect,
   commandRef,
 }) => {
-  // Extract search term without the /g command
-  const searchTerm = inputValue.replace(/^\/g\s*/i, '');
+  // Extract search term without the command prefix
+  const searchTerm = inputValue.split('/').pop() || '';
   
   return (
     <div 
@@ -33,15 +33,15 @@ const CommandMenuPopup: React.FC<CommandMenuPopupProps> = ({
       ref={commandRef}
     >
       <Command className="rounded-lg border shadow-md">
-        <CommandInput 
-          placeholder="Search goals..." 
-          value={searchTerm}
-          onValueChange={(value) => {
-            // This is handled by the parent component
-          }}
-          className="h-9"
-        />
-        <CommandList>
+        <div className="flex items-center border-b px-3 py-2">
+          <Search className="w-4 h-4 mr-2 text-muted-foreground" />
+          <CommandInput 
+            placeholder="Search goals..." 
+            value={searchTerm}
+            className="h-7 border-none focus:ring-0 bg-transparent"
+          />
+        </div>
+        <CommandList className="max-h-[200px] overflow-auto">
           <CommandEmpty>
             No matching goals found
           </CommandEmpty>
@@ -51,10 +51,11 @@ const CommandMenuPopup: React.FC<CommandMenuPopupProps> = ({
               <CommandItem 
                 key={goal.id}
                 onSelect={() => onGoalSelect(goal.id, goal.title)}
-                className="cursor-pointer"
+                className="cursor-pointer flex items-center px-3 py-2 hover:bg-slate-50"
               >
                 <Target className="w-4 h-4 mr-2 text-primary" />
-                {goal.title}
+                <span className="flex-1 truncate">{goal.title}</span>
+                <span className="text-xs text-muted-foreground ml-2">Tab to select</span>
               </CommandItem>
             ))}
           </CommandGroup>

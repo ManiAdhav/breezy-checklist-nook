@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Goals } from '@/types/task';
 import { parseNaturalLanguageTask } from '@/utils/dateParser';
@@ -5,6 +6,31 @@ import { parseNaturalLanguageTask } from '@/utils/dateParser';
 interface UseFabInputProps {
   threeYearGoals: Goals[];
 }
+
+// Function to perform fuzzy matching
+const fuzzyMatch = (text: string, query: string): boolean => {
+  if (!query) return true;
+  
+  const normalizedText = text.toLowerCase();
+  const normalizedQuery = query.toLowerCase();
+  
+  // Simple matching - checks if query is a substring of text
+  if (normalizedText.includes(normalizedQuery)) return true;
+  
+  // More advanced fuzzy matching - handles typos and variations
+  let textIndex = 0;
+  let queryIndex = 0;
+  
+  while (textIndex < normalizedText.length && queryIndex < normalizedQuery.length) {
+    if (normalizedText[textIndex] === normalizedQuery[queryIndex]) {
+      queryIndex++;
+    }
+    textIndex++;
+  }
+  
+  // If we went through the entire query, it's a match
+  return queryIndex === normalizedQuery.length;
+};
 
 export const useFabInput = ({ threeYearGoals }: UseFabInputProps) => {
   const [inputValue, setInputValue] = useState('');
@@ -24,29 +50,30 @@ export const useFabInput = ({ threeYearGoals }: UseFabInputProps) => {
     recurring: false
   });
   
-  // Filter goals based on user input after /g command
+  // Detect any slash in the input to show command menu
   useEffect(() => {
-    const gCommandRegex = /^\/g\s+(.+)$/i;
-    const match = inputValue.match(gCommandRegex);
-    
-    if (match) {
-      const searchTerm = match[1].toLowerCase();
+    // Check if there's a slash in the input and no goal is selected yet
+    if (inputValue.includes('/') && !selectedGoalTitle) {
       setShowCommandMenu(true);
+      
+      // Extract the search term after the last slash
+      const searchTerms = inputValue.split('/');
+      const searchTerm = searchTerms[searchTerms.length - 1].trim().toLowerCase();
+      
+      // Filter goals using fuzzy search
       const filtered = threeYearGoals.filter(goal => 
-        goal.title.toLowerCase().includes(searchTerm)
+        fuzzyMatch(goal.title, searchTerm)
       );
+      
       setFilteredGoals(filtered);
-    } else if (inputValue === '/g' || inputValue === '/g ') {
-      setShowCommandMenu(true);
-      setFilteredGoals(threeYearGoals);
-    } else {
+    } else if (!inputValue.includes('/')) {
       setShowCommandMenu(false);
     }
-  }, [inputValue, threeYearGoals]);
+  }, [inputValue, threeYearGoals, selectedGoalTitle]);
   
   // Parse the input value on change
   useEffect(() => {
-    if (inputValue.trim() && !inputValue.startsWith('/g')) {
+    if (inputValue.trim()) {
       const result = parseNaturalLanguageTask(inputValue);
       setParsedTask(result);
     } else {
@@ -59,13 +86,15 @@ export const useFabInput = ({ threeYearGoals }: UseFabInputProps) => {
   }, [inputValue]);
   
   const handleGoalSelect = (goalId: string, goalTitle: string) => {
-    // Extract the task title without the /g command
-    const originalTaskText = inputValue.replace(/^\/g\s+.+$/i, '').trim();
+    // Extract the task description without any command
+    let taskText = inputValue;
     
-    // If there's a task description first, keep it, otherwise just clear the command
-    const updatedInputValue = originalTaskText || '';
+    // Remove any command parts (text after the slash)
+    if (inputValue.includes('/')) {
+      taskText = inputValue.split('/')[0].trim();
+    }
     
-    setInputValue(updatedInputValue);
+    setInputValue(taskText);
     setSelectedGoalId(goalId);
     setSelectedGoalTitle(goalTitle);
     setShowCommandMenu(false);

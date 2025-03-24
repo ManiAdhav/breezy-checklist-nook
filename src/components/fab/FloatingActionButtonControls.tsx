@@ -32,6 +32,9 @@ const FloatingActionButtonControls: React.FC<FloatingActionButtonControlsProps> 
   handleGoalSelect,
   commandRef
 }) => {
+  // Determine if we are in command mode (when "/" is typed)
+  const isCommandMode = inputValue.includes('/') && !selectedGoalTitle;
+  
   return (
     <div className="w-full flex items-center p-2 relative">
       <Input
@@ -40,10 +43,10 @@ const FloatingActionButtonControls: React.FC<FloatingActionButtonControlsProps> 
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}
-        className="w-full border-none focus:ring-0 h-10 text-sm"
+        className={`w-full border-none focus:ring-0 h-10 text-sm ${isCommandMode ? 'bg-gray-100' : ''}`}
         placeholder={isCalendarPage 
-          ? "Add a task for this date... (Type /g to select a goal)" 
-          : "Add a task... (Type /g to select a goal)"}
+          ? "Add a task for this date... (Type / to use commands)" 
+          : "Add a task... (Type / to use commands)"}
         autoFocus
       />
       
