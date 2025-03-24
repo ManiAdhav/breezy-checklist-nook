@@ -25,7 +25,7 @@ const CommandMenuPopup: React.FC<CommandMenuPopupProps> = ({
   commandRef,
 }) => {
   // Extract search term without the command prefix
-  const searchTerm = inputValue.split('/').pop() || '';
+  const searchTerm = inputValue.includes('/') ? inputValue.split('/').pop() || '' : '';
   
   return (
     <div 

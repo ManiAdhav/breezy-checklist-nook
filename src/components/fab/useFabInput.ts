@@ -66,8 +66,11 @@ export const useFabInput = ({ threeYearGoals }: UseFabInputProps) => {
       );
       
       setFilteredGoals(filtered);
-    } else if (!inputValue.includes('/')) {
-      setShowCommandMenu(false);
+    } else {
+      // Close the command menu if there's no slash or a goal has been selected
+      if (!inputValue.includes('/') || selectedGoalTitle) {
+        setShowCommandMenu(false);
+      }
     }
   }, [inputValue, threeYearGoals, selectedGoalTitle]);
   
