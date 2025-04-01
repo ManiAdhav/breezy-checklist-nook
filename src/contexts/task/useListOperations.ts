@@ -8,8 +8,8 @@ export const useListOperations = (
   setTasks: React.Dispatch<React.SetStateAction<any[]>>,
   setSelectedListId: React.Dispatch<React.SetStateAction<string>>,
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
-  customLists: List[], // Add missing customLists parameter
-  selectedListId: string // Add missing selectedListId parameter
+  customLists: List[],
+  selectedListId: string
 ) => {
   // List operations
   const addList = async (list: Omit<List, 'id'>) => {
@@ -18,8 +18,13 @@ export const useListOperations = (
       const response = await TaskService.createList(list);
       
       if (response.success && response.data) {
+        // Ensure we're adding a valid list object to the state
         setCustomLists(prevLists => [...prevLists, response.data!]);
         setSelectedListId(response.data!.id);
+        
+        // Log the list creation for debugging
+        console.log('List created:', response.data);
+        
         toast({
           title: "List added",
           description: `"${list.name}" was added successfully.`,

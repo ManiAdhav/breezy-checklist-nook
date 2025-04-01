@@ -4,16 +4,19 @@ import { icons } from 'lucide-react';
 import { LucideProps } from 'lucide-react';
 
 interface DynamicIconProps extends Omit<LucideProps, 'ref'> {
-  name: keyof typeof icons;
+  name: keyof typeof icons | string;
 }
 
 const DynamicIcon = ({ name, ...props }: DynamicIconProps) => {
-  const Icon = icons[name];
+  // Handle string that might not be a valid key in icons
+  let iconKey = name as keyof typeof icons;
   
-  if (!Icon) {
-    return React.createElement(icons.List, props);
+  // Check if the icon exists, if not default to List
+  if (!icons[iconKey]) {
+    iconKey = 'List';
   }
   
+  const Icon = icons[iconKey];
   return <Icon {...props} />;
 };
 

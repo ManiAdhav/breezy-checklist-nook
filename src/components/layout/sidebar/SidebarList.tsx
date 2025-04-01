@@ -53,7 +53,7 @@ const SidebarList: React.FC<SidebarListProps> = ({
                 onClick={() => handleListClick(list.id)}
               >
                 <div className="flex items-center gap-2 flex-1">
-                  <DynamicIcon name={list.icon as any || 'List'} className="h-4 w-4" />
+                  <DynamicIcon name={list.icon || 'List'} className="h-4 w-4" />
                   <span className="mr-auto">{list.name}</span>
                 </div>
                 {getTaskCountForList(list.id) > 0 && (

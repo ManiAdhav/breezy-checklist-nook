@@ -1,4 +1,3 @@
-
 import { Task, List, Priority } from '@/types/task';
 import { generateId } from '@/utils/taskUtils';
 import { ApiResponse } from './types';
@@ -7,7 +6,7 @@ import { ApiResponse } from './types';
 const TASKS_STORAGE_KEY = 'tasks';
 const CUSTOM_LISTS_STORAGE_KEY = 'customLists';
 
-// Helper functions
+// Helper functions - updated for debugging
 const getStoredTasks = (): Task[] => {
   const storedTasks = localStorage.getItem(TASKS_STORAGE_KEY);
   return storedTasks ? JSON.parse(storedTasks) : [];
@@ -15,7 +14,9 @@ const getStoredTasks = (): Task[] => {
 
 const getStoredCustomLists = (): List[] => {
   const storedLists = localStorage.getItem(CUSTOM_LISTS_STORAGE_KEY);
-  return storedLists ? JSON.parse(storedLists) : [];
+  const lists = storedLists ? JSON.parse(storedLists) : [];
+  console.log('Retrieved stored lists:', lists);
+  return lists;
 };
 
 const storeTasks = (tasks: Task[]): void => {
@@ -23,6 +24,7 @@ const storeTasks = (tasks: Task[]): void => {
 };
 
 const storeCustomLists = (lists: List[]): void => {
+  console.log('Storing lists:', lists);
   localStorage.setItem(CUSTOM_LISTS_STORAGE_KEY, JSON.stringify(lists));
 };
 
@@ -128,6 +130,7 @@ export const toggleTaskCompletion = async (id: string): Promise<ApiResponse<Task
 export const getLists = async (): Promise<ApiResponse<List[]>> => {
   try {
     const lists = getStoredCustomLists();
+    console.log('getLists:', lists);
     return { success: true, data: lists };
   } catch (error) {
     console.error('Error fetching lists:', error);
@@ -145,6 +148,7 @@ export const createList = async (list: Omit<List, 'id'>): Promise<ApiResponse<Li
     
     const updatedLists = [...lists, newList];
     storeCustomLists(updatedLists);
+    console.log('List created:', newList, 'All lists:', updatedLists);
     
     return { success: true, data: newList };
   } catch (error) {

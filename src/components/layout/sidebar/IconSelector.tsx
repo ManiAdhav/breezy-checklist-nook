@@ -18,7 +18,7 @@ export const listIconOptions = [
   { value: 'Bookmark', label: 'Bookmark' },
   { value: 'Star', label: 'Star' },
   { value: 'Heart', label: 'Heart' },
-  { value: 'LightbulbIcon', label: 'Idea' },
+  { value: 'Lightbulb', label: 'Idea' }, // Fixed from LightbulbIcon to Lightbulb
   { value: 'GraduationCap', label: 'Education' },
   { value: 'Home', label: 'Home' },
   { value: 'Laptop', label: 'Work' },
@@ -39,7 +39,7 @@ const IconSelector: React.FC<IconSelectorProps> = ({ selectedIcon, onSelectIcon 
           size="icon" 
           className="h-10 w-10 rounded-md"
         >
-          <DynamicIcon name={selectedIcon as keyof typeof icons} className="h-5 w-5" />
+          <DynamicIcon name={selectedIcon} className="h-5 w-5" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-60 p-2">
@@ -56,7 +56,7 @@ const IconSelector: React.FC<IconSelectorProps> = ({ selectedIcon, onSelectIcon 
               type="button"
               title={iconOption.label}
             >
-              <DynamicIcon name={iconOption.value as keyof typeof icons} className="h-5 w-5" />
+              <DynamicIcon name={iconOption.value} className="h-5 w-5" />
             </Button>
           ))}
         </div>
