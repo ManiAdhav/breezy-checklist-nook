@@ -2,10 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
 import DynamicIcon from '@/components/ui/dynamic-icon';
-import { icons } from 'lucide-react';
-import { LucideIcon } from 'lucide-react';
 
 export const listIconOptions = [
   { value: 'List', label: 'List' },
@@ -51,9 +48,7 @@ const IconSelector: React.FC<IconSelectorProps> = ({ selectedIcon, onSelectIcon 
               variant={selectedIcon === iconOption.value ? "default" : "outline"}
               size="icon"
               className="h-9 w-9"
-              onClick={() => {
-                onSelectIcon(iconOption.value);
-              }}
+              onClick={() => onSelectIcon(iconOption.value)}
               type="button"
               title={iconOption.label}
             >
