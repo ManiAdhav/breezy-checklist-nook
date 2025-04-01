@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronRight, MoreHorizontal, Package } from 'lucide-react';
+import { ChevronDown, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { useTask } from '@/contexts/TaskContext';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { List } from '@/types/task';
+import DynamicIcon from '@/components/ui/dynamic-icon';
 
 interface SidebarListProps {
   openEditDialog: (list: List) => void;
@@ -13,6 +14,7 @@ interface SidebarListProps {
   setIsAddListOpen: (open: boolean) => void;
   setNewListName: (name: string) => void;
   setEditingList: (list: List | null) => void;
+  setSelectedIcon: (icon: string) => void;
 }
 
 const SidebarList: React.FC<SidebarListProps> = ({
@@ -21,15 +23,11 @@ const SidebarList: React.FC<SidebarListProps> = ({
   selectedListId,
   setIsAddListOpen,
   setNewListName,
-  setEditingList
+  setEditingList,
+  setSelectedIcon
 }) => {
   const { customLists, deleteList, tasks } = useTask();
   const [showCustomLists, setShowCustomLists] = useState(true);
-
-  const getIconForList = (icon: string | undefined) => {
-    // Simplified icon selection for brevity
-    return <Package className="h-4 w-4" />;
-  };
 
   const getTaskCountForList = (listId: string) => {
     return tasks.filter(task => task.listId === listId && !task.completed).length;
@@ -55,7 +53,7 @@ const SidebarList: React.FC<SidebarListProps> = ({
                 onClick={() => handleListClick(list.id)}
               >
                 <div className="flex items-center gap-2 flex-1">
-                  {getIconForList(list.icon)}
+                  <DynamicIcon name={list.icon as any || 'List'} className="h-4 w-4" />
                   <span className="mr-auto">{list.name}</span>
                 </div>
                 {getTaskCountForList(list.id) > 0 && (
@@ -91,10 +89,11 @@ const SidebarList: React.FC<SidebarListProps> = ({
             onClick={() => {
               setNewListName('');
               setEditingList(null);
+              setSelectedIcon('List');
               setIsAddListOpen(true);
             }}
           >
-            <Package className="h-4 w-4 mr-2" />
+            <DynamicIcon name="Plus" className="h-4 w-4 mr-2" />
             <span>Add List</span>
           </Button>
         </nav>

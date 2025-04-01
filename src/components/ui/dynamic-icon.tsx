@@ -11,11 +11,10 @@ const DynamicIcon = ({ name, ...props }: DynamicIconProps) => {
   const Icon = icons[name];
   
   if (!Icon) {
-    return icons.Target(props);
+    return React.createElement(icons.List, props);
   }
   
   return <Icon {...props} />;
 };
 
 export default DynamicIcon;
-

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { List } from '@/types/task';
+import IconSelector from '@/components/layout/sidebar/IconSelector';
 
 interface AddListDialogProps {
   isOpen: boolean;
@@ -13,6 +14,8 @@ interface AddListDialogProps {
   setNewListName: (name: string) => void;
   handleAddList: () => void;
   editingList: List | null;
+  selectedIcon: string;
+  setSelectedIcon: (icon: string) => void;
 }
 
 const AddListDialog: React.FC<AddListDialogProps> = ({
@@ -21,7 +24,9 @@ const AddListDialog: React.FC<AddListDialogProps> = ({
   newListName,
   setNewListName,
   handleAddList,
-  editingList
+  editingList,
+  selectedIcon,
+  setSelectedIcon
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -41,6 +46,17 @@ const AddListDialog: React.FC<AddListDialogProps> = ({
               className="col-span-3" 
               autoFocus 
             />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="list-icon" className="text-right">
+              Icon
+            </Label>
+            <div className="col-span-3">
+              <IconSelector 
+                selectedIcon={selectedIcon} 
+                onSelectIcon={setSelectedIcon} 
+              />
+            </div>
           </div>
         </div>
         <DialogFooter>

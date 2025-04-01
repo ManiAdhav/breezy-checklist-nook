@@ -21,21 +21,24 @@ const Sidebar: React.FC = () => {
   
   const [isAddListOpen, setIsAddListOpen] = useState(false);
   const [newListName, setNewListName] = useState('');
+  const [selectedIcon, setSelectedIcon] = useState<string>('List');
   const [editingList, setEditingList] = useState<List | null>(null);
 
   const handleAddList = () => {
     if (newListName.trim()) {
       if (editingList) {
         updateList(editingList.id, {
-          name: newListName.trim()
+          name: newListName.trim(),
+          icon: selectedIcon
         });
       } else {
         addList({
           name: newListName.trim(),
-          icon: 'list-checks'
+          icon: selectedIcon
         });
       }
       setNewListName('');
+      setSelectedIcon('List');
       setEditingList(null);
       setIsAddListOpen(false);
     }
@@ -44,6 +47,7 @@ const Sidebar: React.FC = () => {
   const openEditDialog = (list: List) => {
     setEditingList(list);
     setNewListName(list.name);
+    setSelectedIcon(list.icon || 'List');
     setIsAddListOpen(true);
   };
 
@@ -67,6 +71,7 @@ const Sidebar: React.FC = () => {
           setIsAddListOpen={setIsAddListOpen}
           setNewListName={setNewListName}
           setEditingList={setEditingList}
+          setSelectedIcon={setSelectedIcon}
         />
       </div>
 
@@ -77,6 +82,8 @@ const Sidebar: React.FC = () => {
         setNewListName={setNewListName}
         handleAddList={handleAddList}
         editingList={editingList}
+        selectedIcon={selectedIcon}
+        setSelectedIcon={setSelectedIcon}
       />
     </aside>
   );
