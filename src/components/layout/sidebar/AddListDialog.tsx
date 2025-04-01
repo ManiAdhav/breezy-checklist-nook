@@ -3,9 +3,9 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { List } from '@/types/task';
 import IconSelector from '@/components/layout/sidebar/IconSelector';
+import DynamicIcon from '@/components/ui/dynamic-icon';
 
 interface AddListDialogProps {
   isOpen: boolean;
@@ -35,33 +35,26 @@ const AddListDialog: React.FC<AddListDialogProps> = ({
           <DialogTitle>{editingList ? 'Edit List' : 'Add New List'}</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="list-name" className="text-right">
-              Name
-            </Label>
+          <div className="flex items-center gap-3">
+            <IconSelector 
+              selectedIcon={selectedIcon} 
+              onSelectIcon={setSelectedIcon} 
+            />
             <Input 
               id="list-name" 
               value={newListName} 
               onChange={e => setNewListName(e.target.value)} 
-              className="col-span-3" 
+              className="flex-1" 
+              placeholder="Enter list name"
               autoFocus 
             />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="list-icon" className="text-right">
-              Icon
-            </Label>
-            <div className="col-span-3">
-              <IconSelector 
-                selectedIcon={selectedIcon} 
-                onSelectIcon={setSelectedIcon} 
-              />
-            </div>
           </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={handleAddList}>{editingList ? 'Save' : 'Add'}</Button>
+          <Button onClick={handleAddList} disabled={!newListName.trim()}>
+            {editingList ? 'Save' : 'Add'}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

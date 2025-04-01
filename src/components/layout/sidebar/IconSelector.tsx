@@ -18,7 +18,7 @@ export const listIconOptions = [
   { value: 'Bookmark', label: 'Bookmark' },
   { value: 'Star', label: 'Star' },
   { value: 'Heart', label: 'Heart' },
-  { value: 'Lightbulb', label: 'Idea' }, // Fixed from LightbulbIcon to Lightbulb
+  { value: 'Lightbulb', label: 'Idea' },
   { value: 'GraduationCap', label: 'Education' },
   { value: 'Home', label: 'Home' },
   { value: 'Laptop', label: 'Work' },
@@ -37,7 +37,8 @@ const IconSelector: React.FC<IconSelectorProps> = ({ selectedIcon, onSelectIcon 
         <Button 
           variant="outline" 
           size="icon" 
-          className="h-10 w-10 rounded-md"
+          className="h-10 w-10 rounded-md flex-shrink-0"
+          title="Click to change icon"
         >
           <DynamicIcon name={selectedIcon} className="h-5 w-5" />
         </Button>
