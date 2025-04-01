@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon, X } from 'lucide-react';
 import { List, Priority } from '@/types/task';
@@ -45,6 +46,8 @@ interface DueDateFieldProps {
 }
 
 export const DueDateField: React.FC<DueDateFieldProps> = ({ dueDate, setDueDate }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
   const handleDateSelect = (date: Date | undefined) => {
     // If selecting the same date, clear it
     if (date && dueDate && date.getTime() === dueDate.getTime()) {
@@ -52,12 +55,14 @@ export const DueDateField: React.FC<DueDateFieldProps> = ({ dueDate, setDueDate 
     } else {
       setDueDate(date);
     }
+    // Close the popover after selection
+    setIsOpen(false);
   };
 
   return (
     <div className="grid gap-2">
       <Label>Due Date</Label>
-      <Popover>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
