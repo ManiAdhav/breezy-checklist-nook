@@ -69,9 +69,9 @@ const ActionPlanSelector: React.FC<ActionPlanSelectorProps> = ({
         </SelectTrigger>
         <SelectContent>
           {getPlansForSelect().length === 0 ? (
-            <SelectItem value="" disabled>
+            <div className="py-2 px-2 text-sm text-muted-foreground">
               {selectedGoalId ? "No plans for selected goal" : "No plans available"}
-            </SelectItem>
+            </div>
           ) : (
             getPlansForSelect().map(plan => (
               <SelectItem key={plan.id} value={plan.id}>

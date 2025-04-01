@@ -152,9 +152,15 @@ const AddActionDialog: React.FC<AddActionDialogProps> = ({
                 <SelectValue placeholder="Select a plan" />
               </SelectTrigger>
               <SelectContent>
-                {getPlansForGoal().map(plan => (
-                  <SelectItem key={plan.id} value={plan.id}>{plan.title}</SelectItem>
-                ))}
+                {getPlansForGoal().length === 0 ? (
+                  <div className="py-2 px-2 text-sm text-muted-foreground">
+                    No plans available for this goal
+                  </div>
+                ) : (
+                  getPlansForGoal().map(plan => (
+                    <SelectItem key={plan.id} value={plan.id}>{plan.title}</SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>

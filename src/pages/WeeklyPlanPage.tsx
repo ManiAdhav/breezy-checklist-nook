@@ -78,9 +78,9 @@ const WeeklyPlanPage: React.FC = () => {
             </SelectTrigger>
             <SelectContent>
               {plans.length === 0 ? (
-                <SelectItem value="" disabled>
+                <div className="py-2 px-2 text-sm text-muted-foreground">
                   No plans available. Create one first.
-                </SelectItem>
+                </div>
               ) : (
                 plans.map((plan) => {
                   const goal = threeYearGoals.find(g => {
