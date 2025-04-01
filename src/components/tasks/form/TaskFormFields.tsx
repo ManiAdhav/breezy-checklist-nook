@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon, X } from 'lucide-react';
@@ -45,46 +44,45 @@ interface DueDateFieldProps {
   setDueDate: (date: Date | undefined) => void;
 }
 
-export const DueDateField: React.FC<DueDateFieldProps> = ({ dueDate, setDueDate }) => (
-  <div className="grid gap-2">
-    <Label>Due Date</Label>
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          className={cn(
-            "w-full justify-start text-left font-normal",
-            !dueDate && "text-muted-foreground"
-          )}
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {dueDate ? format(dueDate, "PPP") : <span>Pick a date</span>}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <Calendar
-          mode="single"
-          selected={dueDate}
-          onSelect={setDueDate}
-          initialFocus
-          className="pointer-events-auto"
-        />
-      </PopoverContent>
-    </Popover>
-    {dueDate && (
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className="mt-1"
-        onClick={() => setDueDate(undefined)}
-      >
-        <X className="h-4 w-4 mr-1" />
-        Clear date
-      </Button>
-    )}
-  </div>
-);
+export const DueDateField: React.FC<DueDateFieldProps> = ({ dueDate, setDueDate }) => {
+  const handleDateSelect = (date: Date | undefined) => {
+    // If selecting the same date, clear it
+    if (date && dueDate && date.getTime() === dueDate.getTime()) {
+      setDueDate(undefined);
+    } else {
+      setDueDate(date);
+    }
+  };
+
+  return (
+    <div className="grid gap-2">
+      <Label>Due Date</Label>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className={cn(
+              "w-full justify-start text-left font-normal",
+              !dueDate && "text-muted-foreground"
+            )}
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {dueDate ? format(dueDate, "PPP") : <span>Pick a date</span>}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={dueDate}
+            onSelect={handleDateSelect}
+            initialFocus
+            className="pointer-events-auto"
+          />
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+};
 
 interface PriorityFieldProps {
   priority: Priority;
