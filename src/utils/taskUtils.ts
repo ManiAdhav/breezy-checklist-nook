@@ -1,5 +1,6 @@
 
 import { Priority, Task } from '@/types/task';
+import { startOfDay, endOfDay, isWithinInterval, isPast, isFuture } from 'date-fns';
 
 export const generateId = (): string => {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
@@ -57,8 +58,31 @@ export const filterTasks = (
       return false;
     }
     
-    // Filter by list
-    if (listId && task.listId !== listId) {
+    // Special handling for "today" list
+    if (listId === 'today') {
+      const today = new Date();
+      const dayStart = startOfDay(today);
+      const dayEnd = endOfDay(today);
+      
+      // Include tasks that are due today
+      if (task.dueDate) {
+        const taskDueDate = new Date(task.dueDate);
+        return isWithinInterval(taskDueDate, { start: dayStart, end: dayEnd });
+      }
+      return false;
+    }
+    
+    // Special handling for "planned" list - show all tasks with a due date in the future
+    if (listId === 'planned') {
+      if (task.dueDate) {
+        const taskDueDate = new Date(task.dueDate);
+        return isFuture(taskDueDate);
+      }
+      return false;
+    }
+    
+    // Filter by standard list
+    if (listId && listId !== 'all' && task.listId !== listId) {
       return false;
     }
     
