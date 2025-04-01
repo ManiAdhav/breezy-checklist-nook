@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import * as TaskService from '@/api/taskService';
 import { toast } from '@/hooks/use-toast';
@@ -40,3 +39,4 @@ export const useTaskData = (
     fetchData();
   }, [setTasks, setCustomLists, setIsLoading]);
 };
+
