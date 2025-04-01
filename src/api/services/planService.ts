@@ -5,9 +5,9 @@ import { generateId } from '@/utils/taskUtils';
 import { 
   PLANS_STORAGE_KEY,
   getStoredData, 
-  storeData,
-  handleServiceError
-} from './baseService';
+  storeData
+} from './storageUtils';
+import { handleServiceError } from './errorUtils';
 
 export const getPlans = async (): Promise<ApiResponse<Plan[]>> => {
   try {

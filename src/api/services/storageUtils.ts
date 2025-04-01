@@ -2,6 +2,9 @@
 // Local storage keys
 export const TASKS_STORAGE_KEY = 'tasks';
 export const CUSTOM_LISTS_STORAGE_KEY = 'customLists';
+export const THREE_YEAR_GOALS_STORAGE_KEY = 'threeYearGoals';
+export const NINETY_DAY_TARGETS_STORAGE_KEY = 'ninetyDayTargets';
+export const PLANS_STORAGE_KEY = 'plans';
 
 // Generic storage helper functions
 export const getStoredData = <T>(key: string): T[] => {
@@ -32,4 +35,10 @@ export const storeTasks = (tasks: any[]): void => {
 export const storeCustomLists = (lists: any[]): void => {
   console.log('Storing lists:', lists);
   storeData(CUSTOM_LISTS_STORAGE_KEY, lists);
+};
+
+// Helper for consistent error handling
+export const handleServiceError = <T>(error: unknown, errorMessage: string): any => {
+  console.error(errorMessage, error);
+  return { success: false, error: errorMessage };
 };

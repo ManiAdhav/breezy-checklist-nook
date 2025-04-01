@@ -6,9 +6,9 @@ import {
   NINETY_DAY_TARGETS_STORAGE_KEY, 
   PLANS_STORAGE_KEY,
   getStoredData, 
-  storeData,
-  handleServiceError
-} from './baseService';
+  storeData
+} from './storageUtils';
+import { handleServiceError } from './errorUtils';
 
 export const getNinetyDayTargets = async (): Promise<ApiResponse<NinetyDayTarget[]>> => {
   try {

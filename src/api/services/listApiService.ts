@@ -1,8 +1,8 @@
-
 import { List } from '@/types/task';
 import { generateId } from '@/utils/taskUtils';
 import { ApiResponse } from '../types';
 import { getStoredCustomLists, getStoredTasks, storeCustomLists, storeTasks } from './storageUtils';
+import { handleServiceError } from './errorUtils';
 
 // List API methods
 export const getLists = async (): Promise<ApiResponse<List[]>> => {
@@ -11,8 +11,7 @@ export const getLists = async (): Promise<ApiResponse<List[]>> => {
     console.log('getLists:', lists);
     return { success: true, data: lists };
   } catch (error) {
-    console.error('Error fetching lists:', error);
-    return { success: false, error: 'Failed to fetch lists' };
+    return handleServiceError<List[]>(error, 'Failed to fetch lists');
   }
 };
 
@@ -30,8 +29,7 @@ export const createList = async (list: Omit<List, 'id'>): Promise<ApiResponse<Li
     
     return { success: true, data: newList };
   } catch (error) {
-    console.error('Error creating list:', error);
-    return { success: false, error: 'Failed to create list' };
+    return handleServiceError<List>(error, 'Failed to create list');
   }
 };
 
@@ -54,8 +52,7 @@ export const updateList = async (id: string, updates: Partial<List>): Promise<Ap
     
     return { success: true, data: updatedList };
   } catch (error) {
-    console.error('Error updating list:', error);
-    return { success: false, error: 'Failed to update list' };
+    return handleServiceError<List>(error, 'Failed to update list');
   }
 };
 
@@ -82,7 +79,6 @@ export const deleteList = async (id: string): Promise<ApiResponse<void>> => {
     
     return { success: true };
   } catch (error) {
-    console.error('Error deleting list:', error);
-    return { success: false, error: 'Failed to delete list' };
+    return handleServiceError<void>(error, 'Failed to delete list');
   }
 };

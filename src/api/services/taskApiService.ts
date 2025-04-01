@@ -1,8 +1,8 @@
-
 import { Task } from '@/types/task';
 import { generateId } from '@/utils/taskUtils';
 import { ApiResponse } from '../types';
 import { getStoredTasks, storeTasks } from './storageUtils';
+import { handleServiceError } from './errorUtils';
 
 // Task API methods
 export const getTasks = async (): Promise<ApiResponse<Task[]>> => {
@@ -10,8 +10,7 @@ export const getTasks = async (): Promise<ApiResponse<Task[]>> => {
     const tasks = getStoredTasks();
     return { success: true, data: tasks };
   } catch (error) {
-    console.error('Error fetching tasks:', error);
-    return { success: false, error: 'Failed to fetch tasks' };
+    return handleServiceError<Task[]>(error, 'Failed to fetch tasks');
   }
 };
 
@@ -30,8 +29,7 @@ export const createTask = async (task: Omit<Task, 'id' | 'createdAt' | 'updatedA
     
     return { success: true, data: newTask };
   } catch (error) {
-    console.error('Error creating task:', error);
-    return { success: false, error: 'Failed to create task' };
+    return handleServiceError<Task>(error, 'Failed to create task');
   }
 };
 
@@ -55,8 +53,7 @@ export const updateTask = async (id: string, updates: Partial<Task>): Promise<Ap
     
     return { success: true, data: updatedTask };
   } catch (error) {
-    console.error('Error updating task:', error);
-    return { success: false, error: 'Failed to update task' };
+    return handleServiceError<Task>(error, 'Failed to update task');
   }
 };
 
@@ -72,8 +69,7 @@ export const deleteTask = async (id: string): Promise<ApiResponse<void>> => {
     storeTasks(updatedTasks);
     return { success: true };
   } catch (error) {
-    console.error('Error deleting task:', error);
-    return { success: false, error: 'Failed to delete task' };
+    return handleServiceError<void>(error, 'Failed to delete task');
   }
 };
 
@@ -97,7 +93,6 @@ export const toggleTaskCompletion = async (id: string): Promise<ApiResponse<Task
     
     return { success: true, data: updatedTask };
   } catch (error) {
-    console.error('Error toggling task completion:', error);
-    return { success: false, error: 'Failed to toggle task completion' };
+    return handleServiceError<Task>(error, 'Failed to toggle task completion');
   }
 };
