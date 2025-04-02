@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Dialog } from '@/components/ui/dialog';
 import GoalForm from '@/components/goals/GoalForm';
 import { useGoal } from '@/hooks/useGoalContext';
+import { useVision } from '@/contexts/VisionContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Goals } from '@/types/task';
 
@@ -15,13 +15,13 @@ interface VisionGoalListProps {
 
 const VisionGoalList: React.FC<VisionGoalListProps> = ({ visionId }) => {
   const { threeYearGoals, addThreeYearGoal, updateThreeYearGoal, deleteThreeYearGoal } = useGoal();
+  const { getVisionGoals } = useVision();
   const [isAddGoalDialogOpen, setIsAddGoalDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
   const { isMobile } = useIsMobile();
 
-  const filteredGoals = threeYearGoals.filter(goal =>
-    goal.visionId === visionId &&
+  const filteredGoals = getVisionGoals(visionId, threeYearGoals).filter(goal =>
     goal.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 

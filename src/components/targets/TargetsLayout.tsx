@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { VisionProvider } from '@/contexts/VisionContext';
 import { TaskProvider } from '@/contexts/TaskContext';
 import { GoalProvider } from '@/contexts/GoalContext';
+import { VisionProvider } from '@/contexts/VisionContext';
 import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
 import MobileSidebar from '@/components/layout/MobileSidebar';
@@ -17,9 +17,9 @@ interface TargetsLayoutProps {
 
 const TargetsLayout: React.FC<TargetsLayoutProps> = ({ user, onSignOut }) => {
   return (
-    <VisionProvider>
-      <TaskProvider>
-        <GoalProvider>
+    <TaskProvider>
+      <GoalProvider>
+        <VisionProvider>
           <SidebarProvider defaultOpen={true}>
             <div className="min-h-screen flex flex-col bg-background w-full">
               <Header user={user} onSignOut={onSignOut} />
@@ -31,9 +31,9 @@ const TargetsLayout: React.FC<TargetsLayoutProps> = ({ user, onSignOut }) => {
               <FloatingActionButton />
             </div>
           </SidebarProvider>
-        </GoalProvider>
-      </TaskProvider>
-    </VisionProvider>
+        </VisionProvider>
+      </GoalProvider>
+    </TaskProvider>
   );
 };
 

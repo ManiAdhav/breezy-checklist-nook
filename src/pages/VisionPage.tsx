@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { VisionProvider } from '@/contexts/VisionContext';
 import { TaskProvider } from '@/contexts/TaskContext';
 import { GoalProvider } from '@/contexts/GoalContext';
+import { VisionProvider } from '@/contexts/VisionContext';
 import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
 import MobileSidebar from '@/components/layout/MobileSidebar';
