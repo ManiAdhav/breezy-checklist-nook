@@ -51,73 +51,79 @@ const TaskList: React.FC = () => {
   
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
-      <div className="py-4 px-6 flex justify-between items-center border-b border-border sticky top-0 bg-background z-10">
-        <div>
-          <h2 className="text-2xl font-semibold">{getSelectedListName()}</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            {filteredTasks.filter(task => !task.completed).length} tasks remaining
-          </p>
+      <div className="py-6 px-6 flex flex-col">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h2 className="text-3xl font-bold">{getSelectedListName()}</h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              {filteredTasks.filter(task => !task.completed).length}
+            </p>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="flex items-center">
+                  <SortAsc className="h-4 w-4 mr-1" />
+                  <span>Sort</span>
+                  <ChevronDown className="h-4 w-4 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuCheckboxItem 
+                  checked={sortBy === 'dueDate'}
+                  onCheckedChange={() => setSortBy('dueDate')}
+                >
+                  <Calendar className="h-4 w-4 mr-2" />
+                  <span>Due Date</span>
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem 
+                  checked={sortBy === 'priority'}
+                  onCheckedChange={() => setSortBy('priority')}
+                >
+                  <Flag className="h-4 w-4 mr-2" />
+                  <span>Priority</span>
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem 
+                  checked={sortBy === 'title'}
+                  onCheckedChange={() => setSortBy('title')}
+                >
+                  <AlignLeft className="h-4 w-4 mr-2" />
+                  <span>Alphabetical</span>
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem 
+                  checked={sortBy === 'createdAt'}
+                  onCheckedChange={() => setSortBy('createdAt')}
+                >
+                  <Clock className="h-4 w-4 mr-2" />
+                  <span>Created Date</span>
+                </DropdownMenuCheckboxItem>
+                
+                <DropdownMenuSeparator />
+                
+                <DropdownMenuCheckboxItem 
+                  checked={showCompleted}
+                  onCheckedChange={setShowCompleted}
+                >
+                  <Check className="h-4 w-4 mr-2" />
+                  <span>Show Completed</span>
+                </DropdownMenuCheckboxItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
         
-        <div className="flex items-center space-x-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="flex items-center">
-                <SortAsc className="h-4 w-4 mr-1" />
-                <span>Sort</span>
-                <ChevronDown className="h-4 w-4 ml-1" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuCheckboxItem 
-                checked={sortBy === 'dueDate'}
-                onCheckedChange={() => setSortBy('dueDate')}
-              >
-                <Calendar className="h-4 w-4 mr-2" />
-                <span>Due Date</span>
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem 
-                checked={sortBy === 'priority'}
-                onCheckedChange={() => setSortBy('priority')}
-              >
-                <Flag className="h-4 w-4 mr-2" />
-                <span>Priority</span>
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem 
-                checked={sortBy === 'title'}
-                onCheckedChange={() => setSortBy('title')}
-              >
-                <AlignLeft className="h-4 w-4 mr-2" />
-                <span>Alphabetical</span>
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem 
-                checked={sortBy === 'createdAt'}
-                onCheckedChange={() => setSortBy('createdAt')}
-              >
-                <Clock className="h-4 w-4 mr-2" />
-                <span>Created Date</span>
-              </DropdownMenuCheckboxItem>
-              
-              <DropdownMenuSeparator />
-              
-              <DropdownMenuCheckboxItem 
-                checked={showCompleted}
-                onCheckedChange={setShowCompleted}
-              >
-                <Check className="h-4 w-4 mr-2" />
-                <span>Show Completed</span>
-              </DropdownMenuCheckboxItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          
-          <Button onClick={handleAddTask} className="flex items-center">
-            <Plus className="h-4 w-4 mr-1" />
-            <span>Add Task</span>
-          </Button>
-        </div>
+        <Button 
+          variant="ghost" 
+          className="flex items-center justify-start py-2 px-0 mb-4 hover:bg-transparent"
+          onClick={handleAddTask}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          <span className="text-sm">Add New Task</span>
+        </Button>
       </div>
       
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto px-6">
         {filteredTasks.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center p-6">
             <div className="bg-muted rounded-full p-6 mb-4">
@@ -133,7 +139,7 @@ const TaskList: React.FC = () => {
             </Button>
           </div>
         ) : (
-          <div className="divide-y divide-border">
+          <div className="space-y-1">
             {filteredTasks.map(task => (
               <TaskItem 
                 key={task.id} 

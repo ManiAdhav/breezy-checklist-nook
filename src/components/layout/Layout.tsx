@@ -22,7 +22,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <MobileSidebar />
             <div className="flex-1 flex flex-col md:pl-[260px]">
               <Header />
-              <main className="flex-1 overflow-y-auto py-4 px-4">
+              <main className="flex-1 overflow-y-auto">
                 {children}
               </main>
             </div>
