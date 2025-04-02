@@ -17,7 +17,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <TaskProvider>
       <GoalProvider>
         <SidebarProvider defaultOpen={true}>
-          <div className="flex h-screen w-full bg-background overflow-hidden">
+          <div className="flex min-h-screen w-full bg-background overflow-hidden">
             <Sidebar />
             <MobileSidebar />
             <div className="flex-1 flex flex-col md:pl-[370px]">

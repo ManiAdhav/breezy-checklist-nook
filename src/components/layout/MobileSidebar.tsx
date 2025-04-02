@@ -2,7 +2,7 @@
 import React from 'react';
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/drawer';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useSidebar } from '@/components/ui/sidebar';
 import TasksSection from './sidebar/TasksSection';
 import CatalystSection from './sidebar/CatalystSection';

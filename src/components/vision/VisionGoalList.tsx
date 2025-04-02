@@ -1,89 +1,112 @@
-
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Goals } from '@/types/task';
+import React, { useState } from 'react';
+import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Target, ArrowRight } from 'lucide-react';
-import { format } from 'date-fns';
-import { useMobile } from '@/hooks/use-mobile';
-import DynamicIcon from '@/components/ui/dynamic-icon';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import GoalForm from '@/components/goals/GoalForm';
+import { useGoalContext } from '@/hooks/useGoalContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface VisionGoalListProps {
-  goals: Goals[];
+  visionId: string;
 }
 
-const VisionGoalList: React.FC<VisionGoalListProps> = ({ goals }) => {
-  const navigate = useNavigate();
-  const { isMobile } = useMobile();
-  
-  if (goals.length === 0) {
-    return (
-      <div className="text-center py-6 text-muted-foreground">
-        <Target className="mx-auto h-12 w-12 opacity-20 mb-2" />
-        <p>No goals mapped to this vision yet</p>
-        <Button 
-          variant="outline" 
-          className="mt-4"
-          onClick={() => navigate('/goals')}
-        >
-          Create a goal
-        </Button>
-      </div>
-    );
-  }
-  
+const VisionGoalList: React.FC<VisionGoalListProps> = ({ visionId }) => {
+  const { goals, addGoal, updateGoal, deleteGoal } = useGoalContext();
+  const [isAddGoalDialogOpen, setIsAddGoalDialogOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
+  const { isMobile } = useIsMobile();
+
+  const filteredGoals = goals.filter(goal =>
+    goal.visionId === visionId &&
+    goal.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleAddGoal = (newGoal: { title: string; description: string; }) => {
+    addGoal({ ...newGoal, visionId: visionId });
+    setIsAddGoalDialogOpen(false);
+  };
+
+  const handleEditGoal = (goalId: string, updatedGoal: { title: string; description: string; }) => {
+    updateGoal(goalId, updatedGoal);
+    setEditingGoalId(null);
+  };
+
+  const handleDeleteGoal = (goalId: string) => {
+    deleteGoal(goalId);
+  };
+
+  const openEditDialog = (goalId: string) => {
+    setEditingGoalId(goalId);
+  };
+
+  const closeEditDialog = () => {
+    setEditingGoalId(null);
+  };
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium">Related Goals</h3>
-        <Button 
-          variant="ghost" 
-          size="sm"
-          onClick={() => navigate('/goals')}
-          className="text-muted-foreground hover:text-foreground flex items-center"
-        >
-          View all goals
-          <ArrowRight className="ml-1 h-4 w-4" />
+    <div>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-bold">Goals</h2>
+        <Button variant="action" onClick={() => setIsAddGoalDialogOpen(true)}>
+          <Plus className="h-4 w-4 mr-2" />
+          Add Goal
         </Button>
       </div>
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {goals.map((goal) => (
-          <Card key={goal.id} className="hover:shadow-md transition-shadow">
-            <CardHeader className="pb-2 flex flex-row items-center">
-              {goal.icon ? (
-                <DynamicIcon 
-                  name={goal.icon as keyof typeof import('lucide-react').icons} 
-                  className="h-5 w-5 mr-2 text-primary" 
-                />
-              ) : (
-                <Target className="h-5 w-5 mr-2 text-primary" />
-              )}
-              <CardTitle className="text-base">{goal.title}</CardTitle>
-            </CardHeader>
-            <CardContent className="pb-4">
-              {goal.description && (
-                <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
-                  {goal.description}
-                </p>
-              )}
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Due: {format(new Date(goal.endDate), 'MMM d, yyyy')}</span>
-                <span className="capitalize">{goal.status.replace('_', ' ')}</span>
+
+      <Input
+        type="text"
+        placeholder="Search goals..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="mb-4"
+      />
+
+      {filteredGoals.length === 0 ? (
+        <p>No goals found for this vision.</p>
+      ) : (
+        <ul>
+          {filteredGoals.map(goal => (
+            <li key={goal.id} className="mb-2 p-4 border rounded-md shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold">{goal.title}</h3>
+                  <p className="text-gray-600">{goal.description}</p>
+                </div>
+                <div>
+                  <Button variant="outline" size="sm" onClick={() => openEditDialog(goal.id)}>Edit</Button>
+                  <Button variant="destructive" size="sm" onClick={() => handleDeleteGoal(goal.id)}>Delete</Button>
+                </div>
               </div>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="mt-3 w-full"
-                onClick={() => navigate(`/goals/${goal.id}`)}
-              >
-                View Goal Details
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <Dialog open={isAddGoalDialogOpen} onOpenChange={setIsAddGoalDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Goal</DialogTitle>
+          </DialogHeader>
+          <GoalForm onSubmit={handleAddGoal} onCancel={() => setIsAddGoalDialogOpen(false)} />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={editingGoalId !== null} onOpenChange={(open) => { if (!open) closeEditDialog(); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Goal</DialogTitle>
+          </DialogHeader>
+          {editingGoalId && (
+            <GoalForm
+              goalId={editingGoalId}
+              onSubmit={handleEditGoal}
+              onCancel={closeEditDialog}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
