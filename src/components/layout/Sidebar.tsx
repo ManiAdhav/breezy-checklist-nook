@@ -82,12 +82,12 @@ const Sidebar: React.FC = () => {
   };
 
   // Determine sidebar position based on state
-  const sidebarPosition = state === 'expanded' ? 'fixed' : 'fixed -left-[330px]';
+  const sidebarPosition = state === 'expanded' ? 'fixed' : 'fixed -left-[280px]';
   const transitionClass = 'transition-all duration-200 ease-in-out';
 
   return (
     <>
-      <Card className={`${sidebarPosition} ${transitionClass} top-[24px] left-[24px] w-[330px] h-[852px] rounded-[16px] bg-[#f4f4f4] border-none shadow-md z-10 overflow-hidden md:left-[24px]`}>
+      <Card className={`${sidebarPosition} ${transitionClass} top-[24px] left-[24px] w-[280px] h-[852px] rounded-[16px] bg-[#f4f4f4] border-none shadow-md z-10 overflow-hidden md:left-[24px]`}>
         <div className="flex justify-end p-2 md:hidden">
           <Button 
             variant="ghost" 

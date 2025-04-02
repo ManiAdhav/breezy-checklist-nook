@@ -20,7 +20,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="flex min-h-screen w-full bg-background overflow-hidden">
             <Sidebar />
             <MobileSidebar />
-            <div className="flex-1 flex flex-col md:pl-[370px]">
+            <div className="flex-1 flex flex-col md:pl-[320px]">
               <Header />
               <main className="flex-1 overflow-y-auto py-4 px-4">
                 {children}
