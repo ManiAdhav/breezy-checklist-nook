@@ -8,11 +8,7 @@ import { Plus } from 'lucide-react';
 import AddActionDialog from '@/components/actions/AddActionDialog';
 
 const ActionsPage: React.FC = () => {
-  const { tasks, isLoading } = useTask();
   const [isAddActionOpen, setIsAddActionOpen] = useState(false);
-  
-  // Filter out only actions
-  const actionTasks = tasks.filter(task => task.isAction);
   
   return (
     <Layout>
@@ -28,11 +24,7 @@ const ActionsPage: React.FC = () => {
           </Button>
         </div>
         
-        {isLoading ? (
-          <div className="text-center py-10">Loading actions...</div>
-        ) : (
-          <ActionsView tasks={actionTasks} />
-        )}
+        <ActionsView />
         
         <AddActionDialog 
           open={isAddActionOpen} 
