@@ -7,8 +7,8 @@ import FloatingActionButton from '@/components/fab/FloatingActionButton';
 const Index: React.FC = () => {
   return (
     <Layout>
-      <div className="p-4 flex flex-col space-y-4">
-        <div className="mt-4">
+      <div className="flex flex-col space-y-4">
+        <div className="mt-2">
           <TaskList />
         </div>
       </div>

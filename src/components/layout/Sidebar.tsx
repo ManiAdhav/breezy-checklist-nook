@@ -8,6 +8,7 @@ import CatalystSection from './sidebar/CatalystSection';
 import SidebarList from './sidebar/SidebarList';
 import AddListDialog from './sidebar/AddListDialog';
 import CalendarLink from './sidebar/CalendarLink';
+import { Card } from '@/components/ui/card';
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
@@ -77,22 +78,24 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <aside className="w-60 border-r border-border h-[calc(100vh-4rem)] flex flex-col overflow-hidden bg-background">
-      <div className="flex-1 overflow-y-auto py-2 px-2">
-        <TasksSection />
-        <CatalystSection />
-        <CalendarLink />
-        <nav className="space-y-0.5 mt-2"></nav>
+    <Card className="fixed top-[24px] left-[24px] w-[330px] h-[852px] rounded-[16px] bg-[#f4f4f4] border-none shadow-md z-10 overflow-hidden">
+      <div className="flex flex-col h-full overflow-hidden">
+        <div className="flex-1 overflow-y-auto py-4 px-3">
+          <TasksSection />
+          <CatalystSection />
+          <CalendarLink />
+          <nav className="space-y-0.5 mt-2"></nav>
 
-        <SidebarList 
-          openEditDialog={openEditDialog}
-          handleListClick={handleListClick}
-          selectedListId={selectedListId}
-          setIsAddListOpen={setIsAddListOpen}
-          setNewListName={setNewListName}
-          setEditingList={setEditingList}
-          setSelectedIcon={setSelectedIcon}
-        />
+          <SidebarList 
+            openEditDialog={openEditDialog}
+            handleListClick={handleListClick}
+            selectedListId={selectedListId}
+            setIsAddListOpen={setIsAddListOpen}
+            setNewListName={setNewListName}
+            setEditingList={setEditingList}
+            setSelectedIcon={setSelectedIcon}
+          />
+        </div>
       </div>
 
       <AddListDialog 
@@ -105,7 +108,7 @@ const Sidebar: React.FC = () => {
         selectedIcon={selectedIcon}
         setSelectedIcon={setSelectedIcon}
       />
-    </aside>
+    </Card>
   );
 };
 

@@ -16,9 +16,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <GoalProvider>
         <div className="flex h-screen w-full bg-background overflow-hidden">
           <Sidebar />
-          <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 flex flex-col pl-[370px]">
             <Header />
-            <main className="flex-1 overflow-y-auto py-4 px-0">
+            <main className="flex-1 overflow-y-auto py-4 px-4">
               {children}
             </main>
           </div>
