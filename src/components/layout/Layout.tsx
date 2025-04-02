@@ -4,6 +4,7 @@ import { TaskProvider } from '@/contexts/TaskContext';
 import { GoalProvider } from '@/contexts/GoalContext';
 import Header from './Header';
 import Sidebar from './Sidebar';
+import { Toaster } from "@/components/ui/toaster";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -21,6 +22,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               {children}
             </main>
           </div>
+          <Toaster />
         </div>
       </GoalProvider>
     </TaskProvider>

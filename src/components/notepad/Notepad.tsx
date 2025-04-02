@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { Save } from 'lucide-react';
-
-const NOTEPAD_STORAGE_KEY = 'notepad_content';
+import { getStoredContent, storeContent, NOTEPAD_STORAGE_KEY } from '@/api/services/storageUtils';
 
 const Notepad: React.FC = () => {
   const [text, setText] = useState('');
@@ -14,17 +13,15 @@ const Notepad: React.FC = () => {
 
   // Load content from localStorage on component mount
   useEffect(() => {
-    const savedContent = localStorage.getItem(NOTEPAD_STORAGE_KEY);
-    if (savedContent) {
-      setText(savedContent);
-    }
+    const savedContent = getStoredContent(NOTEPAD_STORAGE_KEY);
+    setText(savedContent);
   }, []);
 
   // Auto-save on text change with debounce
   useEffect(() => {
     const timer = setTimeout(() => {
       if (text) {
-        localStorage.setItem(NOTEPAD_STORAGE_KEY, text);
+        storeContent(NOTEPAD_STORAGE_KEY, text);
       }
     }, 1000);
     
@@ -34,7 +31,7 @@ const Notepad: React.FC = () => {
   const handleSave = () => {
     setIsSaving(true);
     try {
-      localStorage.setItem(NOTEPAD_STORAGE_KEY, text);
+      storeContent(NOTEPAD_STORAGE_KEY, text);
       toast({
         title: "Saved",
         description: "Your notes have been saved successfully",
