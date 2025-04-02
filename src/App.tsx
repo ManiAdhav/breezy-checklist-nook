@@ -12,7 +12,6 @@ import CalendarPage from './pages/CalendarPage';
 import ActionsPage from './pages/ActionsPage';
 import NotFound from './pages/NotFound';
 import WeeklyPlanPage from './pages/WeeklyPlanPage';
-import { Toaster } from "@/components/ui/toaster";
 
 // Wrapper component to provide props to GoalDetailView
 const GoalDetailViewWrapper = () => {
@@ -38,7 +37,6 @@ function App() {
         <Route path="/weekly" element={<WeeklyPlanPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
-      <Toaster />
     </>
   );
 }
