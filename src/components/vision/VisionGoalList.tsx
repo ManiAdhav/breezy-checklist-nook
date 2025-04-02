@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import GoalForm from '@/components/goals/GoalForm';
-import { useGoalContext } from '@/contexts/goal/GoalContext';
+import { useGoal } from '@/hooks/useGoalContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface VisionGoalListProps {
@@ -13,7 +13,7 @@ interface VisionGoalListProps {
 }
 
 const VisionGoalList: React.FC<VisionGoalListProps> = ({ visionId }) => {
-  const { goals, addGoal, updateGoal, deleteGoal } = useGoalContext();
+  const { goals, addGoal, updateGoal, deleteGoal } = useGoal();
   const [isAddGoalDialogOpen, setIsAddGoalDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
@@ -91,7 +91,6 @@ const VisionGoalList: React.FC<VisionGoalListProps> = ({ visionId }) => {
             <DialogTitle>Add New Goal</DialogTitle>
           </DialogHeader>
           <GoalForm 
-            visionId={visionId}
             onSave={handleAddGoal}
             onCancel={() => setIsAddGoalDialogOpen(false)} 
           />
@@ -105,8 +104,6 @@ const VisionGoalList: React.FC<VisionGoalListProps> = ({ visionId }) => {
           </DialogHeader>
           {editingGoalId && (
             <GoalForm
-              id={editingGoalId}
-              visionId={visionId}
               onSave={(updatedGoal) => handleEditGoal(editingGoalId, updatedGoal)}
               onCancel={closeEditDialog}
             />
