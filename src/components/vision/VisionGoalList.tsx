@@ -1,10 +1,11 @@
+
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import GoalForm from '@/components/goals/GoalForm';
-import { useGoalContext } from '@/hooks/useGoalContext';
+import { useGoalContext } from '@/contexts/goal/GoalContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface VisionGoalListProps {
@@ -89,7 +90,11 @@ const VisionGoalList: React.FC<VisionGoalListProps> = ({ visionId }) => {
           <DialogHeader>
             <DialogTitle>Add New Goal</DialogTitle>
           </DialogHeader>
-          <GoalForm onSubmit={handleAddGoal} onCancel={() => setIsAddGoalDialogOpen(false)} />
+          <GoalForm 
+            visionId={visionId}
+            onSave={handleAddGoal}
+            onCancel={() => setIsAddGoalDialogOpen(false)} 
+          />
         </DialogContent>
       </Dialog>
 
@@ -100,8 +105,9 @@ const VisionGoalList: React.FC<VisionGoalListProps> = ({ visionId }) => {
           </DialogHeader>
           {editingGoalId && (
             <GoalForm
-              goalId={editingGoalId}
-              onSubmit={handleEditGoal}
+              id={editingGoalId}
+              visionId={visionId}
+              onSave={(updatedGoal) => handleEditGoal(editingGoalId, updatedGoal)}
               onCancel={closeEditDialog}
             />
           )}

@@ -22,11 +22,6 @@ const MobileSidebar = () => {
     setSelectedListId(listId);
   };
 
-  const openEditDialog = () => {
-    // This is just a placeholder for mobile view
-    // Actual implementation would be handled in SidebarList
-  };
-
   return (
     <div className="md:hidden fixed top-4 left-4 z-50">
       <Button

@@ -21,7 +21,7 @@ const TargetsLayout: React.FC<TargetsLayoutProps> = ({ user, onSignOut }) => {
       <TaskProvider>
         <GoalProvider>
           <SidebarProvider defaultOpen={true}>
-            <div className="min-h-screen flex flex-col bg-background">
+            <div className="min-h-screen flex flex-col bg-background w-full">
               <Header user={user} onSignOut={onSignOut} />
               <div className="flex flex-1 overflow-hidden">
                 <Sidebar />
