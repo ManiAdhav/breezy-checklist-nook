@@ -28,9 +28,7 @@ const VisionPage: React.FC = () => {
               <div className="flex flex-1 overflow-hidden">
                 <Sidebar />
                 <MobileSidebar />
-                <main className="flex-1 overflow-y-auto">
-                  <VisionList />
-                </main>
+                <VisionList />
               </div>
             </div>
           </SidebarProvider>

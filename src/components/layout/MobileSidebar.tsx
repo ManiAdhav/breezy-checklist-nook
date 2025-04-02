@@ -27,7 +27,7 @@ const MobileSidebar = () => {
           <Button
             variant="outline"
             size="icon"
-            className="rounded-full bg-white shadow-md border border-gray-200"
+            className="rounded-full bg-white shadow-md"
           >
             <Menu className="h-5 w-5" />
             <span className="sr-only">Toggle Sidebar</span>
