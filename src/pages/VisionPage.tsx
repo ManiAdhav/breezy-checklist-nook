@@ -5,9 +5,11 @@ import { TaskProvider } from '@/contexts/TaskContext';
 import { GoalProvider } from '@/contexts/GoalContext';
 import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
+import MobileSidebar from '@/components/layout/MobileSidebar';
 import VisionList from '@/components/vision/VisionList';
 import { useAuth } from '@/hooks/useAuth';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { SidebarProvider } from '@/components/ui/sidebar';
 
 const VisionPage: React.FC = () => {
   const { user, loading, handleSignOut } = useAuth();
@@ -20,13 +22,16 @@ const VisionPage: React.FC = () => {
     <TaskProvider>
       <GoalProvider>
         <VisionProvider>
-          <div className="min-h-screen flex flex-col bg-background">
-            <Header user={user} onSignOut={handleSignOut} />
-            <div className="flex flex-1 overflow-hidden">
-              <Sidebar />
-              <VisionList />
+          <SidebarProvider defaultOpen={true}>
+            <div className="min-h-screen flex flex-col bg-background w-full">
+              <Header user={user} onSignOut={handleSignOut} />
+              <div className="flex flex-1 overflow-hidden">
+                <Sidebar />
+                <MobileSidebar />
+                <VisionList />
+              </div>
             </div>
-          </div>
+          </SidebarProvider>
         </VisionProvider>
       </GoalProvider>
     </TaskProvider>

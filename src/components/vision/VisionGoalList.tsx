@@ -13,29 +13,29 @@ interface VisionGoalListProps {
 }
 
 const VisionGoalList: React.FC<VisionGoalListProps> = ({ visionId }) => {
-  const { goals, addGoal, updateGoal, deleteGoal } = useGoal();
+  const { threeYearGoals, addThreeYearGoal, updateThreeYearGoal, deleteThreeYearGoal } = useGoal();
   const [isAddGoalDialogOpen, setIsAddGoalDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
   const { isMobile } = useIsMobile();
 
-  const filteredGoals = goals.filter(goal =>
+  const filteredGoals = threeYearGoals.filter(goal =>
     goal.visionId === visionId &&
     goal.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleAddGoal = (newGoal: { title: string; description: string; }) => {
-    addGoal({ ...newGoal, visionId: visionId });
+  const handleAddGoal = async (newGoal: { title: string; description: string; }) => {
+    await addThreeYearGoal({ ...newGoal, visionId: visionId });
     setIsAddGoalDialogOpen(false);
   };
 
   const handleEditGoal = (goalId: string, updatedGoal: { title: string; description: string; }) => {
-    updateGoal(goalId, updatedGoal);
+    updateThreeYearGoal(goalId, updatedGoal);
     setEditingGoalId(null);
   };
 
   const handleDeleteGoal = (goalId: string) => {
-    deleteGoal(goalId);
+    deleteThreeYearGoal(goalId);
   };
 
   const openEditDialog = (goalId: string) => {
@@ -91,7 +91,7 @@ const VisionGoalList: React.FC<VisionGoalListProps> = ({ visionId }) => {
             <DialogTitle>Add New Goal</DialogTitle>
           </DialogHeader>
           <GoalForm 
-            onSave={handleAddGoal}
+            onSubmit={handleAddGoal}
             onCancel={() => setIsAddGoalDialogOpen(false)} 
           />
         </DialogContent>
@@ -104,8 +104,9 @@ const VisionGoalList: React.FC<VisionGoalListProps> = ({ visionId }) => {
           </DialogHeader>
           {editingGoalId && (
             <GoalForm
-              onSave={(updatedGoal) => handleEditGoal(editingGoalId, updatedGoal)}
+              onSubmit={(updatedGoal) => handleEditGoal(editingGoalId, updatedGoal)}
               onCancel={closeEditDialog}
+              initialData={threeYearGoals.find(goal => goal.id === editingGoalId)}
             />
           )}
         </DialogContent>
