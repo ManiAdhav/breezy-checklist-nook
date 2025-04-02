@@ -49,6 +49,9 @@ const AddListDialog: React.FC<AddListDialogProps> = ({
               autoFocus 
             />
           </div>
+          <div className="text-sm text-muted-foreground">
+            Selected icon: {selectedIcon}
+          </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>

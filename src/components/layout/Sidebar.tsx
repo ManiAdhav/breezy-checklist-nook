@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTask } from '@/contexts/TaskContext';
 import { List } from '@/types/task';
@@ -24,6 +24,24 @@ const Sidebar: React.FC = () => {
   const [selectedIcon, setSelectedIcon] = useState<string>('List');
   const [editingList, setEditingList] = useState<List | null>(null);
 
+  // Reset form when dialog closes
+  useEffect(() => {
+    if (!isAddListOpen) {
+      if (!editingList) {
+        setNewListName('');
+        setSelectedIcon('List');
+      }
+    }
+  }, [isAddListOpen, editingList]);
+  
+  // Set the form values when editing a list
+  useEffect(() => {
+    if (editingList) {
+      setNewListName(editingList.name);
+      setSelectedIcon(editingList.icon || 'List');
+    }
+  }, [editingList]);
+
   const handleAddList = () => {
     if (newListName.trim()) {
       if (editingList) {
@@ -31,11 +49,13 @@ const Sidebar: React.FC = () => {
           name: newListName.trim(),
           icon: selectedIcon
         });
+        console.log('Updated list with icon:', selectedIcon);
       } else {
         addList({
           name: newListName.trim(),
           icon: selectedIcon
         });
+        console.log('Added list with icon:', selectedIcon);
       }
       setNewListName('');
       setSelectedIcon('List');

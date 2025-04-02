@@ -40,7 +40,7 @@ const IconSelector: React.FC<IconSelectorProps> = ({ selectedIcon, onSelectIcon 
           <DynamicIcon name={selectedIcon} className="h-5 w-5" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-60 p-2">
+      <PopoverContent className="w-60 p-2" side="right">
         <div className="grid grid-cols-5 gap-2">
           {listIconOptions.map((iconOption) => (
             <Button
