@@ -3,10 +3,11 @@ import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog } from '@/components/ui/dialog';
 import GoalForm from '@/components/goals/GoalForm';
 import { useGoal } from '@/hooks/useGoalContext';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Goals } from '@/types/task';
 
 interface VisionGoalListProps {
   visionId: string;
@@ -24,14 +25,12 @@ const VisionGoalList: React.FC<VisionGoalListProps> = ({ visionId }) => {
     goal.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleAddGoal = async (newGoal: { title: string; description: string; }) => {
-    await addThreeYearGoal({ ...newGoal, visionId: visionId });
-    setIsAddGoalDialogOpen(false);
+  const handleOpenAddDialog = () => {
+    setIsAddGoalDialogOpen(true);
   };
 
-  const handleEditGoal = (goalId: string, updatedGoal: { title: string; description: string; }) => {
-    updateThreeYearGoal(goalId, updatedGoal);
-    setEditingGoalId(null);
+  const handleCloseAddDialog = () => {
+    setIsAddGoalDialogOpen(false);
   };
 
   const handleDeleteGoal = (goalId: string) => {
@@ -50,7 +49,7 @@ const VisionGoalList: React.FC<VisionGoalListProps> = ({ visionId }) => {
     <div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold">Goals</h2>
-        <Button variant="action" onClick={() => setIsAddGoalDialogOpen(true)}>
+        <Button variant="action" onClick={handleOpenAddDialog}>
           <Plus className="h-4 w-4 mr-2" />
           Add Goal
         </Button>
@@ -85,32 +84,21 @@ const VisionGoalList: React.FC<VisionGoalListProps> = ({ visionId }) => {
         </ul>
       )}
 
-      <Dialog open={isAddGoalDialogOpen} onOpenChange={setIsAddGoalDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add New Goal</DialogTitle>
-          </DialogHeader>
-          <GoalForm 
-            onSubmit={handleAddGoal}
-            onCancel={() => setIsAddGoalDialogOpen(false)} 
-          />
-        </DialogContent>
-      </Dialog>
+      {/* Add Goal Dialog */}
+      <GoalForm 
+        isOpen={isAddGoalDialogOpen} 
+        onClose={handleCloseAddDialog} 
+        editingGoal={null}
+      />
 
-      <Dialog open={editingGoalId !== null} onOpenChange={(open) => { if (!open) closeEditDialog(); }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Goal</DialogTitle>
-          </DialogHeader>
-          {editingGoalId && (
-            <GoalForm
-              onSubmit={(updatedGoal) => handleEditGoal(editingGoalId, updatedGoal)}
-              onCancel={closeEditDialog}
-              initialData={threeYearGoals.find(goal => goal.id === editingGoalId)}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      {/* Edit Goal Dialog */}
+      {editingGoalId && (
+        <GoalForm 
+          isOpen={editingGoalId !== null}
+          onClose={closeEditDialog}
+          editingGoal={threeYearGoals.find(goal => goal.id === editingGoalId) || null}
+        />
+      )}
     </div>
   );
 };
