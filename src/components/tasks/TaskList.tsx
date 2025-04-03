@@ -38,8 +38,6 @@ const TaskList: React.FC = () => {
     const list = allLists.find(list => list.id === selectedListId);
     return list?.name || 'Tasks';
   };
-  
-  const incompleteTasks = filteredTasks.filter(task => !task.completed).length;
 
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
@@ -47,9 +45,7 @@ const TaskList: React.FC = () => {
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center">
             <h2 className="font-bold text-xl">{getSelectedListName()}</h2>
-            <span className="ml-2 text-sm text-muted-foreground bg-muted/30 px-2 py-0.5 rounded-full">
-              {incompleteTasks}
-            </span>
+            {/* Task count badge removed */}
           </div>
           
           <div className="flex items-center space-x-2">

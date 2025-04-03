@@ -5,7 +5,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Task, Priority } from '@/types/task';
 import { useTask } from '@/contexts/TaskContext';
 import { ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 interface TaskItemProps {
@@ -14,7 +13,7 @@ interface TaskItemProps {
 }
 
 const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit }) => {
-  const { toggleTaskCompletion } = useTask();
+  const { toggleTaskCompletion, lists, customLists } = useTask();
   const [isHovered, setIsHovered] = useState(false);
 
   const handleToggle = () => {
@@ -32,6 +31,18 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit }) => {
       default:
         return 'bg-gray-500';
     }
+  };
+
+  const getListName = (listId: string): string => {
+    // Check built-in lists
+    const builtInList = lists.find(list => list.id === listId);
+    if (builtInList) return builtInList.name;
+    
+    // Check custom lists
+    const customList = customLists.find(list => list.id === listId);
+    if (customList) return customList.name;
+    
+    return '';
   };
 
   return (
@@ -55,17 +66,17 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit }) => {
         
         <div className="flex-1 min-w-0">
           <div className={cn(
-            "font-medium text-sm", // Reduced font size to small
+            "font-medium text-xs", // Further reduced font size to extra small
             task.completed && "line-through text-muted-foreground"
           )}>
             {task.title}
           </div>
           
-          <div className="flex items-center flex-wrap mt-1.5 text-xs text-muted-foreground">
+          <div className="flex items-center flex-wrap mt-1.5 text-[0.7rem] text-muted-foreground">
             {task.listId && task.listId !== 'inbox' && task.listId !== 'today' && task.listId !== 'planned' && (
               <>
-                <span className="flex items-center text-xs">
-                  {task.listId === '1' ? 'Subtasks' : task.listId}
+                <span className="flex items-center text-[0.7rem]">
+                  {getListName(task.listId)}
                 </span>
                 <span className="mx-1.5 text-gray-300">|</span>
               </>
@@ -73,7 +84,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit }) => {
             
             {task.dueDate && (
               <>
-                <span className="text-xs">
+                <span className="text-[0.7rem]">
                   {format(new Date(task.dueDate), 'dd-MM-yy')}
                 </span>
                 {task.priority !== 'none' && <span className="mx-1.5 text-gray-300">|</span>}
