@@ -7,25 +7,22 @@ import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
 import MobileSidebar from '@/components/layout/MobileSidebar';
 import GoalList from '@/components/goals/GoalList';
-import { SidebarProvider } from '@/components/ui/sidebar';
 
 const GoalsPage: React.FC = () => {
   return (
     <TaskProvider>
       <GoalProvider>
         <VisionProvider>
-          <SidebarProvider defaultOpen={true}>
-            <div className="min-h-screen flex flex-col bg-background w-full">
-              <Header />
-              <div className="flex flex-1 overflow-hidden">
-                <Sidebar />
-                <MobileSidebar />
-                <main className="flex-1 overflow-y-auto">
-                  <GoalList />
-                </main>
-              </div>
+          <div className="min-h-screen flex flex-col bg-background w-full">
+            <Header />
+            <div className="flex flex-1 overflow-hidden">
+              <Sidebar />
+              <MobileSidebar />
+              <main className="flex-1 overflow-y-auto">
+                <GoalList />
+              </main>
             </div>
-          </SidebarProvider>
+          </div>
         </VisionProvider>
       </GoalProvider>
     </TaskProvider>

@@ -12,6 +12,7 @@ import CalendarPage from './pages/CalendarPage';
 import ActionsPage from './pages/ActionsPage';
 import NotFound from './pages/NotFound';
 import WeeklyPlanPage from './pages/WeeklyPlanPage';
+import { SidebarProvider } from '@/components/ui/sidebar';
 
 // Wrapper component to provide props to GoalDetailView
 const GoalDetailViewWrapper = () => {
@@ -23,7 +24,7 @@ const GoalDetailViewWrapper = () => {
 
 function App() {
   return (
-    <>
+    <SidebarProvider defaultOpen={true}>
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/goals" element={<GoalsPage />} />
@@ -37,7 +38,7 @@ function App() {
         <Route path="/weekly" element={<WeeklyPlanPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </>
+    </SidebarProvider>
   );
 }
 
