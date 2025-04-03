@@ -12,7 +12,6 @@ import CalendarPage from './pages/CalendarPage';
 import ActionsPage from './pages/ActionsPage';
 import NotFound from './pages/NotFound';
 import WeeklyPlanPage from './pages/WeeklyPlanPage';
-import { SidebarProvider } from '@/components/ui/sidebar';
 
 // Wrapper component to provide props to GoalDetailView
 const GoalDetailViewWrapper = () => {
@@ -24,21 +23,19 @@ const GoalDetailViewWrapper = () => {
 
 function App() {
   return (
-    <SidebarProvider defaultOpen={true}>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/goals" element={<GoalsPage />} />
-        <Route path="/goals/:id" element={<GoalDetailViewWrapper />} />
-        <Route path="/milestones" element={<MilestonePage />} />
-        <Route path="/vision" element={<VisionPage />} />
-        <Route path="/plans" element={<PlansPage />} />
-        <Route path="/mindmap" element={<MindMapPage />} />
-        <Route path="/calendar" element={<CalendarPage />} />
-        <Route path="/actions" element={<ActionsPage />} />
-        <Route path="/weekly" element={<WeeklyPlanPage />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </SidebarProvider>
+    <Routes>
+      <Route path="/" element={<Index />} />
+      <Route path="/goals" element={<GoalsPage />} />
+      <Route path="/goals/:id" element={<GoalDetailViewWrapper />} />
+      <Route path="/milestones" element={<MilestonePage />} />
+      <Route path="/vision" element={<VisionPage />} />
+      <Route path="/plans" element={<PlansPage />} />
+      <Route path="/mindmap" element={<MindMapPage />} />
+      <Route path="/calendar" element={<CalendarPage />} />
+      <Route path="/actions" element={<ActionsPage />} />
+      <Route path="/weekly" element={<WeeklyPlanPage />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
 

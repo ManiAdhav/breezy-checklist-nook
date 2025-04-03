@@ -55,27 +55,29 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit }) => {
         
         <div className="flex-1 min-w-0">
           <div className={cn(
-            "font-medium text-base",
+            "font-medium text-sm", // Reduced font size to small
             task.completed && "line-through text-muted-foreground"
           )}>
             {task.title}
           </div>
           
-          <div className="flex items-center mt-1.5 text-xs text-muted-foreground">
+          <div className="flex items-center flex-wrap mt-1.5 text-xs text-muted-foreground">
+            {task.listId && task.listId !== 'inbox' && task.listId !== 'today' && task.listId !== 'planned' && (
+              <>
+                <span className="flex items-center text-xs">
+                  {task.listId === '1' ? 'Subtasks' : task.listId}
+                </span>
+                <span className="mx-1.5 text-gray-300">|</span>
+              </>
+            )}
+            
             {task.dueDate && (
-              <div className="flex items-center mr-3">
+              <>
                 <span className="text-xs">
                   {format(new Date(task.dueDate), 'dd-MM-yy')}
                 </span>
-              </div>
-            )}
-            
-            {task.listId && task.listId !== 'inbox' && task.listId !== 'today' && task.listId !== 'planned' && (
-              <div className="flex items-center mr-2">
-                <span className="flex items-center text-xs">
-                  {task.listId === '1' ? 'Subtasks' : ''}
-                </span>
-              </div>
+                {task.priority !== 'none' && <span className="mx-1.5 text-gray-300">|</span>}
+              </>
             )}
             
             {task.priority !== 'none' && (

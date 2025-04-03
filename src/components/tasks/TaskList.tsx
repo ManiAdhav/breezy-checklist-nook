@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useTask } from '@/contexts/TaskContext';
 import TaskItem from './TaskItem';
@@ -6,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, SortAsc, Check, Calendar, Flag, AlignLeft, Clock, ChevronDown, MoreVertical } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuCheckboxItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Task } from '@/types/task';
+
 const TaskList: React.FC = () => {
   const {
     filteredTasks,
@@ -17,29 +19,37 @@ const TaskList: React.FC = () => {
     showCompleted,
     setShowCompleted
   } = useTask();
+  
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  
   const handleAddTask = () => {
     setEditingTask(null);
     setIsTaskFormOpen(true);
   };
+  
   const handleEditTask = (task: Task) => {
     setEditingTask(task);
     setIsTaskFormOpen(true);
   };
+  
   const getSelectedListName = () => {
     const allLists = [...lists, ...customLists];
     const list = allLists.find(list => list.id === selectedListId);
     return list?.name || 'Tasks';
   };
-  return <div className="flex-1 flex flex-col h-full overflow-hidden">
+  
+  const incompleteTasks = filteredTasks.filter(task => !task.completed).length;
+
+  return (
+    <div className="flex-1 flex flex-col h-full overflow-hidden">
       <div className="py-6 px-6 flex flex-col">
         <div className="flex justify-between items-center mb-6">
-          <div>
+          <div className="flex items-center">
             <h2 className="font-bold text-xl">{getSelectedListName()}</h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              {filteredTasks.filter(task => !task.completed).length}
-            </p>
+            <span className="ml-2 text-sm text-muted-foreground bg-muted/30 px-2 py-0.5 rounded-full">
+              {incompleteTasks}
+            </span>
           </div>
           
           <div className="flex items-center space-x-2">
@@ -80,14 +90,19 @@ const TaskList: React.FC = () => {
           </div>
         </div>
         
-        <Button variant="ghost" className="flex items-center justify-start py-2 px-0 mb-4 hover:bg-transparent" onClick={handleAddTask}>
+        <Button 
+          variant="outline" 
+          className="flex items-center justify-start py-2 border border-gray-200 hover:bg-accent/10 hover:border-gray-300" 
+          onClick={handleAddTask}
+        >
           <Plus className="h-4 w-4 mr-2" />
           <span className="text-sm">Add New Task</span>
         </Button>
       </div>
       
       <div className="flex-1 overflow-y-auto px-6">
-        {filteredTasks.length === 0 ? <div className="flex flex-col items-center justify-center h-full text-center p-6">
+        {filteredTasks.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-center p-6">
             <div className="bg-muted rounded-full p-6 mb-4">
               <Check className="h-12 w-12 text-muted-foreground" />
             </div>
@@ -99,12 +114,19 @@ const TaskList: React.FC = () => {
               <Plus className="h-4 w-4 mr-1" />
               <span>Add Task</span>
             </Button>
-          </div> : <div className="space-y-1">
-            {filteredTasks.map(task => <TaskItem key={task.id} task={task} onEdit={handleEditTask} />)}
-          </div>}
+          </div>
+        ) : (
+          <div className="space-y-1">
+            {filteredTasks.map(task => (
+              <TaskItem key={task.id} task={task} onEdit={handleEditTask} />
+            ))}
+          </div>
+        )}
       </div>
       
       <TaskForm isOpen={isTaskFormOpen} onClose={() => setIsTaskFormOpen(false)} editingTask={editingTask} />
-    </div>;
+    </div>
+  );
 };
+
 export default TaskList;
