@@ -66,25 +66,25 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit }) => {
         
         <div className="flex-1 min-w-0">
           <div className={cn(
-            "font-medium text-sm", // Changed from text-xs to text-sm
+            "font-medium text-sm",
             task.completed && "line-through text-muted-foreground"
           )}>
             {task.title}
           </div>
           
-          <div className="flex items-center flex-wrap mt-1.5 text-[0.7rem] text-muted-foreground">
-            {task.listId && task.listId !== 'inbox' && task.listId !== 'today' && task.listId !== 'planned' && (
+          <div className="flex items-center flex-wrap mt-1.5 text-[0.65rem] text-muted-foreground">
+            {task.listId && (
               <>
-                <span className="flex items-center text-[0.7rem]">
+                <span className="flex items-center text-[0.65rem]">
                   {getListName(task.listId)}
                 </span>
-                <span className="mx-1.5 text-gray-300">|</span>
+                {(task.dueDate || task.priority !== 'none') && <span className="mx-1.5 text-gray-300">|</span>}
               </>
             )}
             
             {task.dueDate && (
               <>
-                <span className="text-[0.7rem]">
+                <span className="text-[0.65rem]">
                   {format(new Date(task.dueDate), 'dd-MM-yy')}
                 </span>
                 {task.priority !== 'none' && <span className="mx-1.5 text-gray-300">|</span>}

@@ -26,6 +26,7 @@ export interface TaskContextType {
 
 // Default lists that will be used by the task context
 export const defaultLists: List[] = [
+  { id: 'all', name: 'All Tasks', icon: 'list-todo' },
   { id: 'inbox', name: 'Inbox', icon: 'inbox' },
   { id: 'today', name: 'Today', icon: 'calendar' },
   { id: 'planned', name: 'Planned', icon: 'calendar-clock' },

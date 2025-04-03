@@ -34,10 +34,15 @@ const TaskList: React.FC = () => {
   };
   
   const getSelectedListName = () => {
+    if (selectedListId === 'all') return 'All Tasks';
+    
     const allLists = [...lists, ...customLists];
     const list = allLists.find(list => list.id === selectedListId);
     return list?.name || 'Tasks';
   };
+
+  // Don't show Today and Planned additional information for regular lists
+  const showDateHeader = selectedListId === 'today' || selectedListId === 'planned';
 
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
@@ -45,7 +50,6 @@ const TaskList: React.FC = () => {
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center">
             <h2 className="font-bold text-xl">{getSelectedListName()}</h2>
-            {/* Task count badge removed */}
           </div>
           
           <div className="flex items-center space-x-2">
@@ -113,6 +117,18 @@ const TaskList: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-1">
+            {showDateHeader && selectedListId === 'today' && (
+              <div className="text-sm font-medium text-foreground mb-2">
+                Today
+              </div>
+            )}
+            
+            {showDateHeader && selectedListId === 'planned' && (
+              <div className="text-sm font-medium text-foreground mb-2">
+                Upcoming
+              </div>
+            )}
+            
             {filteredTasks.map(task => (
               <TaskItem key={task.id} task={task} onEdit={handleEditTask} />
             ))}

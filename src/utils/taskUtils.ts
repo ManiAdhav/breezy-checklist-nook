@@ -58,16 +58,25 @@ export const filterTasks = (
       return false;
     }
     
+    // Special handling for "all" list - show all tasks
+    if (listId === 'all') {
+      // Just apply search filter for "all"
+      if (searchQuery && !task.title.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return false;
+      }
+      return true;
+    }
+    
     // Special handling for "today" list
     if (listId === 'today') {
       const today = new Date();
-      const dayStart = startOfDay(today);
-      const dayEnd = endOfDay(today);
+      const todayStart = startOfDay(today);
+      const todayEnd = endOfDay(today);
       
       // Include tasks that are due today
       if (task.dueDate) {
         const taskDueDate = new Date(task.dueDate);
-        return isWithinInterval(taskDueDate, { start: dayStart, end: dayEnd });
+        return isWithinInterval(taskDueDate, { start: todayStart, end: todayEnd });
       }
       return false;
     }
@@ -76,7 +85,12 @@ export const filterTasks = (
     if (listId === 'planned') {
       if (task.dueDate) {
         const taskDueDate = new Date(task.dueDate);
-        return isFuture(taskDueDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        taskDueDate.setHours(0, 0, 0, 0);
+        
+        // Return true if the date is in the future (but not today)
+        return taskDueDate > today;
       }
       return false;
     }
