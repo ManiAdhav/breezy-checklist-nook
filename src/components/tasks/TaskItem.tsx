@@ -66,7 +66,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit }) => {
         
         <div className="flex-1 min-w-0">
           <div className={cn(
-            "font-medium text-xs", // Further reduced font size to extra small
+            "font-medium text-sm", // Changed from text-xs to text-sm
             task.completed && "line-through text-muted-foreground"
           )}>
             {task.title}
