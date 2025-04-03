@@ -72,7 +72,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit }) => {
             {task.title}
           </div>
           
-          <div className="flex items-center flex-wrap mt-1.5 text-[0.65rem] text-muted-foreground">
+          <div className="flex flex-wrap items-center mt-1 text-[0.65rem] text-muted-foreground">
             {task.listId && (
               <>
                 <span className="flex items-center text-[0.65rem]">
