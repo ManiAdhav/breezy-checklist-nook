@@ -8,6 +8,7 @@ import Sidebar from '@/components/layout/Sidebar';
 import MobileSidebar from '@/components/layout/MobileSidebar';
 import GoalList from '@/components/goals/GoalList';
 import { SidebarProvider } from '@/components/ui/sidebar';
+import { Toaster } from "@/components/ui/toaster";
 
 const GoalsPage: React.FC = () => {
   return (
@@ -24,6 +25,7 @@ const GoalsPage: React.FC = () => {
                   <GoalList />
                 </main>
               </div>
+              <Toaster />
             </div>
           </SidebarProvider>
         </VisionProvider>
