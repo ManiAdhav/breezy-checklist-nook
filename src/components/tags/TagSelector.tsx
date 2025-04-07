@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { X, Plus, Tag as TagIcon } from 'lucide-react';
 import { useTask } from '@/contexts/TaskContext';
@@ -30,9 +29,12 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedTagIds, onTagsChange 
         color: generateRandomColor()
       });
       
-      onTagsChange([...selectedTagIds, newTag.id]);
-      setNewTagName('');
-      setIsCreatingTag(false);
+      // Only access id and update selection if newTag exists and has an id
+      if (newTag && newTag.id) {
+        onTagsChange([...selectedTagIds, newTag.id]);
+        setNewTagName('');
+        setIsCreatingTag(false);
+      }
     }
   };
 
