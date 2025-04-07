@@ -8,6 +8,12 @@ export interface List {
   icon?: string;
 }
 
+export interface Tag {
+  id: string;
+  name: string;
+  color: string;
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -22,6 +28,7 @@ export interface Task {
   goalId?: string; // Added field to associate actions directly with goals
   isAction?: boolean; // New field to identify action items
   startDate?: Date;  // New field specific to actions
+  tags?: string[]; // Array of tag IDs
 }
 
 export type GoalStatus = 'not_started' | 'in_progress' | 'completed' | 'abandoned';

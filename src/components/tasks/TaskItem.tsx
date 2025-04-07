@@ -6,6 +6,7 @@ import { Task, Priority } from '@/types/task';
 import { useTask } from '@/contexts/TaskContext';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import TagBadge from '@/components/tags/TagBadge';
 
 interface TaskItemProps {
   task: Task;
@@ -98,6 +99,14 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit }) => {
               </div>
             )}
           </div>
+          
+          {task.tags && task.tags.length > 0 && (
+            <div className="flex flex-wrap mt-2">
+              {task.tags.map(tagId => (
+                <TagBadge key={tagId} tagId={tagId} />
+              ))}
+            </div>
+          )}
         </div>
         
         <div className="flex-shrink-0">

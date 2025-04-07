@@ -1,10 +1,11 @@
 
-import { Task, List, Priority } from '@/types/task';
+import { Task, List, Priority, Tag } from '@/types/task';
 
 export interface TaskContextType {
   tasks: Task[];
   lists: List[];
   customLists: List[];
+  tags: Tag[];
   selectedListId: string;
   sortBy: 'dueDate' | 'priority' | 'title' | 'createdAt';
   showCompleted: boolean;
@@ -16,6 +17,9 @@ export interface TaskContextType {
   addList: (list: Omit<List, 'id'>) => void;
   updateList: (id: string, updates: Partial<List>) => void;
   deleteList: (id: string) => void;
+  addTag: (tag: Omit<Tag, 'id'>) => void;
+  updateTag: (id: string, updates: Partial<Tag>) => void;
+  deleteTag: (id: string) => void;
   setSelectedListId: (id: string) => void;
   setSortBy: (sortBy: 'dueDate' | 'priority' | 'title' | 'createdAt') => void;
   setShowCompleted: (show: boolean) => void;

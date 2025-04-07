@@ -1,10 +1,11 @@
 
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import { TaskContextType, defaultLists } from './task/types';
 import { useTaskOperations } from './task/useTaskOperations';
 import { useListOperations } from './task/useListOperations';
 import { useTaskPreferences } from './task/useTaskPreferences';
 import { useTaskData } from './task/useTaskData';
+import { useTagOperations } from './task/useTagOperations';
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
@@ -42,12 +43,27 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setTasks, 
     setSelectedListId,
     setIsLoading,
-    customLists, // Pass customLists as a parameter
-    selectedListId // Pass selectedListId as a parameter
+    customLists, 
+    selectedListId 
   );
+
+  // Tag operations (create, update, delete)
+  const {
+    tags,
+    setTags,
+    loadTags,
+    addTag,
+    updateTag,
+    deleteTag
+  } = useTagOperations();
 
   // Data fetching
   useTaskData(setTasks, setCustomLists, setIsLoading);
+
+  // Load tags when the component mounts
+  useEffect(() => {
+    loadTags();
+  }, []);
 
   // Use the built-in lists
   const lists = defaultLists;
@@ -57,6 +73,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       tasks,
       lists,
       customLists,
+      tags,
       selectedListId,
       sortBy,
       showCompleted,
@@ -68,6 +85,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       addList,
       updateList,
       deleteList,
+      addTag,
+      updateTag,
+      deleteTag,
       setSelectedListId,
       setSortBy,
       setShowCompleted,

@@ -1,87 +1,56 @@
-
-import React, { useState } from 'react';
-import { format } from 'date-fns';
-import { Calendar as CalendarIcon, X } from 'lucide-react';
-import { List, Priority } from '@/types/task';
-import { Button } from "@/components/ui/button";
+import React from 'react';
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Priority } from '@/types/task';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from '@/lib/utils';
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { format } from 'date-fns';
+import TagSelector from '@/components/tags/TagSelector';
 
-interface TitleFieldProps {
-  title: string;
-  setTitle: (title: string) => void;
+interface List {
+  id: string;
+  name: string;
 }
 
-export const TitleField: React.FC<TitleFieldProps> = ({ title, setTitle }) => (
-  <div className="grid gap-2">
-    <Label htmlFor="title">Task</Label>
-    <Input
-      id="title"
-      value={title}
-      onChange={(e) => setTitle(e.target.value)}
-      placeholder="What needs to be done?"
-      autoFocus
-    />
-  </div>
-);
-
-interface DueDateFieldProps {
-  dueDate: Date | undefined;
-  setDueDate: (date: Date | undefined) => void;
-}
-
-export const DueDateField: React.FC<DueDateFieldProps> = ({ dueDate, setDueDate }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const handleDateSelect = (date: Date | undefined) => {
-    // If selecting the same date, clear it
-    if (date && dueDate && date.getTime() === dueDate.getTime()) {
-      setDueDate(undefined);
-    } else {
-      setDueDate(date);
-    }
-    // Close the popover after selection
-    setIsOpen(false);
-  };
-
+export const TitleField: React.FC<{ title: string; setTitle: (title: string) => void }> = ({ title, setTitle }) => {
   return (
-    <div className="grid gap-2">
-      <Label>Due Date</Label>
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
+    <div className="space-y-2">
+      <Label htmlFor="task-title">Title</Label>
+      <Input
+        id="task-title"
+        placeholder="Enter task title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+    </div>
+  );
+};
+
+export const DueDateField: React.FC<{ dueDate?: Date; setDueDate: (date?: Date) => void }> = ({ dueDate, setDueDate }) => {
+  return (
+    <div className="space-y-2">
+      <Label htmlFor="task-due-date">Due Date</Label>
+      <Popover>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className={cn(
-              "w-full justify-start text-left font-normal",
-              !dueDate && "text-muted-foreground"
-            )}
+            className="w-full justify-start text-left"
           >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {dueDate ? format(dueDate, "PPP") : <span>Pick a date</span>}
+            {dueDate ? format(dueDate, 'PPP') : <span>Pick a date</span>}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
+          <CalendarComponent
             mode="single"
             selected={dueDate}
-            onSelect={handleDateSelect}
+            onSelect={setDueDate}
             initialFocus
-            className="pointer-events-auto"
           />
         </PopoverContent>
       </Popover>
@@ -89,72 +58,68 @@ export const DueDateField: React.FC<DueDateFieldProps> = ({ dueDate, setDueDate 
   );
 };
 
-interface PriorityFieldProps {
-  priority: Priority;
-  setPriority: (priority: Priority) => void;
-}
+export const PriorityField: React.FC<{ priority: Priority; setPriority: (priority: Priority) => void }> = ({ priority, setPriority }) => {
+  return (
+    <div className="space-y-2">
+      <Label htmlFor="task-priority">Priority</Label>
+      <Select value={priority} onValueChange={setPriority}>
+        <SelectTrigger id="task-priority">
+          <SelectValue placeholder="Select priority" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="high">High</SelectItem>
+          <SelectItem value="medium">Medium</SelectItem>
+          <SelectItem value="low">Low</SelectItem>
+          <SelectItem value="none">None</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+  );
+};
 
-export const PriorityField: React.FC<PriorityFieldProps> = ({ priority, setPriority }) => (
-  <div className="grid gap-2">
-    <Label htmlFor="priority">Priority</Label>
-    <Select 
-      value={priority} 
-      onValueChange={(value) => setPriority(value as Priority)}
-    >
-      <SelectTrigger id="priority">
-        <SelectValue placeholder="Select priority" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="none">None</SelectItem>
-        <SelectItem value="low">Low</SelectItem>
-        <SelectItem value="medium">Medium</SelectItem>
-        <SelectItem value="high">High</SelectItem>
-      </SelectContent>
-    </Select>
-  </div>
-);
+export const ListField: React.FC<{ listId: string; setListId: (listId: string) => void; allLists: List[] }> = ({ listId, setListId, allLists }) => {
+  return (
+    <div className="space-y-2">
+      <Label htmlFor="task-list">List</Label>
+      <Select value={listId} onValueChange={setListId}>
+        <SelectTrigger id="task-list">
+          <SelectValue placeholder="Select list" />
+        </SelectTrigger>
+        <SelectContent>
+          {allLists.map(list => (
+            <SelectItem key={list.id} value={list.id}>{list.name}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+};
 
-interface ListFieldProps {
-  listId: string;
-  setListId: (listId: string) => void;
-  allLists: List[];
-}
+export const NotesField: React.FC<{ notes: string; setNotes: (notes: string) => void }> = ({ notes, setNotes }) => {
+  return (
+    <div className="space-y-2">
+      <Label htmlFor="task-notes">Notes</Label>
+      <Textarea
+        id="task-notes"
+        placeholder="Add any additional notes here..."
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+      />
+    </div>
+  );
+};
 
-export const ListField: React.FC<ListFieldProps> = ({ listId, setListId, allLists }) => (
-  <div className="grid gap-2">
-    <Label htmlFor="list">List</Label>
-    <Select 
-      value={listId} 
-      onValueChange={setListId}
-    >
-      <SelectTrigger id="list">
-        <SelectValue placeholder="Select list" />
-      </SelectTrigger>
-      <SelectContent>
-        {allLists.map(list => (
-          <SelectItem key={list.id} value={list.id}>
-            {list.name}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  </div>
-);
-
-interface NotesFieldProps {
-  notes: string;
-  setNotes: (notes: string) => void;
-}
-
-export const NotesField: React.FC<NotesFieldProps> = ({ notes, setNotes }) => (
-  <div className="grid gap-2">
-    <Label htmlFor="notes">Notes</Label>
-    <Textarea
-      id="notes"
-      value={notes}
-      onChange={(e) => setNotes(e.target.value)}
-      placeholder="Add notes (optional)"
-      rows={3}
-    />
-  </div>
-);
+export const TagsField: React.FC<{
+  selectedTagIds: string[];
+  setSelectedTagIds: (tagIds: string[]) => void;
+}> = ({ selectedTagIds, setSelectedTagIds }) => {
+  return (
+    <div className="space-y-2">
+      <Label htmlFor="tags">Tags</Label>
+      <TagSelector
+        selectedTagIds={selectedTagIds}
+        onTagsChange={setSelectedTagIds}
+      />
+    </div>
+  );
+};
