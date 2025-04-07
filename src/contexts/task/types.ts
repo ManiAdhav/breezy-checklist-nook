@@ -17,7 +17,7 @@ export interface TaskContextType {
   addList: (list: Omit<List, 'id'>) => void;
   updateList: (id: string, updates: Partial<List>) => void;
   deleteList: (id: string) => void;
-  addTag: (tag: Omit<Tag, 'id'>) => void;
+  addTag: (tag: Omit<Tag, 'id'>) => Tag;
   updateTag: (id: string, updates: Partial<Tag>) => void;
   deleteTag: (id: string) => void;
   setSelectedListId: (id: string) => void;

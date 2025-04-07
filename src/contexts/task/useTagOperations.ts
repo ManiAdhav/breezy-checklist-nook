@@ -38,7 +38,7 @@ export const useTagOperations = () => {
     }
   };
 
-  const addTag = (tag: Omit<Tag, 'id'>) => {
+  const addTag = (tag: Omit<Tag, 'id'>): Tag => {
     const newTag: Tag = {
       ...tag,
       id: generateId(),
