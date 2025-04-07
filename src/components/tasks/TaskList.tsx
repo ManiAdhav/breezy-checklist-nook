@@ -8,7 +8,6 @@ import TaskListHeader from './list/TaskListHeader';
 import TaskFilters from './list/TaskFilters';
 import EmptyTaskList from './list/EmptyTaskList';
 import TaskDateHeader from './list/TaskDateHeader';
-import { Calendar, Check, Flag, AlignLeft, Clock } from 'lucide-react';
 
 const TaskList: React.FC = () => {
   const {
