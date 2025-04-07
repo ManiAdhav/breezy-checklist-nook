@@ -27,7 +27,16 @@ export const useTaskPreferences = (tasks: Task[]) => {
       showCompleted,
       searchQuery: searchQuery || '(none)',
     });
-  }, [tasks.length, filteredTasks.length, selectedListId, sortBy, showCompleted, searchQuery]);
+    
+    // Enhanced debugging for task content
+    if (tasks.length > 0) {
+      console.log('First 3 tasks sample:', tasks.slice(0, 3));
+      
+      // Log lists represented in tasks
+      const listIds = [...new Set(tasks.map(task => task.listId))];
+      console.log('Lists present in tasks:', listIds);
+    }
+  }, [tasks.length, filteredTasks.length, selectedListId, sortBy, showCompleted, searchQuery, tasks]);
 
   return {
     selectedListId,
