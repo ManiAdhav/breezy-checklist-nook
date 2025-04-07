@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Task } from '@/types/task';
 import { filterTasks, sortTasks } from '@/utils/taskUtils';
 
@@ -9,34 +9,25 @@ export const useTaskPreferences = (tasks: Task[]) => {
   const [showCompleted, setShowCompleted] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Load preferences from localStorage when component mounts
+  // Use useMemo to compute filtered tasks to avoid unnecessary re-filtering
+  const filteredTasks = useMemo(() => {
+    // Filter tasks based on selected list, search query, and showCompleted preference
+    const filtered = filterTasks(tasks, selectedListId, searchQuery, showCompleted);
+    
+    // Sort the filtered tasks
+    return sortTasks(filtered, sortBy);
+  }, [tasks, selectedListId, sortBy, showCompleted, searchQuery]);
+
+  // Log changes to tasks or filtered tasks for debugging
   useEffect(() => {
-    const savedSelectedListId = localStorage.getItem('selectedListId');
-    const savedSortBy = localStorage.getItem('sortBy');
-    const savedShowCompleted = localStorage.getItem('showCompleted');
-
-    if (savedSelectedListId) setSelectedListId(savedSelectedListId);
-    if (savedSortBy) setSortBy(savedSortBy as any);
-    if (savedShowCompleted) setShowCompleted(JSON.parse(savedShowCompleted));
-  }, []);
-
-  // Save preferences to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('selectedListId', selectedListId);
-    localStorage.setItem('sortBy', sortBy);
-    localStorage.setItem('showCompleted', JSON.stringify(showCompleted));
-  }, [selectedListId, sortBy, showCompleted]);
-
-  // Filter and sort tasks based on current preferences
-  const filteredTasks = sortTasks(
-    filterTasks(
-      tasks, 
-      selectedListId === 'all' ? undefined : selectedListId, 
-      searchQuery, 
-      showCompleted
-    ), 
-    sortBy
-  );
+    console.log(`Tasks count: ${tasks.length}, filtered count: ${filteredTasks.length}`);
+    console.log('Current filters:', {
+      selectedListId,
+      sortBy, 
+      showCompleted,
+      searchQuery: searchQuery || '(none)',
+    });
+  }, [tasks.length, filteredTasks.length, selectedListId, sortBy, showCompleted, searchQuery]);
 
   return {
     selectedListId,

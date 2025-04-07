@@ -1,11 +1,11 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { format } from 'date-fns';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Task, Priority } from '@/types/task';
-import { useTask } from '@/contexts/TaskContext';
-import { ChevronRight } from 'lucide-react';
+import { CheckCircle2, Circle, Calendar, Tag as TagIcon, TrashIcon, Pencil } from 'lucide-react';
+import { Task } from '@/types/task';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { useTask } from '@/contexts/TaskContext';
 import TagBadge from '@/components/tags/TagBadge';
 
 interface TaskItemProps {
@@ -14,104 +14,109 @@ interface TaskItemProps {
 }
 
 const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit }) => {
-  const { toggleTaskCompletion, lists, customLists } = useTask();
-  const [isHovered, setIsHovered] = useState(false);
-
-  const handleToggle = () => {
-    toggleTaskCompletion(task.id);
-  };
+  const { toggleTaskCompletion, deleteTask, tags } = useTask();
   
-  const getPriorityColor = (priority: Priority): string => {
+  // Priority color mapping
+  const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'high':
-        return 'bg-red-500';
+        return 'text-red-500';
       case 'medium':
-        return 'bg-orange-500';
+        return 'text-orange-400';
       case 'low':
-        return 'bg-blue-500';
+        return 'text-blue-400';
       default:
-        return 'bg-gray-500';
+        return 'text-gray-400';
     }
   };
 
-  const getListName = (listId: string): string => {
-    // Check built-in lists
-    const builtInList = lists.find(list => list.id === listId);
-    if (builtInList) return builtInList.name;
-    
-    // Check custom lists
-    const customList = customLists.find(list => list.id === listId);
-    if (customList) return customList.name;
-    
-    return '';
-  };
-
+  // Format the due date
+  const formattedDate = task.dueDate 
+    ? format(new Date(task.dueDate), 'MMM d, yyyy') 
+    : null;
+  
   return (
     <div 
       className={cn(
-        "flex flex-col border-b border-border py-3 px-2 hover:bg-accent/10 rounded-md transition-colors duration-150",
-        task.completed && "opacity-70"
+        "p-3 flex items-start rounded-md border border-border mb-2 transition-all",
+        "hover:bg-accent/10 relative group",
+        task.completed && "bg-accent/5 opacity-75"
       )}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={() => onEdit(task)}
     >
-      <div className="flex items-start">
-        <div className="flex-shrink-0 pt-1 mr-3" onClick={(e) => e.stopPropagation()}>
-          <Checkbox 
-            checked={task.completed} 
-            onCheckedChange={handleToggle}
-            className={`transition-transform ${task.completed ? 'checkbox-animation' : ''}`}
-          />
-        </div>
+      <Button
+        variant="ghost"
+        size="sm"
+        className={`p-0 w-6 h-6 mr-3 ${task.completed ? 'text-green-500' : 'text-gray-400'}`}
+        onClick={() => toggleTaskCompletion(task.id)}
+      >
+        {task.completed ? (
+          <CheckCircle2 className="h-5 w-5" />
+        ) : (
+          <Circle className="h-5 w-5" />
+        )}
+      </Button>
+      
+      <div className="flex-1 min-w-0">
+        <p className={cn(
+          "font-medium text-sm mb-1 break-words",
+          task.completed && "line-through text-muted-foreground"
+        )}>
+          {task.title}
+        </p>
         
-        <div className="flex-1 min-w-0">
-          <div className={cn(
-            "font-medium text-sm",
-            task.completed && "line-through text-muted-foreground"
-          )}>
-            {task.title}
-          </div>
-          
-          <div className="flex flex-wrap items-center mt-1 text-[0.65rem] text-muted-foreground">
-            {task.listId && (
-              <>
-                <span className="flex items-center text-[0.65rem]">
-                  {getListName(task.listId)}
-                </span>
-                {(task.dueDate || task.priority !== 'none') && <span className="mx-1.5 text-gray-300">|</span>}
-              </>
-            )}
-            
-            {task.dueDate && (
-              <>
-                <span className="text-[0.65rem]">
-                  {format(new Date(task.dueDate), 'dd-MM-yy')}
-                </span>
-                {task.priority !== 'none' && <span className="mx-1.5 text-gray-300">|</span>}
-              </>
-            )}
-            
-            {task.priority !== 'none' && (
-              <div className="flex items-center space-x-1">
-                <div className={`h-2 w-2 rounded-full ${getPriorityColor(task.priority)}`}></div>
-                <span className="capitalize">{task.priority}</span>
-              </div>
-            )}
-          </div>
-          
-          {task.tags && task.tags.length > 0 && (
-            <div className="flex flex-wrap mt-2">
-              {task.tags.map(tagId => (
-                <TagBadge key={tagId} tagId={tagId} />
-              ))}
+        <div className="flex flex-wrap gap-2 items-center mt-2 text-xs text-muted-foreground">
+          {formattedDate && (
+            <div className="flex items-center">
+              <Calendar className="h-3.5 w-3.5 mr-1" />
+              {formattedDate}
             </div>
           )}
+          
+          {task.priority && task.priority !== 'none' && (
+            <div className={`capitalize ${getPriorityColor(task.priority)}`}>
+              {task.priority} priority
+            </div>
+          )}
+          
+          {/* Display task ID for debugging */}
+          <div className="text-xs text-muted-foreground/50 hidden group-hover:inline-flex">
+            ID: {task.id.substring(0, 6)}...
+          </div>
         </div>
         
-        <div className="flex-shrink-0">
-          <ChevronRight className="h-5 w-5 text-muted-foreground opacity-60" />
-        </div>
+        {/* Display tags */}
+        {task.tags && task.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-2">
+            {task.tags.map(tagId => (
+              <TagBadge key={tagId} tagId={tagId} />
+            ))}
+          </div>
+        )}
+        
+        {task.notes && (
+          <p className="text-xs text-muted-foreground mt-2 break-words line-clamp-2">
+            {task.notes}
+          </p>
+        )}
+      </div>
+      
+      <div className="flex flex-col space-y-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-7 w-7" 
+          onClick={() => onEdit(task)}
+        >
+          <Pencil className="h-3.5 w-3.5" />
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-7 w-7 text-destructive" 
+          onClick={() => deleteTask(task.id)}
+        >
+          <TrashIcon className="h-3.5 w-3.5" />
+        </Button>
       </div>
     </div>
   );
