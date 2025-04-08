@@ -9,17 +9,29 @@ export const NOTEPAD_STORAGE_KEY = 'notepad_content';
 
 // Generic storage helper functions
 export const getStoredData = <T>(key: string): T[] => {
-  const storedData = localStorage.getItem(key);
-  return storedData ? JSON.parse(storedData) : [];
+  try {
+    const storedData = localStorage.getItem(key);
+    console.log(`Retrieving data for key ${key}, found:`, storedData ? 'data' : 'nothing');
+    return storedData ? JSON.parse(storedData) : [];
+  } catch (error) {
+    console.error(`Error retrieving data for key ${key}:`, error);
+    return [];
+  }
 };
 
 export const storeData = <T>(key: string, data: T[]): void => {
-  localStorage.setItem(key, JSON.stringify(data));
+  try {
+    console.log(`Storing data for key ${key}:`, data);
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (error) {
+    console.error(`Error storing data for key ${key}:`, error);
+  }
 };
 
 // Specific storage helpers for tasks and lists
 export const getStoredTasks = (): any[] => {
   const tasks = getStoredData(TASKS_STORAGE_KEY);
+  console.log('Retrieved stored tasks:', tasks);
   return tasks;
 };
 
@@ -30,6 +42,7 @@ export const getStoredCustomLists = (): any[] => {
 };
 
 export const storeTasks = (tasks: any[]): void => {
+  console.log('Storing tasks:', tasks);
   storeData(TASKS_STORAGE_KEY, tasks);
 };
 
@@ -40,12 +53,21 @@ export const storeCustomLists = (lists: any[]): void => {
 
 // Helper for string content storage (for notepad)
 export const getStoredContent = (key: string): string => {
-  const content = localStorage.getItem(key);
-  return content || '';
+  try {
+    const content = localStorage.getItem(key);
+    return content || '';
+  } catch (error) {
+    console.error(`Error retrieving content for key ${key}:`, error);
+    return '';
+  }
 };
 
 export const storeContent = (key: string, content: string): void => {
-  localStorage.setItem(key, content);
+  try {
+    localStorage.setItem(key, content);
+  } catch (error) {
+    console.error(`Error storing content for key ${key}:`, error);
+  }
 };
 
 // Helper for consistent error handling
