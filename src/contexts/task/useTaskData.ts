@@ -1,8 +1,7 @@
-
 import { useEffect } from 'react';
 import * as TaskService from '@/api/taskService';
 import { toast } from '@/hooks/use-toast';
-import { getStoredTasks, getStoredCustomLists } from '@/api/services/storageUtils';
+import { getStoredTasks, getStoredCustomLists } from '@/api/services/storage/supabaseStorage';
 
 export const useTaskData = (
   setTasks: React.Dispatch<React.SetStateAction<any[]>>,

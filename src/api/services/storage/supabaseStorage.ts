@@ -1,15 +1,12 @@
 
-// Local storage keys
-export const TASKS_STORAGE_KEY = 'tasks';
-export const CUSTOM_LISTS_STORAGE_KEY = 'customLists';
-export const THREE_YEAR_GOALS_STORAGE_KEY = 'threeYearGoals';
-export const NINETY_DAY_TARGETS_STORAGE_KEY = 'ninetyDayTargets';
-export const PLANS_STORAGE_KEY = 'plans';
-export const NOTEPAD_STORAGE_KEY = 'notepad_content';
-
 import { supabase } from '@/integrations/supabase/client';
+import { getLocalStorageData, saveToLocalStorage } from './localStorage';
 
-// Generic storage helper functions
+/**
+ * Gets data from Supabase or falls back to localStorage
+ * @param key Storage key
+ * @returns Promise resolving to the data
+ */
 export const getStoredData = async <T>(key: string): Promise<T[]> => {
   try {
     // First try to get data from Supabase if the user is authenticated
@@ -40,28 +37,32 @@ export const getStoredData = async <T>(key: string): Promise<T[]> => {
         }).filter(Boolean) as T[];
         
         // Also update localStorage as a cache
-        localStorage.setItem(key, JSON.stringify(parsedData));
+        saveToLocalStorage(key, parsedData);
         
         return parsedData;
       }
     }
     
     // Fall back to localStorage
-    const storedData = localStorage.getItem(key);
-    console.log(`Retrieving data for key ${key} from localStorage, found:`, storedData ? 'data' : 'nothing');
-    return storedData ? JSON.parse(storedData) : [];
+    return getLocalStorageData<T>(key);
   } catch (error) {
     console.error(`Error retrieving data for key ${key}:`, error);
     return [];
   }
 };
 
+/**
+ * Stores data in Supabase and localStorage
+ * @param key Storage key
+ * @param data Data to store
+ * @returns Promise resolving when storage operations complete
+ */
 export const storeData = async <T>(key: string, data: T[]): Promise<void> => {
   try {
     console.log(`Storing data for key ${key}:`, data);
     
     // First, always update localStorage for immediate access
-    localStorage.setItem(key, JSON.stringify(data));
+    saveToLocalStorage(key, data);
     
     // Then try to store in Supabase if the user is authenticated
     const { data: session } = await supabase.auth.getSession();
@@ -104,30 +105,11 @@ export const storeData = async <T>(key: string, data: T[]): Promise<void> => {
   }
 };
 
-// Specific storage helpers for tasks and lists
-export const getStoredTasks = async (): Promise<any[]> => {
-  const tasks = await getStoredData(TASKS_STORAGE_KEY);
-  console.log('Retrieved stored tasks:', tasks);
-  return tasks;
-};
-
-export const getStoredCustomLists = async (): Promise<any[]> => {
-  const lists = await getStoredData(CUSTOM_LISTS_STORAGE_KEY);
-  console.log('Retrieved stored lists:', lists);
-  return lists;
-};
-
-export const storeTasks = async (tasks: any[]): Promise<void> => {
-  console.log('Storing tasks:', tasks);
-  await storeData(TASKS_STORAGE_KEY, tasks);
-};
-
-export const storeCustomLists = async (lists: any[]): Promise<void> => {
-  console.log('Storing lists:', lists);
-  await storeData(CUSTOM_LISTS_STORAGE_KEY, lists);
-};
-
-// Helper for string content storage (for notepad)
+/**
+ * Gets content from Supabase or falls back to localStorage
+ * @param key Storage key
+ * @returns Promise resolving to the content
+ */
 export const getStoredContent = async (key: string): Promise<string> => {
   try {
     // First try to get from Supabase if the user is authenticated
@@ -151,18 +133,23 @@ export const getStoredContent = async (key: string): Promise<string> => {
     }
     
     // Fall back to localStorage
-    const content = localStorage.getItem(key);
-    return content || '';
+    return getLocalStorageContent(key);
   } catch (error) {
     console.error(`Error retrieving content for key ${key}:`, error);
     return '';
   }
 };
 
+/**
+ * Stores content in Supabase and localStorage
+ * @param key Storage key
+ * @param content Content to store
+ * @returns Promise resolving when storage operations complete
+ */
 export const storeContent = async (key: string, content: string): Promise<void> => {
   try {
     // Always update localStorage
-    localStorage.setItem(key, content);
+    saveContentToLocalStorage(key, content);
     
     // Then try to store in Supabase if the user is authenticated
     const { data: session } = await supabase.auth.getSession();
@@ -205,8 +192,44 @@ export const storeContent = async (key: string, content: string): Promise<void> 
   }
 };
 
-// Helper for consistent error handling
-export const handleServiceError = <T>(error: unknown, errorMessage: string): any => {
-  console.error(errorMessage, error);
-  return { success: false, error: errorMessage };
+// Helper functions for specific data types
+
+/**
+ * Gets tasks from storage
+ * @returns Promise resolving to tasks
+ */
+export const getStoredTasks = async (): Promise<any[]> => {
+  const tasks = await getStoredData('tasks');
+  console.log('Retrieved stored tasks:', tasks);
+  return tasks;
+};
+
+/**
+ * Gets custom lists from storage
+ * @returns Promise resolving to custom lists
+ */
+export const getStoredCustomLists = async (): Promise<any[]> => {
+  const lists = await getStoredData('customLists');
+  console.log('Retrieved stored lists:', lists);
+  return lists;
+};
+
+/**
+ * Stores tasks in storage
+ * @param tasks Tasks to store
+ * @returns Promise resolving when storage operation completes
+ */
+export const storeTasks = async (tasks: any[]): Promise<void> => {
+  console.log('Storing tasks:', tasks);
+  await storeData('tasks', tasks);
+};
+
+/**
+ * Stores custom lists in storage
+ * @param lists Lists to store
+ * @returns Promise resolving when storage operation completes
+ */
+export const storeCustomLists = async (lists: any[]): Promise<void> => {
+  console.log('Storing lists:', lists);
+  await storeData('customLists', lists);
 };

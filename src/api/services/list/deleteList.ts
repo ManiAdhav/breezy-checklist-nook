@@ -1,7 +1,7 @@
 
 import { ApiResponse } from '../../types';
-import { getStoredCustomLists, getStoredTasks, storeCustomLists, storeTasks } from '../storageUtils';
-import { handleServiceError } from '../errorUtils';
+import { getStoredCustomLists, getStoredTasks, storeCustomLists, storeTasks } from '../storage/supabaseStorage';
+import { handleServiceError } from '../storage/errorHandling';
 import { supabase } from '@/integrations/supabase/client';
 
 export const deleteList = async (id: string): Promise<ApiResponse<void>> => {

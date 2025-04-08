@@ -2,8 +2,8 @@
 import { Task } from '@/types/task';
 import { generateId } from '@/utils/taskUtils';
 import { ApiResponse } from '../types';
-import { getStoredTasks, storeTasks } from './storageUtils';
-import { handleServiceError } from './errorUtils';
+import { getStoredTasks, storeTasks } from './storage/supabaseStorage';
+import { handleServiceError } from './storage/errorHandling';
 import { supabase } from '@/integrations/supabase/client';
 
 // Task API methods

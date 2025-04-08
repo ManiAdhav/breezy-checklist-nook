@@ -1,8 +1,8 @@
 
 import { List } from '@/types/task';
 import { ApiResponse } from '../../types';
-import { getStoredCustomLists, storeCustomLists } from '../storageUtils';
-import { handleServiceError } from '../errorUtils';
+import { getStoredCustomLists, storeCustomLists } from '../storage/supabaseStorage';
+import { handleServiceError } from '../storage/errorHandling';
 import { supabase } from '@/integrations/supabase/client';
 
 export const getLists = async (): Promise<ApiResponse<List[]>> => {

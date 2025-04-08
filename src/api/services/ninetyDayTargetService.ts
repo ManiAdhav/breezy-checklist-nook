@@ -1,4 +1,3 @@
-
 import { NinetyDayTarget, Plan } from '@/types/task';
 import { ApiResponse } from '../types';
 import { generateId } from '@/utils/taskUtils';
@@ -7,8 +6,8 @@ import {
   PLANS_STORAGE_KEY,
   getStoredData, 
   storeData
-} from './storageUtils';
-import { handleServiceError } from './errorUtils';
+} from './storage/index';
+import { handleServiceError } from './storage/errorHandling';
 
 export const getNinetyDayTargets = async (): Promise<ApiResponse<NinetyDayTarget[]>> => {
   try {
