@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTask } from '@/contexts/TaskContext';
@@ -48,25 +47,30 @@ const Sidebar: React.FC = () => {
     }
   }, [editingList]);
 
-  const handleAddList = () => {
+  const handleAddList = async () => {
     if (newListName.trim()) {
-      if (editingList) {
-        updateList(editingList.id, {
-          name: newListName.trim(),
-          icon: selectedIcon
-        });
-        console.log('Updated list with icon:', selectedIcon);
-      } else {
-        addList({
-          name: newListName.trim(),
-          icon: selectedIcon
-        });
-        console.log('Added list with icon:', selectedIcon);
+      try {
+        if (editingList) {
+          await updateList(editingList.id, {
+            name: newListName.trim(),
+            icon: selectedIcon
+          });
+          console.log('Updated list with icon:', selectedIcon);
+        } else {
+          await addList({
+            name: newListName.trim(),
+            icon: selectedIcon
+          });
+          console.log('Added list with icon:', selectedIcon);
+        }
+        setNewListName('');
+        setSelectedIcon('List');
+        setEditingList(null);
+        setIsAddListOpen(false);
+      } catch (error) {
+        console.error('Error handling list operation:', error);
+        // Keep dialog open if there was an error
       }
-      setNewListName('');
-      setSelectedIcon('List');
-      setEditingList(null);
-      setIsAddListOpen(false);
     }
   };
 

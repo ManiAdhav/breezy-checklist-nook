@@ -41,7 +41,7 @@ export const useListOperations = (
         description: "Failed to add list",
         variant: "destructive",
       });
-      throw error;
+      return null; // Return null instead of throwing to prevent app freeze
     } finally {
       setIsLoading(false);
     }
@@ -73,7 +73,7 @@ export const useListOperations = (
         description: "Failed to update list",
         variant: "destructive",
       });
-      throw error;
+      return null; // Return null instead of throwing to prevent app freeze
     } finally {
       setIsLoading(false);
     }
@@ -121,7 +121,7 @@ export const useListOperations = (
         description: "Failed to delete list",
         variant: "destructive",
       });
-      throw error;
+      return false; // Return false instead of throwing to prevent app freeze
     } finally {
       setIsLoading(false);
     }

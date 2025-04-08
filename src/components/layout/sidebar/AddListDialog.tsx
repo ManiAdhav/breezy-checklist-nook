@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,8 +28,23 @@ const AddListDialog: React.FC<AddListDialogProps> = ({
   selectedIcon,
   setSelectedIcon
 }) => {
+  const [isSaving, setIsSaving] = useState(false);
+  
+  const onSave = async () => {
+    setIsSaving(true);
+    try {
+      await handleAddList();
+    } finally {
+      setIsSaving(false);
+    }
+  };
+  
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      if (!isSaving) {
+        onOpenChange(open);
+      }
+    }}>
       <DialogContent className="sm:max-w-[425px] animate-scale-in">
         <DialogHeader>
           <DialogTitle>{editingList ? 'Edit List' : 'Add New List'}</DialogTitle>
@@ -54,9 +69,9 @@ const AddListDialog: React.FC<AddListDialogProps> = ({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={handleAddList} disabled={!newListName.trim()}>
-            {editingList ? 'Save' : 'Add'}
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSaving}>Cancel</Button>
+          <Button onClick={onSave} disabled={!newListName.trim() || isSaving}>
+            {isSaving ? 'Saving...' : editingList ? 'Save' : 'Add'}
           </Button>
         </DialogFooter>
       </DialogContent>
