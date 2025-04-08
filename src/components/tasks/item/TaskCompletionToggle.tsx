@@ -26,6 +26,7 @@ const TaskCompletionToggle: React.FC<TaskCompletionToggleProps> = ({
       size="sm"
       className={`p-0 w-6 h-6 mr-3 ${completed ? 'text-green-500' : 'text-gray-400'}`}
       onClick={handleToggle}
+      type="button"
     >
       {completed ? (
         <CheckCircle2 className="h-5 w-5" />

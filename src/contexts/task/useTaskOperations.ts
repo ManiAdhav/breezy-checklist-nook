@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Task, List } from '@/types/task';
 import * as TaskService from '@/api/taskService';
@@ -20,6 +21,7 @@ export const useTaskOperations = () => {
           title: "Task added",
           description: "Your task was added successfully.",
         });
+        return response.data;
       } else {
         throw new Error(response.error || 'Failed to add task');
       }
@@ -30,6 +32,7 @@ export const useTaskOperations = () => {
         description: "Failed to add task",
         variant: "destructive",
       });
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -50,6 +53,7 @@ export const useTaskOperations = () => {
           title: "Task updated",
           description: "Your task was updated successfully.",
         });
+        return response.data;
       } else {
         throw new Error(response.error || 'Failed to update task');
       }
@@ -60,6 +64,7 @@ export const useTaskOperations = () => {
         description: "Failed to update task",
         variant: "destructive",
       });
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -77,6 +82,7 @@ export const useTaskOperations = () => {
           description: "Your task was deleted successfully.",
           variant: "destructive",
         });
+        return true;
       } else {
         throw new Error(response.error || 'Failed to delete task');
       }
@@ -87,6 +93,7 @@ export const useTaskOperations = () => {
         description: "Failed to delete task",
         variant: "destructive",
       });
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -102,6 +109,7 @@ export const useTaskOperations = () => {
             task.id === id ? response.data! : task
           )
         );
+        return response.data;
       } else {
         throw new Error(response.error || 'Failed to toggle task completion');
       }
@@ -112,6 +120,7 @@ export const useTaskOperations = () => {
         description: "Failed to update task",
         variant: "destructive",
       });
+      throw error;
     }
   };
 

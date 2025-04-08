@@ -15,18 +15,19 @@ export const useTaskData = (
       setIsLoading(true);
       console.log('Fetching tasks and lists data...');
       
-      // First check local storage directly to debug
-      const localStorageTasks = getStoredTasks();
-      const localStorageLists = getStoredCustomLists();
-      
-      console.log('Direct local storage check - Tasks:', localStorageTasks);
-      console.log('Direct local storage check - Lists:', localStorageLists);
-      
       try {
+        // Get data from API services
         const [tasksResponse, listsResponse] = await Promise.all([
           TaskService.getTasks(),
           TaskService.getLists()
         ]);
+        
+        // Also get direct storage data for debugging and fallback
+        const localStorageTasks = await getStoredTasks();
+        const localStorageLists = await getStoredCustomLists();
+        
+        console.log('Direct storage check - Tasks:', localStorageTasks);
+        console.log('Direct storage check - Lists:', localStorageLists);
         
         if (tasksResponse.success && tasksResponse.data) {
           console.log(`Loaded ${tasksResponse.data.length} tasks successfully:`, tasksResponse.data);
@@ -34,9 +35,9 @@ export const useTaskData = (
         } else {
           console.error('Failed to load tasks:', tasksResponse.error);
           
-          // If API failed but we have local storage data, use that as fallback
+          // If API failed but we have storage data, use that as fallback
           if (localStorageTasks && localStorageTasks.length > 0) {
-            console.log('Using fallback tasks from local storage');
+            console.log('Using fallback tasks from storage');
             setTasks(localStorageTasks);
           }
         }
@@ -47,24 +48,33 @@ export const useTaskData = (
         } else {
           console.error('Failed to load lists:', listsResponse.error);
           
-          // If API failed but we have local storage data, use that as fallback
+          // If API failed but we have storage data, use that as fallback
           if (localStorageLists && localStorageLists.length > 0) {
-            console.log('Using fallback lists from local storage');
+            console.log('Using fallback lists from storage');
             setCustomLists(localStorageLists);
           }
         }
       } catch (error) {
         console.error('Error loading data:', error);
         
-        // Attempt to recover using local storage in case of error
-        if (localStorageTasks && localStorageTasks.length > 0) {
-          console.log('Error recovery: Using tasks from local storage');
-          setTasks(localStorageTasks);
-        }
-        
-        if (localStorageLists && localStorageLists.length > 0) {
-          console.log('Error recovery: Using lists from local storage');
-          setCustomLists(localStorageLists);
+        // Last-ditch effort to get data directly from storage
+        try {
+          const storageTasks = await getStoredTasks();
+          const storageLists = await getStoredCustomLists();
+          
+          console.log('Error recovery: Attempting to load directly from storage');
+          
+          if (storageTasks && storageTasks.length > 0) {
+            console.log('Error recovery: Using tasks from storage');
+            setTasks(storageTasks);
+          }
+          
+          if (storageLists && storageLists.length > 0) {
+            console.log('Error recovery: Using lists from storage');
+            setCustomLists(storageLists);
+          }
+        } catch (storageError) {
+          console.error('Error recovery failed:', storageError);
         }
         
         toast({

@@ -1,3 +1,4 @@
+
 import { List } from '@/types/task';
 import * as TaskService from '@/api/taskService';
 import { toast } from '@/hooks/use-toast';
@@ -28,6 +29,8 @@ export const useListOperations = (
           title: "List added",
           description: `"${list.name}" was added successfully.`,
         });
+        
+        return response.data;
       } else {
         throw new Error(response.error || 'Failed to add list');
       }
@@ -38,6 +41,7 @@ export const useListOperations = (
         description: "Failed to add list",
         variant: "destructive",
       });
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -58,6 +62,7 @@ export const useListOperations = (
           title: "List updated",
           description: "Your list was updated successfully.",
         });
+        return response.data;
       } else {
         throw new Error(response.error || 'Failed to update list');
       }
@@ -68,6 +73,7 @@ export const useListOperations = (
         description: "Failed to update list",
         variant: "destructive",
       });
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -103,6 +109,8 @@ export const useListOperations = (
           description: `"${listToDelete?.name}" was deleted and its tasks moved to Inbox.`,
           variant: "destructive",
         });
+        
+        return true;
       } else {
         throw new Error(response.error || 'Failed to delete list');
       }
@@ -113,6 +121,7 @@ export const useListOperations = (
         description: "Failed to delete list",
         variant: "destructive",
       });
+      throw error;
     } finally {
       setIsLoading(false);
     }
