@@ -29,7 +29,8 @@ const TaskListHeader: React.FC<TaskListHeaderProps> = ({
 }) => {
   const { 
     setSortBy, 
-    setShowCompleted 
+    setShowCompleted,
+    showCompleted
   } = useTask();
 
   return (
@@ -88,9 +89,9 @@ const TaskListHeader: React.FC<TaskListHeaderProps> = ({
               <DynamicIcon name="clock" className="h-4 w-4 mr-2" />
               Creation date
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setShowCompleted(prev => !prev)}>
+            <DropdownMenuItem onClick={() => setShowCompleted(!showCompleted)}>
               <DynamicIcon name="check" className="h-4 w-4 mr-2" />
-              Show/hide completed
+              {showCompleted ? 'Hide completed' : 'Show completed'}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
