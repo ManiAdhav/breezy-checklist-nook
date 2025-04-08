@@ -12,7 +12,7 @@ import { handleServiceError } from './errorUtils';
 
 export const getNinetyDayTargets = async (): Promise<ApiResponse<NinetyDayTarget[]>> => {
   try {
-    const targets = getStoredData<NinetyDayTarget>(NINETY_DAY_TARGETS_STORAGE_KEY);
+    const targets = await getStoredData<NinetyDayTarget>(NINETY_DAY_TARGETS_STORAGE_KEY);
     return { success: true, data: targets };
   } catch (error) {
     return handleServiceError<NinetyDayTarget[]>(error, 'Failed to fetch 90-day targets');
@@ -21,7 +21,7 @@ export const getNinetyDayTargets = async (): Promise<ApiResponse<NinetyDayTarget
 
 export const createNinetyDayTarget = async (target: Omit<NinetyDayTarget, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<NinetyDayTarget>> => {
   try {
-    const targets = getStoredData<NinetyDayTarget>(NINETY_DAY_TARGETS_STORAGE_KEY);
+    const targets = await getStoredData<NinetyDayTarget>(NINETY_DAY_TARGETS_STORAGE_KEY);
     const newTarget: NinetyDayTarget = {
       ...target,
       id: generateId(),
@@ -30,7 +30,7 @@ export const createNinetyDayTarget = async (target: Omit<NinetyDayTarget, 'id' |
     };
     
     const updatedTargets = [...targets, newTarget];
-    storeData(NINETY_DAY_TARGETS_STORAGE_KEY, updatedTargets);
+    await storeData(NINETY_DAY_TARGETS_STORAGE_KEY, updatedTargets);
     
     return { success: true, data: newTarget };
   } catch (error) {
@@ -40,7 +40,7 @@ export const createNinetyDayTarget = async (target: Omit<NinetyDayTarget, 'id' |
 
 export const updateNinetyDayTarget = async (id: string, updates: Partial<NinetyDayTarget>): Promise<ApiResponse<NinetyDayTarget>> => {
   try {
-    const targets = getStoredData<NinetyDayTarget>(NINETY_DAY_TARGETS_STORAGE_KEY);
+    const targets = await getStoredData<NinetyDayTarget>(NINETY_DAY_TARGETS_STORAGE_KEY);
     const targetIndex = targets.findIndex(target => target.id === id);
     
     if (targetIndex === -1) {
@@ -54,7 +54,7 @@ export const updateNinetyDayTarget = async (id: string, updates: Partial<NinetyD
     };
     
     targets[targetIndex] = updatedTarget;
-    storeData(NINETY_DAY_TARGETS_STORAGE_KEY, targets);
+    await storeData(NINETY_DAY_TARGETS_STORAGE_KEY, targets);
     
     return { success: true, data: updatedTarget };
   } catch (error) {
@@ -64,8 +64,8 @@ export const updateNinetyDayTarget = async (id: string, updates: Partial<NinetyD
 
 export const deleteNinetyDayTarget = async (id: string): Promise<ApiResponse<void>> => {
   try {
-    const targets = getStoredData<NinetyDayTarget>(NINETY_DAY_TARGETS_STORAGE_KEY);
-    const plans = getStoredData<Plan>(PLANS_STORAGE_KEY);
+    const targets = await getStoredData<NinetyDayTarget>(NINETY_DAY_TARGETS_STORAGE_KEY);
+    const plans = await getStoredData<Plan>(PLANS_STORAGE_KEY);
     
     const updatedTargets = targets.filter(target => target.id !== id);
     const updatedPlans = plans.filter(plan => plan.ninetyDayTargetId !== id);
@@ -74,8 +74,8 @@ export const deleteNinetyDayTarget = async (id: string): Promise<ApiResponse<voi
       return { success: false, error: '90-day target not found' };
     }
     
-    storeData(NINETY_DAY_TARGETS_STORAGE_KEY, updatedTargets);
-    storeData(PLANS_STORAGE_KEY, updatedPlans);
+    await storeData(NINETY_DAY_TARGETS_STORAGE_KEY, updatedTargets);
+    await storeData(PLANS_STORAGE_KEY, updatedPlans);
     
     return { success: true };
   } catch (error) {

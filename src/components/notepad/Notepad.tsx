@@ -13,25 +13,37 @@ const Notepad: React.FC = () => {
 
   // Load content from localStorage on component mount
   useEffect(() => {
-    const savedContent = getStoredContent(NOTEPAD_STORAGE_KEY);
-    setText(savedContent);
+    const fetchContent = async () => {
+      try {
+        const savedContent = await getStoredContent(NOTEPAD_STORAGE_KEY);
+        setText(savedContent);
+      } catch (error) {
+        console.error('Error loading notepad content:', error);
+      }
+    };
+    
+    fetchContent();
   }, []);
 
   // Auto-save on text change with debounce
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       if (text) {
-        storeContent(NOTEPAD_STORAGE_KEY, text);
+        try {
+          await storeContent(NOTEPAD_STORAGE_KEY, text);
+        } catch (error) {
+          console.error('Error auto-saving notepad content:', error);
+        }
       }
     }, 1000);
     
     return () => clearTimeout(timer);
   }, [text]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
     try {
-      storeContent(NOTEPAD_STORAGE_KEY, text);
+      await storeContent(NOTEPAD_STORAGE_KEY, text);
       toast({
         title: "Saved",
         description: "Your notes have been saved successfully",
