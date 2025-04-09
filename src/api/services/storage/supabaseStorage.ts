@@ -1,6 +1,5 @@
-
 import { supabase } from '@/integrations/supabase/client';
-import { getLocalStorageData, saveToLocalStorage } from './localStorage';
+import { getLocalStorageData, saveToLocalStorage, getLocalStorageContent, saveContentToLocalStorage } from './localStorage';
 
 /**
  * Gets data from Supabase or falls back to localStorage

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { Save } from 'lucide-react';
-import { getStoredContent, storeContent, NOTEPAD_STORAGE_KEY } from '@/api/services/storageUtils';
+import { getStoredContent, storeContent, NOTEPAD_STORAGE_KEY } from '@/api/services/storage';
 
 const Notepad: React.FC = () => {
   const [text, setText] = useState('');
