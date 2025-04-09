@@ -1,6 +1,6 @@
 
 import { ApiResponse } from '../../types';
-import { getStoredCustomLists, getStoredTasks, storeCustomLists, storeTasks } from '../storage/supabaseStorage';
+import { getStoredCustomLists, getStoredTasks, storeCustomLists, storeTasks } from '../storage/supabase';
 import { handleServiceError } from '../storage/errorHandling';
 import { supabase } from '@/integrations/supabase/client';
 

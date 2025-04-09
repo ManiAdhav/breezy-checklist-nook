@@ -1,5 +1,6 @@
+
 import { supabase } from '@/integrations/supabase/client';
-import { getLocalStorageData, saveToLocalStorage, getLocalStorageContent, saveContentToLocalStorage } from './localStorage';
+import { getLocalStorageData, saveToLocalStorage, getLocalStorageContent, saveContentToLocalStorage } from '../localStorage';
 
 /**
  * Gets data from Supabase or falls back to localStorage
@@ -189,46 +190,4 @@ export const storeContent = async (key: string, content: string): Promise<void> 
   } catch (error) {
     console.error(`Error storing content for key ${key}:`, error);
   }
-};
-
-// Helper functions for specific data types
-
-/**
- * Gets tasks from storage
- * @returns Promise resolving to tasks
- */
-export const getStoredTasks = async (): Promise<any[]> => {
-  const tasks = await getStoredData('tasks');
-  console.log('Retrieved stored tasks:', tasks);
-  return tasks;
-};
-
-/**
- * Gets custom lists from storage
- * @returns Promise resolving to custom lists
- */
-export const getStoredCustomLists = async (): Promise<any[]> => {
-  const lists = await getStoredData('customLists');
-  console.log('Retrieved stored lists:', lists);
-  return lists;
-};
-
-/**
- * Stores tasks in storage
- * @param tasks Tasks to store
- * @returns Promise resolving when storage operation completes
- */
-export const storeTasks = async (tasks: any[]): Promise<void> => {
-  console.log('Storing tasks:', tasks);
-  await storeData('tasks', tasks);
-};
-
-/**
- * Stores custom lists in storage
- * @param lists Lists to store
- * @returns Promise resolving when storage operation completes
- */
-export const storeCustomLists = async (lists: any[]): Promise<void> => {
-  console.log('Storing lists:', lists);
-  await storeData('customLists', lists);
 };
