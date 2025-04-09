@@ -64,6 +64,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit }) => {
           dueDate={task.dueDate} 
           priority={task.priority} 
           taskId={task.id} 
+          goalId={task.goalId}
           getPriorityColor={getPriorityColor} 
         />
         
