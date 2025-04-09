@@ -41,8 +41,8 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit }) => {
   return (
     <div 
       className={cn(
-        "p-2 flex items-start rounded-md border border-border mb-1.5 transition-all",
-        "hover:bg-accent/10 relative group",
+        "px-2 py-1.5 flex items-start rounded-md border border-border mb-1.5 transition-all",
+        "hover:bg-accent/10 relative group min-h-[fit-content]",
         task.completed && "bg-accent/5 opacity-75"
       )}
     >

@@ -9,7 +9,7 @@ const TaskItemNotes: React.FC<TaskItemNotesProps> = ({ notes }) => {
   if (!notes) return null;
   
   return (
-    <p className="text-xs text-muted-foreground mt-2 break-words line-clamp-2">
+    <p className="text-xs text-muted-foreground mt-1.5 break-words whitespace-pre-wrap">
       {notes}
     </p>
   );
