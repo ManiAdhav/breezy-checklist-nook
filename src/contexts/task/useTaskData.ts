@@ -32,6 +32,12 @@ export const useTaskData = (
         
         if (tasksResponse.success && tasksResponse.data) {
           console.log(`Loaded ${tasksResponse.data.length} tasks successfully:`, tasksResponse.data);
+          
+          // Save to storage as backup even if from API
+          if (tasksResponse.data.length > 0) {
+            await storeTasks(tasksResponse.data);
+          }
+          
           setTasks(tasksResponse.data);
         } else {
           console.error('Failed to load tasks:', tasksResponse.error);

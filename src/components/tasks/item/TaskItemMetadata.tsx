@@ -27,7 +27,7 @@ const TaskItemMetadata: React.FC<TaskItemMetadataProps> = ({
     : null;
   
   // Find the goal name if goalId is provided
-  const goal = goalId ? threeYearGoals.find(g => g.id === goalId) : null;
+  const goal = goalId && threeYearGoals ? threeYearGoals.find(g => g.id === goalId) : null;
   
   return (
     <div className="flex flex-wrap gap-2 items-center mt-2 text-xs text-muted-foreground">

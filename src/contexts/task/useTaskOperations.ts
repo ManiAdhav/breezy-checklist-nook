@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Task, List } from '@/types/task';
 import * as TaskService from '@/api/taskService';
 import { toast } from '@/hooks/use-toast';
+import { storeTasks } from '@/api/services/storage/supabase/tasks';
 
 export const useTaskOperations = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -16,7 +17,12 @@ export const useTaskOperations = () => {
       const response = await TaskService.createTask(task);
       
       if (response.success && response.data) {
-        setTasks(prevTasks => [...prevTasks, response.data!]);
+        const newTasks = [...tasks, response.data];
+        setTasks(newTasks);
+        
+        // Also ensure tasks are saved to storage directly
+        await storeTasks(newTasks);
+        
         toast({
           title: "Task added",
           description: "Your task was added successfully.",
@@ -44,11 +50,14 @@ export const useTaskOperations = () => {
       const response = await TaskService.updateTask(id, updates);
       
       if (response.success && response.data) {
-        setTasks(prevTasks => 
-          prevTasks.map(task => 
-            task.id === id ? response.data! : task
-          )
+        const updatedTasks = tasks.map(task => 
+          task.id === id ? response.data! : task
         );
+        setTasks(updatedTasks);
+        
+        // Also ensure tasks are saved to storage directly
+        await storeTasks(updatedTasks);
+        
         toast({
           title: "Task updated",
           description: "Your task was updated successfully.",
@@ -76,7 +85,12 @@ export const useTaskOperations = () => {
       const response = await TaskService.deleteTask(id);
       
       if (response.success) {
-        setTasks(prevTasks => prevTasks.filter(task => task.id !== id));
+        const updatedTasks = tasks.filter(task => task.id !== id);
+        setTasks(updatedTasks);
+        
+        // Also ensure tasks are saved to storage directly
+        await storeTasks(updatedTasks);
+        
         toast({
           title: "Task deleted",
           description: "Your task was deleted successfully.",
@@ -104,11 +118,14 @@ export const useTaskOperations = () => {
       const response = await TaskService.toggleTaskCompletion(id);
       
       if (response.success && response.data) {
-        setTasks(prevTasks => 
-          prevTasks.map(task => 
-            task.id === id ? response.data! : task
-          )
+        const updatedTasks = tasks.map(task => 
+          task.id === id ? response.data! : task
         );
+        setTasks(updatedTasks);
+        
+        // Also ensure tasks are saved to storage directly
+        await storeTasks(updatedTasks);
+        
         return response.data;
       } else {
         throw new Error(response.error || 'Failed to toggle task completion');

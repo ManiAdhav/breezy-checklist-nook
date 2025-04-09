@@ -7,8 +7,19 @@
 export const getLocalStorageData = <T>(key: string): T[] => {
   try {
     const storedData = localStorage.getItem(key);
-    console.log(`Retrieving data for key ${key} from localStorage, found:`, storedData ? 'data' : 'nothing');
-    return storedData ? JSON.parse(storedData) : [];
+    console.log(`Retrieving data for key ${key} from localStorage, found: ${storedData ? 'data' : 'nothing'}`);
+    
+    if (!storedData) {
+      return [];
+    }
+    
+    const parsedData = JSON.parse(storedData);
+    if (!Array.isArray(parsedData)) {
+      console.warn(`Data for key ${key} is not an array, converting to array`);
+      return [parsedData] as T[];
+    }
+    
+    return parsedData;
   } catch (error) {
     console.error(`Error retrieving data for key ${key} from localStorage:`, error);
     return [];
@@ -22,7 +33,12 @@ export const getLocalStorageData = <T>(key: string): T[] => {
  */
 export const saveToLocalStorage = <T>(key: string, data: T[]): void => {
   try {
-    console.log(`Storing data for key ${key} to localStorage`);
+    if (!data || !Array.isArray(data)) {
+      console.warn(`Attempted to store non-array data for key ${key}, converting to array`);
+      data = data ? [data] as T[] : [];
+    }
+    
+    console.log(`Storing ${data.length} items for key ${key} to localStorage`);
     localStorage.setItem(key, JSON.stringify(data));
   } catch (error) {
     console.error(`Error storing data for key ${key} to localStorage:`, error);

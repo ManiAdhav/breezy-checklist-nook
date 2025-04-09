@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { getLocalStorageData, saveToLocalStorage, getLocalStorageContent, saveContentToLocalStorage } from '../localStorage';
 
@@ -44,10 +43,21 @@ export const getStoredData = async <T>(key: string): Promise<T[]> => {
     }
     
     // Fall back to localStorage
-    return getLocalStorageData<T>(key);
+    const localData = getLocalStorageData<T>(key);
+    console.log(`Retrieved ${localData.length} items for ${key} from localStorage`);
+    return localData;
   } catch (error) {
     console.error(`Error retrieving data for key ${key}:`, error);
-    return [];
+    
+    // Last attempt to get from localStorage in case of unexpected error
+    try {
+      const localData = getLocalStorageData<T>(key);
+      console.log(`Error recovery: Retrieved ${localData.length} items for ${key} from localStorage`);
+      return localData;
+    } catch (e) {
+      console.error(`Failed to retrieve data even from localStorage for key ${key}:`, e);
+      return [];
+    }
   }
 };
 
@@ -59,7 +69,7 @@ export const getStoredData = async <T>(key: string): Promise<T[]> => {
  */
 export const storeData = async <T>(key: string, data: T[]): Promise<void> => {
   try {
-    console.log(`Storing data for key ${key}:`, data);
+    console.log(`Storing ${data.length} items for key ${key}`);
     
     // First, always update localStorage for immediate access
     saveToLocalStorage(key, data);
