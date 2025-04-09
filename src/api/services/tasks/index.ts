@@ -1,6 +1,3 @@
 
-export * from './getTasks';
-export * from './createTask';
-export * from './updateTask';
-export * from './deleteTask';
-export * from './toggleTaskCompletion';
+// Re-export all task operations from the supabase subdirectory
+export * from './supabase';
