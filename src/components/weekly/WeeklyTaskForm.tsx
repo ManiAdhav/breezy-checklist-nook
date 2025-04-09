@@ -18,7 +18,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Task, Priority } from '@/types/task';
 import { useTask } from '@/contexts/TaskContext';
 import { format } from 'date-fns';
-import { toast } from 'sonner';
 
 interface WeeklyTaskFormProps {
   planId: string;
@@ -65,11 +64,9 @@ const WeeklyTaskForm: React.FC<WeeklyTaskFormProps> = ({ planId, date, onClose }
       };
       
       await addTask(taskData);
-      toast.success('Task added to your weekly plan');
       onClose();
     } catch (error) {
       console.error('Error adding task:', error);
-      toast.error('Failed to add task');
     } finally {
       setIsSubmitting(false);
     }

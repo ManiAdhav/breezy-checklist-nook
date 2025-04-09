@@ -66,12 +66,6 @@ const ActionForm: React.FC<ActionFormProps> = ({ onSuccess, onCancel }) => {
 
     try {
       await addTask(newAction);
-      
-      toast({
-        title: "Action added",
-        description: "Your new action has been added successfully",
-      });
-      
       onSuccess();
     } catch (error) {
       console.error("Error adding action:", error);

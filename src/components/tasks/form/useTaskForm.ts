@@ -77,13 +77,6 @@ export const useTaskForm = ({ editingTask, defaultDueDate, onClose }: UseTaskFor
       }
       
       onClose();
-      
-      toast({
-        title: editingTask ? "Task updated" : "Task added",
-        description: editingTask 
-          ? "Your task was updated successfully" 
-          : "Your task was added successfully",
-      });
     } catch (error) {
       console.error("Error saving task:", error);
       toast({

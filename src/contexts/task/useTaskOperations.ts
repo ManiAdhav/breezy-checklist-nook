@@ -23,10 +23,6 @@ export const useTaskOperations = () => {
         // Also ensure tasks are saved to storage directly
         await storeTasks(newTasks);
         
-        toast({
-          title: "Task added",
-          description: "Your task was added successfully.",
-        });
         return response.data;
       } else {
         throw new Error(response.error || 'Failed to add task');
@@ -58,10 +54,6 @@ export const useTaskOperations = () => {
         // Also ensure tasks are saved to storage directly
         await storeTasks(updatedTasks);
         
-        toast({
-          title: "Task updated",
-          description: "Your task was updated successfully.",
-        });
         return response.data;
       } else {
         throw new Error(response.error || 'Failed to update task');
@@ -91,11 +83,6 @@ export const useTaskOperations = () => {
         // Also ensure tasks are saved to storage directly
         await storeTasks(updatedTasks);
         
-        toast({
-          title: "Task deleted",
-          description: "Your task was deleted successfully.",
-          variant: "destructive",
-        });
         return true;
       } else {
         throw new Error(response.error || 'Failed to delete task');

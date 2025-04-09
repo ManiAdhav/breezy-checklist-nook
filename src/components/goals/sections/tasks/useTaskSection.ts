@@ -1,6 +1,5 @@
 
 import { useState } from 'react';
-import { toast } from '@/hooks/use-toast';
 import { Task, Priority } from '@/types/task';
 
 export function useTaskSection(goalId: string) {
@@ -68,11 +67,6 @@ export function useTaskSection(goalId: string) {
 
   const handleSaveTask = () => {
     if (!taskTitle.trim()) {
-      toast({
-        title: "Error",
-        description: "Task title is required",
-        variant: "destructive",
-      });
       return;
     }
 
@@ -90,10 +84,6 @@ export function useTaskSection(goalId: string) {
             : task
         )
       );
-      toast({
-        title: "Task updated",
-        description: "Your task has been updated successfully",
-      });
     } else {
       // Create new task
       const newTask: Task = {
@@ -108,21 +98,12 @@ export function useTaskSection(goalId: string) {
         goalId: goalId
       };
       setTasks(prevTasks => [...prevTasks, newTask]);
-      toast({
-        title: "Task created",
-        description: "Your new task has been created",
-      });
     }
     setIsTaskDialogOpen(false);
   };
 
   const handleDeleteTask = (id: string) => {
     setTasks(prevTasks => prevTasks.filter(task => task.id !== id));
-    toast({
-      title: "Task deleted",
-      description: "Your task has been deleted",
-      variant: "destructive",
-    });
   };
 
   return {
