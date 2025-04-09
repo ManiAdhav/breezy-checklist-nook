@@ -11,14 +11,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { useTaskForm } from './form/useTaskForm';
 import { 
-  TitleField, 
-  DueDateField, 
-  PriorityField, 
-  ListField, 
-  NotesField,
-  TagsField 
+  MinimalTitleField, 
+  MinimalDueDateField, 
+  MinimalPriorityField, 
+  MinimalListField, 
+  MinimalNotesField,
+  MinimalTagsField,
+  RecurringOptionField
 } from './form/TaskFormFields';
-import GoalSelectorField from '@/components/targets/form-fields/GoalSelectorField';
+import MinimalGoalSelectorField from '@/components/targets/form-fields/MinimalGoalSelectorField';
 import { useGoal } from '@/contexts/GoalContext';
 
 interface TaskFormProps {
@@ -50,6 +51,10 @@ const TaskForm: React.FC<TaskFormProps> = ({
     setSelectedGoalId,
     selectedTagIds,
     setSelectedTagIds,
+    recurring,
+    setRecurring,
+    recurringPattern,
+    setRecurringPattern,
     isSubmitting,
     handleSubmit,
     allLists,
@@ -67,31 +72,32 @@ const TaskForm: React.FC<TaskFormProps> = ({
           </DialogHeader>
           
           <div className="grid gap-4 py-4">
-            <TitleField title={title} setTitle={setTitle} />
+            <MinimalTitleField title={title} setTitle={setTitle} />
             
-            <div className="grid grid-cols-2 gap-4">
-              <DueDateField dueDate={dueDate} setDueDate={setDueDate} />
-              <PriorityField priority={priority} setPriority={setPriority} />
+            <div className="flex flex-wrap gap-3 items-center">
+              <MinimalDueDateField dueDate={dueDate} setDueDate={setDueDate} />
+              <MinimalPriorityField priority={priority} setPriority={setPriority} />
+              <MinimalListField listId={listId} setListId={setListId} allLists={allLists} />
+              <MinimalGoalSelectorField
+                goals={threeYearGoals}
+                selectedGoalId={selectedGoalId}
+                setSelectedGoalId={setSelectedGoalId}
+              />
             </div>
             
-            <ListField 
-              listId={listId} 
-              setListId={setListId} 
-              allLists={allLists} 
+            <RecurringOptionField 
+              recurring={recurring}
+              setRecurring={setRecurring}
+              recurringPattern={recurringPattern}
+              setRecurringPattern={setRecurringPattern}
             />
             
-            <GoalSelectorField
-              goals={threeYearGoals}
-              selectedGoalId={selectedGoalId}
-              setSelectedGoalId={setSelectedGoalId}
-            />
-            
-            <TagsField
+            <MinimalTagsField
               selectedTagIds={selectedTagIds}
               setSelectedTagIds={setSelectedTagIds}
             />
             
-            <NotesField notes={notes} setNotes={setNotes} />
+            <MinimalNotesField notes={notes} setNotes={setNotes} />
           </div>
           
           <DialogFooter>

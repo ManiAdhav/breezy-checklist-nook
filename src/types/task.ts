@@ -1,4 +1,3 @@
-
 export type Priority = 'high' | 'medium' | 'low' | 'none';
 
 export interface List {
@@ -29,6 +28,8 @@ export interface Task {
   isAction?: boolean; // New field to identify action items
   startDate?: Date;  // New field specific to actions
   tags?: string[]; // Array of tag IDs
+  recurring?: boolean; // Whether this is a recurring task
+  recurringPattern?: string; // The pattern for recurrence (daily, weekly, monthly, custom)
 }
 
 export type GoalStatus = 'not_started' | 'in_progress' | 'completed' | 'abandoned';

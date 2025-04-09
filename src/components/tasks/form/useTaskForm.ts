@@ -21,6 +21,8 @@ export const useTaskForm = ({ editingTask, defaultDueDate, onClose }: UseTaskFor
   const [selectedGoalId, setSelectedGoalId] = useState<string>('');
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [recurring, setRecurring] = useState<boolean>(false);
+  const [recurringPattern, setRecurringPattern] = useState<string>('daily');
 
   // Initialize form with editingTask data or defaults
   useEffect(() => {
@@ -32,6 +34,15 @@ export const useTaskForm = ({ editingTask, defaultDueDate, onClose }: UseTaskFor
       setListId(editingTask.listId);
       setSelectedGoalId(editingTask.goalId || '');
       setSelectedTagIds(editingTask.tags || []);
+      
+      // Set recurring data if available
+      if (editingTask.recurring) {
+        setRecurring(true);
+        setRecurringPattern(editingTask.recurringPattern || 'daily');
+      } else {
+        setRecurring(false);
+        setRecurringPattern('daily');
+      }
     } else {
       // Reset form for new task
       setTitle('');
@@ -41,6 +52,8 @@ export const useTaskForm = ({ editingTask, defaultDueDate, onClose }: UseTaskFor
       setListId('inbox');
       setSelectedGoalId('');
       setSelectedTagIds([]);
+      setRecurring(false);
+      setRecurringPattern('daily');
     }
   }, [editingTask, defaultDueDate]);
 
@@ -67,6 +80,8 @@ export const useTaskForm = ({ editingTask, defaultDueDate, onClose }: UseTaskFor
       goalId: selectedGoalId || undefined,
       tags: selectedTagIds.length > 0 ? selectedTagIds : undefined,
       completed: editingTask ? editingTask.completed : false,
+      recurring: recurring,
+      recurringPattern: recurring ? recurringPattern : undefined,
     };
     
     try {
@@ -106,6 +121,10 @@ export const useTaskForm = ({ editingTask, defaultDueDate, onClose }: UseTaskFor
     setSelectedGoalId,
     selectedTagIds,
     setSelectedTagIds,
+    recurring,
+    setRecurring,
+    recurringPattern,
+    setRecurringPattern,
     isSubmitting,
     handleSubmit,
     allLists,
