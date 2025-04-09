@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTask } from '@/contexts/TaskContext';
 import { generateRandomColor } from '@/contexts/task/useTagOperations';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, Tag as TagIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { 
   Command, 
@@ -10,7 +10,8 @@ import {
   CommandGroup, 
   CommandInput,
   CommandItem, 
-  CommandList
+  CommandList,
+  CommandSeparator
 } from '@/components/ui/command';
 import {
   Popover,
@@ -35,6 +36,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const selectedTags = tags.filter(tag => selectedTagIds.includes(tag.id));
 
@@ -43,6 +45,11 @@ const TagSelector: React.FC<TagSelectorProps> = ({
     tag.name.toLowerCase().includes(searchValue.toLowerCase()) && 
     !selectedTagIds.includes(tag.id)
   );
+
+  // Get recently used tags (excluding selected ones)
+  const recentTags = tags
+    .filter(tag => !selectedTagIds.includes(tag.id))
+    .slice(0, 5);
 
   // Handle tag creation for autocomplete
   const handleCreateTag = () => {
@@ -54,6 +61,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
       
       onTagsChange([...selectedTagIds, newTag.id]);
       setSearchValue('');
+      setOpen(false);
     }
   };
 
@@ -80,21 +88,36 @@ const TagSelector: React.FC<TagSelectorProps> = ({
     setTimeout(() => inputRef.current?.focus(), 0);
   };
 
+  // Adjust input container height based on content
+  useEffect(() => {
+    if (containerRef.current) {
+      const hasMultipleRows = selectedTags.length > 2;
+      containerRef.current.style.minHeight = hasMultipleRows ? '60px' : '38px';
+    }
+  }, [selectedTags.length]);
+
   return (
     <div className="w-full">
       <Popover open={open} onOpenChange={setOpen}>
-        <div className="flex flex-wrap gap-1 p-1 border rounded-md min-h-[38px]">
+        <div 
+          ref={containerRef}
+          className="flex flex-wrap gap-1 p-1.5 border rounded-md min-h-[38px] transition-all duration-200 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20"
+          onClick={() => inputRef.current?.focus()}
+        >
           {selectedTags.map(tag => (
             <Badge 
               key={tag.id} 
               style={{ backgroundColor: tag.color, color: '#fff' }}
-              className="flex items-center gap-1 px-2 py-1"
+              className="flex items-center gap-1 px-2 py-1 animate-fade-in"
             >
               {tag.name}
               <button
                 type="button"
-                onClick={() => removeTag(tag.id)}
-                className="rounded-full hover:bg-white/20 p-0.5"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeTag(tag.id);
+                }}
+                className="rounded-full hover:bg-white/20 p-0.5 transition-colors"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -125,7 +148,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
               <CommandEmpty>
                 {enableAutoCreate && searchValue.trim() ? (
                   <button
-                    className="flex items-center gap-2 p-2 w-full hover:bg-gray-100 text-left"
+                    className="flex items-center gap-2 p-2 w-full hover:bg-gray-100 text-left transition-colors"
                     onClick={handleCreateTag}
                   >
                     <Plus className="h-4 w-4" />
@@ -135,7 +158,30 @@ const TagSelector: React.FC<TagSelectorProps> = ({
                   "No tags found"
                 )}
               </CommandEmpty>
-              <CommandGroup>
+              
+              {recentTags.length > 0 && !searchValue && (
+                <>
+                  <CommandGroup heading="Recent Tags">
+                    {recentTags.map(tag => (
+                      <CommandItem
+                        key={tag.id}
+                        value={tag.name}
+                        onSelect={() => addTagToSelection(tag.id)}
+                        className="flex items-center gap-2"
+                      >
+                        <div 
+                          className="w-3 h-3 rounded-full" 
+                          style={{ backgroundColor: tag.color }} 
+                        />
+                        {tag.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                  <CommandSeparator />
+                </>
+              )}
+              
+              <CommandGroup heading="All Tags">
                 {filteredTags.map(tag => (
                   <CommandItem
                     key={tag.id}

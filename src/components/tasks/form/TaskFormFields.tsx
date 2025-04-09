@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useRef, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -165,13 +166,15 @@ export const MinimalTitleField: React.FC<{ title: string; setTitle: (title: stri
 };
 
 export const MinimalDueDateField: React.FC<{ dueDate?: Date; setDueDate: (date?: Date) => void }> = ({ dueDate, setDueDate }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  
   return (
-    <Popover>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
           size="sm"
-          className={`flex items-center gap-1 h-8 ${dueDate ? 'bg-blue-50 text-blue-600 border-blue-200' : ''}`}
+          className={`flex items-center gap-1 h-8 transition-colors duration-200 ${dueDate ? 'bg-blue-50 text-blue-600 border-blue-200' : ''}`}
         >
           <CalendarIcon className="h-3.5 w-3.5" />
           {dueDate ? format(dueDate, 'MMM d') : 'Due date'}
@@ -184,10 +187,9 @@ export const MinimalDueDateField: React.FC<{ dueDate?: Date; setDueDate: (date?:
           onSelect={(date) => {
             setDueDate(date);
             // Auto close popover after selection
-            document.body.click();
+            setTimeout(() => setIsOpen(false), 200);
           }}
           initialFocus
-          className="p-3 pointer-events-auto"
         />
       </PopoverContent>
     </Popover>
@@ -219,7 +221,7 @@ export const MinimalPriorityField: React.FC<{ priority: Priority; setPriority: (
         <Button
           variant="outline"
           size="sm"
-          className={`flex items-center gap-1 h-8 ${getPriorityBackground(priority)}`}
+          className={`flex items-center gap-1 h-8 transition-colors duration-200 ${getPriorityBackground(priority)}`}
         >
           <AlertCircle className={`h-3.5 w-3.5 ${getPriorityColor(priority)}`} />
           <span>Priority</span>
@@ -260,7 +262,7 @@ export const MinimalListField: React.FC<{ listId: string; setListId: (listId: st
         <Button
           variant="outline"
           size="sm"
-          className="flex items-center gap-1 h-8"
+          className="flex items-center gap-1 h-8 transition-colors duration-200 hover:bg-accent"
         >
           <FolderIcon className="h-3.5 w-3.5" />
           <span>{selectedList?.name || 'List'}</span>
@@ -281,13 +283,26 @@ export const MinimalListField: React.FC<{ listId: string; setListId: (listId: st
 };
 
 export const MinimalNotesField: React.FC<{ notes: string; setNotes: (notes: string) => void }> = ({ notes, setNotes }) => {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  
+  // Auto-resize the textarea based on content
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = `${Math.max(80, textarea.scrollHeight)}px`;
+    }
+  }, [notes]);
+  
   return (
     <div>
       <Textarea
+        ref={textareaRef}
         placeholder="Add notes..."
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
-        className="min-h-[100px] resize-none"
+        className="min-h-[80px] resize-none transition-all duration-200 focus:border-primary"
+        rows={3}
       />
     </div>
   );
