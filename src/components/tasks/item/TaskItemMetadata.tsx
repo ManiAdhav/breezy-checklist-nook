@@ -13,18 +13,12 @@ interface TaskItemMetadataProps {
 const TaskItemMetadata: React.FC<TaskItemMetadataProps> = ({
   dueDate,
   priority,
-  taskId,
   getPriorityColor
 }) => {
   // Format the due date
   const formattedDate = dueDate 
     ? format(new Date(dueDate), 'MMM d, yyyy') 
     : null;
-  
-  // Format task ID to be more readable
-  const formattedTaskId = taskId.length > 8 
-    ? `${taskId.substring(0, 4)}-${taskId.substring(4, 8)}` 
-    : taskId;
   
   return (
     <div className="flex flex-wrap gap-2 items-center mt-2 text-xs text-muted-foreground">
@@ -40,11 +34,6 @@ const TaskItemMetadata: React.FC<TaskItemMetadataProps> = ({
           {priority} priority
         </div>
       )}
-      
-      {/* Display task ID in a more readable format */}
-      <div className="text-xs text-muted-foreground/50 inline-flex">
-        Task: {formattedTaskId}
-      </div>
     </div>
   );
 };
