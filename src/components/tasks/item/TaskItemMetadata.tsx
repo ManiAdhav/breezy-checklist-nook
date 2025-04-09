@@ -21,6 +21,11 @@ const TaskItemMetadata: React.FC<TaskItemMetadataProps> = ({
     ? format(new Date(dueDate), 'MMM d, yyyy') 
     : null;
   
+  // Format task ID to be more readable
+  const formattedTaskId = taskId.length > 8 
+    ? `${taskId.substring(0, 4)}-${taskId.substring(4, 8)}` 
+    : taskId;
+  
   return (
     <div className="flex flex-wrap gap-2 items-center mt-2 text-xs text-muted-foreground">
       {formattedDate && (
@@ -36,9 +41,9 @@ const TaskItemMetadata: React.FC<TaskItemMetadataProps> = ({
         </div>
       )}
       
-      {/* Display task ID for debugging */}
+      {/* Display task ID in a more readable format */}
       <div className="text-xs text-muted-foreground/50 inline-flex">
-        ID: {taskId.substring(0, 6)}...
+        Task: {formattedTaskId}
       </div>
     </div>
   );
