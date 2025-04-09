@@ -1,7 +1,9 @@
+
 import { useEffect } from 'react';
 import * as TaskService from '@/api/taskService';
 import { toast } from '@/hooks/use-toast';
-import { getStoredTasks, getStoredCustomLists } from '@/api/services/storage/supabase';
+import { getTasks, storeTasks } from '@/api/services/storage/supabase/tasks';
+import { getStoredCustomLists } from '@/api/services/storage/supabase/lists';
 
 export const useTaskData = (
   setTasks: React.Dispatch<React.SetStateAction<any[]>>,
@@ -22,7 +24,7 @@ export const useTaskData = (
         ]);
         
         // Also get direct storage data for debugging and fallback
-        const localStorageTasks = await getStoredTasks();
+        const localStorageTasks = await getTasks();
         const localStorageLists = await getStoredCustomLists();
         
         console.log('Direct storage check - Tasks:', localStorageTasks);
@@ -58,7 +60,7 @@ export const useTaskData = (
         
         // Last-ditch effort to get data directly from storage
         try {
-          const storageTasks = await getStoredTasks();
+          const storageTasks = await getTasks();
           const storageLists = await getStoredCustomLists();
           
           console.log('Error recovery: Attempting to load directly from storage');

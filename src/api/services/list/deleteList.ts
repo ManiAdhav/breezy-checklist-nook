@@ -1,6 +1,7 @@
 
 import { ApiResponse } from '../../types';
-import { getStoredCustomLists, getStoredTasks, storeCustomLists, storeTasks } from '../storage/supabase';
+import { getStoredCustomLists, storeCustomLists } from '../storage/supabase/lists';
+import { getTasks, storeTasks } from '../storage/supabase/tasks';
 import { handleServiceError } from '../storage/errorHandling';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -63,7 +64,7 @@ export const deleteList = async (id: string): Promise<ApiResponse<void>> => {
     await storeCustomLists(updatedLists);
     
     // Update tasks to move them to inbox
-    const tasks = await getStoredTasks();
+    const tasks = await getTasks();
     const updatedTasks = tasks.map(task => 
       task.listId === id 
         ? { ...task, listId: 'inbox' } 

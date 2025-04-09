@@ -3,11 +3,11 @@ import { Task } from '@/types/task';
 import { ApiResponse } from '../../../types';
 import { handleServiceError } from '../../storage/errorHandling';
 import { supabase } from '@/integrations/supabase/client';
-import { getStoredTasks } from '../../storage/supabase';
+import { getTasks as getStoredTasks, storeTasks } from '../../storage/supabase/tasks';
 
 export const toggleTaskCompletion = async (id: string): Promise<ApiResponse<Task>> => {
   try {
-    const tasks = await getStoredTasks.getTasks();
+    const tasks = await getStoredTasks();
     const taskIndex = tasks.findIndex(task => task.id === id);
     
     if (taskIndex === -1) {
@@ -40,7 +40,7 @@ export const toggleTaskCompletion = async (id: string): Promise<ApiResponse<Task
           
           // Also update localStorage as backup
           tasks[taskIndex] = data;
-          await getStoredTasks.storeTasks(tasks);
+          await storeTasks(tasks);
           
           return { success: true, data };
         }
@@ -51,7 +51,7 @@ export const toggleTaskCompletion = async (id: string): Promise<ApiResponse<Task
     
     // Fall back to localStorage
     tasks[taskIndex] = updatedTask;
-    await getStoredTasks.storeTasks(tasks);
+    await storeTasks(tasks);
     console.log('Task completion toggled in localStorage:', updatedTask.id);
     
     return { success: true, data: updatedTask };

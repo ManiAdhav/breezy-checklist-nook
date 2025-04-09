@@ -1,13 +1,13 @@
 
 import { Task } from '@/types/task';
 import { ApiResponse } from '../../types';
-import { getStoredTasks, storeTasks } from '../storage/supabase';
+import { getTasks, storeTasks } from '../storage/supabase/tasks';
 import { handleServiceError } from '../storage/errorHandling';
 import { supabase } from '@/integrations/supabase/client';
 
 export const updateTask = async (id: string, updates: Partial<Task>): Promise<ApiResponse<Task>> => {
   try {
-    const tasks = await getStoredTasks();
+    const tasks = await getTasks();
     const taskIndex = tasks.findIndex(task => task.id === id);
     
     if (taskIndex === -1) {

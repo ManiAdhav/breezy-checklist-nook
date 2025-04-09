@@ -1,7 +1,7 @@
 
 import { Task } from '@/types/task';
 import { ApiResponse } from '../../types';
-import { getStoredTasks, storeTasks } from '../storage/supabase';
+import { getTasks as getStoredTasks, storeTasks } from '../storage/supabase/tasks';
 import { handleServiceError } from '../storage/errorHandling';
 import { supabase } from '@/integrations/supabase/client';
 

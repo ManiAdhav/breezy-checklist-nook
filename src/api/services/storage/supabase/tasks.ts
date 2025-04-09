@@ -5,7 +5,7 @@ import { getStoredData, storeData } from './core';
  * Gets tasks from storage
  * @returns Promise resolving to tasks
  */
-export const getStoredTasks = async (): Promise<any[]> => {
+export const getTasks = async (): Promise<any[]> => {
   const tasks = await getStoredData('tasks');
   console.log('Retrieved stored tasks:', tasks);
   return tasks;

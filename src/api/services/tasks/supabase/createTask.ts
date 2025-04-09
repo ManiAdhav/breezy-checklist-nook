@@ -3,7 +3,7 @@ import { Task } from '@/types/task';
 import { ApiResponse } from '../../../types';
 import { handleServiceError } from '../../storage/errorHandling';
 import { supabase } from '@/integrations/supabase/client';
-import { getStoredTasks } from '../../storage/supabase';
+import { getTasks as getStoredTasks, storeTasks } from '../../storage/supabase/tasks';
 import { generateId } from '@/utils/taskUtils';
 
 export const createTask = async (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Task>> => {
@@ -32,16 +32,16 @@ export const createTask = async (task: Omit<Task, 'id' | 'createdAt' | 'updatedA
           console.log('Falling back to user_entries for task storage');
           
           // Try storing in user_entries if tasks table insert fails
-          const tasks = await getStoredTasks.getTasks();
+          const tasks = await getStoredTasks();
           const updatedTasks = [...tasks, newTask];
-          await getStoredTasks.storeTasks(updatedTasks);
+          await storeTasks(updatedTasks);
         } else if (data) {
           console.log('Task saved to Supabase:', data.id);
           
           // Also update localStorage as backup
-          const tasks = await getStoredTasks.getTasks();
+          const tasks = await getStoredTasks();
           const updatedTasks = [...tasks, data];
-          await getStoredTasks.storeTasks(updatedTasks);
+          await storeTasks(updatedTasks);
           
           return { success: true, data };
         }
@@ -51,9 +51,9 @@ export const createTask = async (task: Omit<Task, 'id' | 'createdAt' | 'updatedA
     }
     
     // Fall back to localStorage
-    const tasks = await getStoredTasks.getTasks();
+    const tasks = await getStoredTasks();
     const updatedTasks = [...tasks, newTask];
-    await getStoredTasks.storeTasks(updatedTasks);
+    await storeTasks(updatedTasks);
     console.log('Task saved to localStorage:', newTask.id);
     
     return { success: true, data: newTask };

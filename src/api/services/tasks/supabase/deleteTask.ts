@@ -2,7 +2,7 @@
 import { ApiResponse } from '../../../types';
 import { handleServiceError } from '../../storage/errorHandling';
 import { supabase } from '@/integrations/supabase/client';
-import { getStoredTasks } from '../../storage/supabase';
+import { getTasks as getStoredTasks, storeTasks } from '../../storage/supabase/tasks';
 
 export const deleteTask = async (id: string): Promise<ApiResponse<void>> => {
   try {
@@ -28,14 +28,14 @@ export const deleteTask = async (id: string): Promise<ApiResponse<void>> => {
     }
     
     // Always update localStorage regardless of Supabase result
-    const tasks = await getStoredTasks.getTasks();
+    const tasks = await getStoredTasks();
     const updatedTasks = tasks.filter(task => task.id !== id);
     
     if (updatedTasks.length === tasks.length) {
       return { success: false, error: 'Task not found' };
     }
     
-    await getStoredTasks.storeTasks(updatedTasks);
+    await storeTasks(updatedTasks);
     console.log('Task deleted from localStorage:', id);
     
     return { success: true };

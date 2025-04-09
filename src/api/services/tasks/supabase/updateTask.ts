@@ -3,11 +3,11 @@ import { Task } from '@/types/task';
 import { ApiResponse } from '../../../types';
 import { handleServiceError } from '../../storage/errorHandling';
 import { supabase } from '@/integrations/supabase/client';
-import { getStoredTasks } from '../../storage/supabase';
+import { getTasks as getStoredTasks, storeTasks } from '../../storage/supabase/tasks';
 
 export const updateTask = async (id: string, updates: Partial<Task>): Promise<ApiResponse<Task>> => {
   try {
-    const tasks = await getStoredTasks.getTasks();
+    const tasks = await getStoredTasks();
     const taskIndex = tasks.findIndex(task => task.id === id);
     
     if (taskIndex === -1) {
@@ -36,13 +36,13 @@ export const updateTask = async (id: string, updates: Partial<Task>): Promise<Ap
           console.error('Supabase update error:', error);
           // Fall back to user_entries if tasks table update fails
           tasks[taskIndex] = updatedTask;
-          await getStoredTasks.storeTasks(tasks);
+          await storeTasks(tasks);
         } else if (data) {
           console.log('Task updated in Supabase:', data.id);
           
           // Also update localStorage as backup
           tasks[taskIndex] = data;
-          await getStoredTasks.storeTasks(tasks);
+          await storeTasks(tasks);
           
           return { success: true, data };
         }
@@ -53,7 +53,7 @@ export const updateTask = async (id: string, updates: Partial<Task>): Promise<Ap
     
     // Fall back to localStorage
     tasks[taskIndex] = updatedTask;
-    await getStoredTasks.storeTasks(tasks);
+    await storeTasks(tasks);
     console.log('Task updated in localStorage:', updatedTask.id);
     
     return { success: true, data: updatedTask };
