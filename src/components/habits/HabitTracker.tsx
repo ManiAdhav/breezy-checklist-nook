@@ -54,6 +54,7 @@ const HabitTracker: React.FC = () => {
           habits={filteredHabits} 
           selectedHabitId={selectedHabitId}
           onSelectHabit={handleSelectHabit}
+          onAddHabit={() => setIsAddHabitOpen(true)}
         />
       )}
       

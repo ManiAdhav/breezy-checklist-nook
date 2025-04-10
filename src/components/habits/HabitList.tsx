@@ -10,12 +10,14 @@ interface HabitListProps {
   habits: Habit[];
   selectedHabitId: string | null;
   onSelectHabit: (habitId: string) => void;
+  onAddHabit: () => void;
 }
 
 const HabitList: React.FC<HabitListProps> = ({ 
   habits, 
   selectedHabitId, 
-  onSelectHabit 
+  onSelectHabit,
+  onAddHabit 
 }) => {
   const { getHabitStreak } = useHabit();
 
@@ -38,7 +40,7 @@ const HabitList: React.FC<HabitListProps> = ({
         <h3 className="mt-2 text-sm font-medium text-gray-900">No habits yet</h3>
         <p className="mt-1 text-sm text-gray-500">Get started by creating a new habit to track</p>
         <div className="mt-6">
-          <Button>
+          <Button onClick={onAddHabit}>
             <PlusCircle className="mr-2 h-4 w-4" />
             Add Habit
           </Button>
