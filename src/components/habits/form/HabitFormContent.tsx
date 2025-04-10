@@ -103,15 +103,6 @@ const HabitFormContent: React.FC<HabitFormContentProps> = ({
       <Separator className="my-4" />
       
       <div className="space-y-4">
-        <FrequencySelector
-          frequency={frequency}
-          setFrequency={setFrequency}
-          selectedDays={selectedDays}
-          toggleDaySelection={toggleDaySelection}
-          timeOfDay={timeOfDay}
-          setTimeOfDay={setTimeOfDay}
-        />
-        
         <DateAndGoalSelector
           endDate={endDate}
           setEndDate={setEndDate}
@@ -120,6 +111,15 @@ const HabitFormContent: React.FC<HabitFormContentProps> = ({
           goalId={goalId}
           setGoalId={setGoalId}
           goals={goals}
+        />
+        
+        <FrequencySelector
+          frequency={frequency}
+          setFrequency={setFrequency}
+          selectedDays={selectedDays}
+          toggleDaySelection={toggleDaySelection}
+          timeOfDay={timeOfDay}
+          setTimeOfDay={setTimeOfDay}
         />
       </div>
       

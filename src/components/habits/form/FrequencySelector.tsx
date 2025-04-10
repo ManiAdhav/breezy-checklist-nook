@@ -65,7 +65,7 @@ const FrequencySelector: React.FC<FrequencySelectorProps> = ({
             value={timeOfDay} 
             onValueChange={setTimeOfDay}
           >
-            <SelectTrigger className="w-24">
+            <SelectTrigger className="w-16">
               <SelectValue placeholder="Time" />
             </SelectTrigger>
             <SelectContent>
