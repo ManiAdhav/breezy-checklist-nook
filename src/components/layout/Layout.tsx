@@ -1,7 +1,5 @@
 
 import React from 'react';
-import { TaskProvider } from '@/contexts/TaskContext';
-import { GoalProvider } from '@/contexts/GoalContext';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import MobileSidebar from './MobileSidebar';
