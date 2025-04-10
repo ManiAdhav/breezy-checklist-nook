@@ -1,14 +1,15 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Clock } from 'lucide-react';
 
-// Frequency options
+// Frequency options (removing monthly)
 export const FREQUENCY_OPTIONS = [
   { value: 'daily', label: 'Daily' },
   { value: 'weekly', label: 'Weekly' },
-  { value: 'monthly', label: 'Monthly' },
 ];
 
 // Days of the week
@@ -22,18 +23,30 @@ export const DAYS_OF_WEEK = [
   { value: 'sun', label: 'Sun' },
 ];
 
+// Time options for the dropdown
+export const TIME_OPTIONS = [
+  { value: 'morning', label: 'Morning' },
+  { value: 'afternoon', label: 'Afternoon' },
+  { value: 'evening', label: 'Evening' },
+  { value: 'anytime', label: 'Anytime' },
+];
+
 interface FrequencySelectorProps {
   frequency: string;
   setFrequency: (frequency: string) => void;
   selectedDays: string[];
   toggleDaySelection: (day: string) => void;
+  timeOfDay?: string;
+  setTimeOfDay?: (time: string) => void;
 }
 
 const FrequencySelector: React.FC<FrequencySelectorProps> = ({
   frequency,
   setFrequency,
   selectedDays,
-  toggleDaySelection
+  toggleDaySelection,
+  timeOfDay = 'anytime',
+  setTimeOfDay = () => {}
 }) => {
   return (
     <div className="bg-muted/50 p-4 rounded-lg border border-border">
@@ -69,6 +82,28 @@ const FrequencySelector: React.FC<FrequencySelectorProps> = ({
             ))}
           </div>
         )}
+        
+        <div className="mt-4">
+          <Label className="text-muted-foreground text-xs font-normal mb-2 block">What time of day?</Label>
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4 text-muted-foreground" />
+            <Select 
+              value={timeOfDay} 
+              onValueChange={setTimeOfDay}
+            >
+              <SelectTrigger className="w-32">
+                <SelectValue placeholder="Select time" />
+              </SelectTrigger>
+              <SelectContent>
+                {TIME_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </div>
     </div>
   );

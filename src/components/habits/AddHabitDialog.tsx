@@ -40,6 +40,7 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
   const [showIconSelector, setShowIconSelector] = useState(false);
   const [frequency, setFrequency] = useState('daily');
   const [selectedDays, setSelectedDays] = useState<string[]>(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
+  const [timeOfDay, setTimeOfDay] = useState('anytime');
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [showDatePicker, setShowDatePicker] = useState(false);
   
@@ -62,6 +63,7 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
         setSelectedIcon(editHabit.icon || 'Activity');
         setFrequency(editHabit.frequency || 'daily');
         setSelectedDays(editHabit.selectedDays || ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
+        setTimeOfDay(editHabit.timeOfDay || 'anytime');
         setEndDate(editHabit.endDate);
       } else {
         setName('');
@@ -72,6 +74,7 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
         setSelectedIcon('Activity');
         setFrequency('daily');
         setSelectedDays(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
+        setTimeOfDay('anytime');
         setEndDate(undefined);
       }
       setShowIconSelector(false);
@@ -98,6 +101,7 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
           icon: selectedIcon,
           frequency,
           selectedDays,
+          timeOfDay,
           endDate
         });
         toast({
@@ -113,6 +117,7 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
           icon: selectedIcon,
           frequency,
           selectedDays,
+          timeOfDay,
           endDate
         });
         toast({
@@ -130,6 +135,7 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
       setSelectedIcon('Activity');
       setFrequency('daily');
       setSelectedDays(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
+      setTimeOfDay('anytime');
       setEndDate(undefined);
       onOpenChange(false);
     } catch (error) {
@@ -202,6 +208,8 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
               setFrequency={setFrequency}
               selectedDays={selectedDays}
               toggleDaySelection={toggleDaySelection}
+              timeOfDay={timeOfDay}
+              setTimeOfDay={setTimeOfDay}
             />
             
             <DateAndGoalSelector

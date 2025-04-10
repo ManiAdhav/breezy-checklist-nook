@@ -12,6 +12,7 @@ export interface Habit {
   icon?: string;
   frequency?: string;
   selectedDays?: string[];
+  timeOfDay?: string;
   endDate?: Date;
 }
 
