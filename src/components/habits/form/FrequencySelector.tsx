@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
-import { Bell, Plus, X, Calendar, Clock } from 'lucide-react';
+import { Bell, Plus, X, Calendar } from 'lucide-react';
 import { FREQUENCY_OPTIONS, DAYS_OF_WEEK } from '../constants/habit-constants';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -99,19 +99,6 @@ const FrequencySelector: React.FC<FrequencySelectorProps> = ({
               </div>
             </div>
           )}
-          
-          <div className="mt-3">
-            <div className="flex items-center gap-2 mt-4 mb-2 text-sm font-medium text-muted-foreground">
-              <Clock className="h-4 w-4 text-primary" />
-              <span>Preferred time</span>
-            </div>
-            <Input
-              type="time"
-              value={timeOfDay}
-              onChange={(e) => setTimeOfDay(e.target.value)}
-              className="w-32 border-input/40 focus-visible:ring-primary"
-            />
-          </div>
         </CardContent>
       </Card>
       
