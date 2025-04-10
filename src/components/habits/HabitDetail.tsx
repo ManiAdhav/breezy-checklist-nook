@@ -1,263 +1,223 @@
 
 import React, { useState } from 'react';
-import { format } from 'date-fns';
-import { Habit, HabitLog } from '@/types/habit';
-import { useHabit } from '@/contexts/HabitContext';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle 
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { CalendarIcon, Edit, Trash2 } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
-import { Progress } from '@/components/ui/progress';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
+import { Calendar, Edit, Target, X } from 'lucide-react';
+import { format } from 'date-fns';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Habit, HabitLog } from '@/types/habit';
+import { useHabit } from '@/contexts/HabitContext';
 import AddHabitDialog from './AddHabitDialog';
+import { useGoal } from '@/hooks/useGoalContext';
 import HabitLogList from './HabitLogList';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 
 interface HabitDetailProps {
-  habit: Habit;
-  onClose: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  habit: Habit | null;
 }
 
-const HabitDetail: React.FC<HabitDetailProps> = ({ habit, onClose }) => {
-  const { getHabitLogs, logProgress, deleteHabit, getHabitStreak } = useHabit();
+const HabitDetail: React.FC<HabitDetailProps> = ({ open, onOpenChange, habit }) => {
+  const { updateHabit, deleteHabit } = useHabit();
+  const { threeYearGoals } = useGoal();
+  
   const [logValue, setLogValue] = useState('');
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [calendarOpen, setCalendarOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [logDate, setLogDate] = useState<Date>(new Date());
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   
-  const logs = getHabitLogs(habit.id);
-  const streak = getHabitStreak(habit.id);
+  if (!habit) return null;
   
-  // Check if there's already a log for the selected date
-  const existingLog = logs.find(log => {
-    const logDate = new Date(log.date);
-    return (
-      logDate.getDate() === selectedDate.getDate() &&
-      logDate.getMonth() === selectedDate.getMonth() &&
-      logDate.getFullYear() === selectedDate.getFullYear()
-    );
-  });
-  
-  const handleLogSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAddLog = () => {
+    if (!logValue.trim()) return;
     
-    if (!logValue) return;
+    const numericValue = parseFloat(logValue);
+    if (isNaN(numericValue)) return;
     
-    try {
-      const value = parseFloat(logValue);
-      
-      if (isNaN(value) || value < 0) {
-        toast({
-          title: "Invalid value",
-          description: "Please enter a valid positive number.",
-          variant: "destructive"
-        });
-        return;
+    const newLog: HabitLog = {
+      id: `log-${Date.now()}`,
+      date: logDate,
+      value: numericValue
+    };
+    
+    const updatedLogs = [...(habit.logs || []), newLog];
+    
+    // Calculate new streak
+    let streak = habit.streak || 0;
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    const isToday = logDate.toDateString() === today.toDateString();
+    const isYesterday = logDate.toDateString() === yesterday.toDateString();
+    
+    if (isToday) {
+      // Log for today - increment streak if there was a log yesterday
+      const hasYesterdayLog = habit.logs?.some(
+        log => new Date(log.date).toDateString() === yesterday.toDateString()
+      );
+      if (hasYesterdayLog) {
+        streak += 1;
+      } else {
+        streak = 1; // Reset streak to 1 if today but no yesterday log
       }
-      
-      logProgress({
-        habitId: habit.id,
-        date: selectedDate,
-        value
-      });
-      
-      setLogValue('');
-      
-      toast({
-        title: "Progress logged",
-        description: `You've logged ${value} ${habit.metric.unit} for ${format(selectedDate, 'MMM d, yyyy')}.`
-      });
-    } catch (error) {
-      console.error('Error logging progress:', error);
-      toast({
-        title: "Error",
-        description: "There was an error logging your progress. Please try again.",
-        variant: "destructive"
-      });
+    } else if (isYesterday) {
+      // Log for yesterday - set streak to 1 if there wasn't already a streak
+      if (streak === 0) {
+        streak = 1;
+      }
     }
+    
+    // Update the habit with new logs and streak
+    updateHabit(habit.id, { 
+      logs: updatedLogs,
+      streak
+    });
+    
+    // Reset form
+    setLogValue('');
+    setLogDate(new Date());
+    setIsDatePickerOpen(false);
   };
   
-  const handleDelete = () => {
-    try {
+  const handleEditHabit = (updatedHabit: Habit) => {
+    updateHabit(updatedHabit.id, updatedHabit);
+    setIsEditMode(false);
+  };
+  
+  const handleDeleteHabit = () => {
+    if (window.confirm('Are you sure you want to delete this habit?')) {
       deleteHabit(habit.id);
-      onClose();
-      toast({
-        title: "Habit deleted",
-        description: "Your habit has been deleted successfully."
-      });
-    } catch (error) {
-      console.error('Error deleting habit:', error);
-      toast({
-        title: "Error",
-        description: "There was an error deleting your habit. Please try again.",
-        variant: "destructive"
-      });
+      onOpenChange(false);
     }
   };
   
-  const calculateProgress = () => {
-    if (!existingLog) return 0;
-    return Math.min(100, (existingLog.value / habit.metric.target) * 100);
-  };
+  // Get associated goal if any
+  const associatedGoal = habit.goalId 
+    ? threeYearGoals?.find(goal => goal.id === habit.goalId)
+    : null;
 
   return (
     <>
-      <Card>
-        <CardHeader className="flex flex-row items-start justify-between pb-2">
-          <div>
-            <CardTitle className="text-xl">{habit.name}</CardTitle>
-            <div className="flex gap-1 mt-1">
-              {habit.tags.map(tag => (
-                <Badge key={tag} variant="secondary" className="text-xs">
-                  {tag}
-                </Badge>
-              ))}
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <div className="flex justify-between items-center">
+              <DialogTitle>{habit.name}</DialogTitle>
+              <div className="flex gap-2">
+                <Button variant="ghost" size="icon" onClick={() => setIsEditMode(true)}>
+                  <Edit className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" className="text-destructive" onClick={handleDeleteHabit}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-          </div>
-          <div className="flex space-x-2">
-            <Button 
-              variant="outline" 
-              size="icon"
-              onClick={() => setIsEditDialogOpen(true)}
-            >
-              <Edit className="h-4 w-4" />
-            </Button>
-            <Button 
-              variant="outline" 
-              size="icon"
-              onClick={() => setIsDeleteDialogOpen(true)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        </CardHeader>
-        
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Streak and Progress Section */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <h3 className="text-lg font-medium">Daily Target</h3>
-                  <p className="text-gray-500">
-                    {habit.metric.target} {habit.metric.unit} {habit.metric.type === 'duration' ? 'per day' : ''}
+          </DialogHeader>
+          
+          <div className="space-y-6 pt-4">
+            {/* Habit Info */}
+            <div>
+              <h3 className="text-sm font-medium mb-2">Details</h3>
+              <div className="bg-muted p-3 rounded-md">
+                <div className="flex justify-between items-center mb-2">
+                  <p className="text-sm">Metric:</p>
+                  <p className="text-sm font-medium">{habit.metric}</p>
+                </div>
+                
+                <div className="flex justify-between items-center mb-2">
+                  <p className="text-sm">Current streak:</p>
+                  <p className="text-sm font-medium">{habit.streak || 0} days</p>
+                </div>
+                
+                <div className="flex justify-between items-center mb-2">
+                  <p className="text-sm">Total logs:</p>
+                  <p className="text-sm font-medium">{habit.logs?.length || 0} entries</p>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <p className="text-sm">Created:</p>
+                  <p className="text-sm font-medium">
+                    {format(new Date(habit.created), 'MMM d, yyyy')}
                   </p>
                 </div>
                 
-                <div className="text-right">
-                  <div className="text-3xl font-bold">{streak.current}</div>
-                  <div className="text-sm text-gray-500">day streak</div>
-                </div>
-              </div>
-              
-              <div className="space-y-1">
-                <div className="flex justify-between text-sm">
-                  <span>Today's Progress</span>
-                  <span>
-                    {existingLog ? existingLog.value : 0} / {habit.metric.target} {habit.metric.unit}
-                  </span>
-                </div>
-                <Progress value={calculateProgress()} className="h-2" />
-              </div>
-              
-              <form onSubmit={handleLogSubmit} className="mt-4">
-                <div className="space-y-2">
-                  <div className="flex items-center">
-                    <h3 className="text-sm font-medium">Log Progress</h3>
-                    <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-                      <PopoverTrigger asChild>
-                        <Button 
-                          variant="link" 
-                          className="h-auto p-0 ml-1"
-                        >
-                          <CalendarIcon className="h-3.5 w-3.5 text-gray-500" />
-                          <span className="text-xs text-gray-500 ml-1">
-                            {format(selectedDate, 'MMM d, yyyy')}
-                          </span>
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={selectedDate}
-                          onSelect={(date) => {
-                            if (date) {
-                              setSelectedDate(date);
-                              setCalendarOpen(false);
-                            }
-                          }}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
+                {associatedGoal && (
+                  <div className="mt-2 pt-2 border-t border-border">
+                    <div className="flex items-center text-sm">
+                      <Target className="h-4 w-4 mr-1 text-muted-foreground" />
+                      <span className="text-muted-foreground mr-1">Goal:</span>
+                      <span className="font-medium">{associatedGoal.title}</span>
+                    </div>
                   </div>
-                  
-                  <div className="flex gap-2">
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      placeholder={`Enter ${habit.metric.unit}`}
-                      value={logValue}
-                      onChange={(e) => setLogValue(e.target.value)}
-                      className="flex-1"
-                    />
-                    <Button type="submit">Log</Button>
-                  </div>
-                  
-                  {existingLog && (
-                    <p className="text-xs text-amber-600">
-                      You've already logged {existingLog.value} {habit.metric.unit} for this date. 
-                      This will overwrite the previous entry.
-                    </p>
-                  )}
-                </div>
-              </form>
+                )}
+              </div>
             </div>
             
-            {/* History Section */}
+            {/* Add new log */}
             <div>
-              <h3 className="text-lg font-medium mb-3">History</h3>
-              <HabitLogList logs={logs} habitUnit={habit.metric.unit} />
+              <h3 className="text-sm font-medium mb-2">Log Progress</h3>
+              <div className="flex gap-2">
+                <div className="flex-grow">
+                  <Input
+                    type="number"
+                    placeholder={`Enter ${habit.metric}`}
+                    value={logValue}
+                    onChange={(e) => setLogValue(e.target.value)}
+                  />
+                </div>
+                
+                <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="icon">
+                      <Calendar className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="end">
+                    <CalendarComponent
+                      mode="single"
+                      selected={logDate}
+                      onSelect={(date) => date && setLogDate(date)}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                
+                <Button onClick={handleAddLog}>Add</Button>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Selected date: {format(logDate, 'MMM d, yyyy')}
+              </p>
+            </div>
+            
+            {/* Log history */}
+            <div>
+              <h3 className="text-sm font-medium mb-2">History</h3>
+              <HabitLogList 
+                logs={habit.logs || []} 
+                metric={habit.metric}
+                habitId={habit.id}
+              />
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </DialogContent>
+      </Dialog>
       
-      <AddHabitDialog
-        open={isEditDialogOpen}
-        onOpenChange={setIsEditDialogOpen}
-        editHabit={habit}
-      />
-      
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the habit
-              "{habit.name}" and all its logged data.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {isEditMode && (
+        <AddHabitDialog
+          open={isEditMode}
+          onOpenChange={setIsEditMode}
+          onHabitAdded={handleEditHabit}
+          editHabit={habit}
+        />
+      )}
     </>
   );
 };
