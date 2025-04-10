@@ -18,7 +18,7 @@ import {
   MinimalNotesField,
   MinimalTagsField,
   RecurringOptionField
-} from './form/TaskFormFields';
+} from './form';
 import MinimalGoalSelectorField from '@/components/targets/form-fields/MinimalGoalSelectorField';
 import { useGoal } from '@/contexts/GoalContext';
 
