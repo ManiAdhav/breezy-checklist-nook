@@ -46,7 +46,7 @@ const DateAndGoalSelector: React.FC<DateAndGoalSelectorProps> = ({
               type="button"
             >
               <CalendarIcon className="h-4 w-4" />
-              {endDate ? format(endDate, 'MMM d, yyyy') : 'End date (optional)'}
+              {endDate ? format(endDate, 'MMM d, yyyy') : 'End date'}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">

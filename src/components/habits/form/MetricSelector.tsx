@@ -43,7 +43,7 @@ const MetricSelector: React.FC<MetricSelectorProps> = ({
           </div>
           <div className="flex-1">
             <Select value={metric} onValueChange={(value) => setMetric(value)}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-24">
                 <SelectValue placeholder="Select a measurement unit" />
               </SelectTrigger>
               <SelectContent>
