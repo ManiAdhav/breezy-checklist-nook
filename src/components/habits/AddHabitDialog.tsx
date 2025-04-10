@@ -57,6 +57,7 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
       goalId: goalId || undefined,
       streak: editHabit?.streak || 0,
       createdAt: editHabit?.createdAt || new Date(),
+      updatedAt: new Date(), // Add the missing updatedAt property
       logs: editHabit?.logs || [],
       tags: editHabit?.tags || []
     };
