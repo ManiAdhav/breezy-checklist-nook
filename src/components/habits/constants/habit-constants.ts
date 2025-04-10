@@ -22,10 +22,10 @@ export const FREQUENCY_OPTIONS = [
 
 // Time of day options
 export const TIME_OF_DAY_OPTIONS = [
-  { value: 'anytime', label: 'Anytime' },
   { value: 'morning', label: 'Morning' },
   { value: 'afternoon', label: 'Afternoon' },
-  { value: 'evening', label: 'Evening' }
+  { value: 'evening', label: 'Evening' },
+  { value: 'anytime', label: 'Anytime' }
 ];
 
 // Days of the week

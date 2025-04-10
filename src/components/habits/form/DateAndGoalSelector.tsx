@@ -1,11 +1,17 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Target } from 'lucide-react';
 import { format } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
 import DynamicIcon from '@/components/ui/dynamic-icon';
 
 interface DateAndGoalSelectorProps {
@@ -15,7 +21,7 @@ interface DateAndGoalSelectorProps {
   setShowDatePicker: (show: boolean) => void;
   goalId: string;
   setGoalId: (id: string) => void;
-  goals: Array<{ id: string; title: string }>;
+  goals: Array<{ id: string; title: string; icon?: string }>;
 }
 
 const DateAndGoalSelector: React.FC<DateAndGoalSelectorProps> = ({
@@ -27,6 +33,8 @@ const DateAndGoalSelector: React.FC<DateAndGoalSelectorProps> = ({
   setGoalId,
   goals
 }) => {
+  const selectedGoal = goals.find(goal => goal.id === goalId);
+
   return (
     <div className="flex justify-between items-center">
       <div className="flex items-center gap-2">
@@ -57,14 +65,27 @@ const DateAndGoalSelector: React.FC<DateAndGoalSelectorProps> = ({
       </div>
       
       <Select value={goalId} onValueChange={(value) => setGoalId(value)}>
-        <SelectTrigger className="bg-background border-muted w-10">
-          <DynamicIcon name="Goal" className="h-4 w-4 text-muted-foreground" />
+        <SelectTrigger className="bg-background border-muted w-36 flex items-center gap-2">
+          {selectedGoal?.icon ? (
+            <DynamicIcon name={selectedGoal.icon} className="h-4 w-4 text-muted-foreground" />
+          ) : (
+            <Target className="h-4 w-4 text-muted-foreground" />
+          )}
+          <span className="truncate">{selectedGoal?.title || 'Select goal'}</span>
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="none">None</SelectItem>
+          <SelectItem value="none" className="flex items-center gap-2">
+            <Target className="h-4 w-4 text-muted-foreground inline mr-2" />
+            <span>None</span>
+          </SelectItem>
           {goals && goals.map((goal) => (
-            <SelectItem key={goal.id} value={goal.id}>
-              {goal.title}
+            <SelectItem key={goal.id} value={goal.id} className="flex items-center gap-2">
+              {goal.icon ? (
+                <DynamicIcon name={goal.icon} className="h-4 w-4 inline mr-2" />
+              ) : (
+                <Target className="h-4 w-4 inline mr-2" />
+              )}
+              <span>{goal.title}</span>
             </SelectItem>
           ))}
         </SelectContent>
