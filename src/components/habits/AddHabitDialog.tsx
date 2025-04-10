@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Check, Goal } from 'lucide-react';
+import { Plus, Check, Goal, CalendarIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useGoal } from '@/contexts/GoalContext';
 import { useHabit } from '@/contexts/HabitContext';
@@ -12,6 +12,10 @@ import { Habit } from '@/types/habit';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import DynamicIcon from '@/components/ui/dynamic-icon';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
 
 interface AddHabitDialogProps {
   open: boolean;
@@ -49,6 +53,24 @@ const METRIC_OPTIONS = [
   'custom'
 ];
 
+// Frequency options
+const FREQUENCY_OPTIONS = [
+  { value: 'daily', label: 'Daily' },
+  { value: 'weekly', label: 'Weekly' },
+  { value: 'monthly', label: 'Monthly' },
+];
+
+// Days of the week
+const DAYS_OF_WEEK = [
+  { value: 'mon', label: 'Mon' },
+  { value: 'tue', label: 'Tue' },
+  { value: 'wed', label: 'Wed' },
+  { value: 'thu', label: 'Thu' },
+  { value: 'fri', label: 'Fri' },
+  { value: 'sat', label: 'Sat' },
+  { value: 'sun', label: 'Sun' },
+];
+
 const AddHabitDialog: React.FC<AddHabitDialogProps> = ({ 
   open, 
   onOpenChange, 
@@ -62,10 +84,15 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
   // Form state
   const [name, setName] = useState('');
   const [metric, setMetric] = useState('');
+  const [metricValue, setMetricValue] = useState('');
   const [customMetric, setCustomMetric] = useState('');
   const [goalId, setGoalId] = useState('none');
   const [selectedIcon, setSelectedIcon] = useState('Activity');
   const [showIconSelector, setShowIconSelector] = useState(false);
+  const [frequency, setFrequency] = useState('daily');
+  const [selectedDays, setSelectedDays] = useState<string[]>(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   
   // Reset form when dialog opens/closes or editing habit changes
   React.useEffect(() => {
@@ -84,14 +111,20 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
         
         setGoalId(editHabit.goalId || 'none');
         setSelectedIcon(editHabit.icon || 'Activity');
+        // We would set frequency, selectedDays and endDate here too if they were part of the habit type
       } else {
         setName('');
         setMetric('steps');
+        setMetricValue('');
         setCustomMetric('');
         setGoalId('none');
         setSelectedIcon('Activity');
+        setFrequency('daily');
+        setSelectedDays(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
+        setEndDate(undefined);
       }
       setShowIconSelector(false);
+      setShowDatePicker(false);
     }
   }, [open, editHabit]);
   
@@ -112,6 +145,7 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
           metric: finalMetric,
           goalId: goalId !== 'none' ? goalId : undefined,
           icon: selectedIcon
+          // We would add frequency, selectedDays and endDate here too if they were part of the habit type
         });
         toast({
           title: "Habit updated",
@@ -124,6 +158,7 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
           goalId: goalId !== 'none' ? goalId : undefined,
           tags: [],
           icon: selectedIcon
+          // We would add frequency, selectedDays and endDate here too if they were part of the habit type
         });
         toast({
           title: "Habit added",
@@ -134,9 +169,13 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
       // Reset and close
       setName('');
       setMetric('steps');
+      setMetricValue('');
       setCustomMetric('');
       setGoalId('none');
       setSelectedIcon('Activity');
+      setFrequency('daily');
+      setSelectedDays(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
+      setEndDate(undefined);
       onOpenChange(false);
     } catch (error) {
       console.error('Error handling habit:', error);
@@ -150,6 +189,17 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
 
   const toggleIconSelector = () => {
     setShowIconSelector(!showIconSelector);
+  };
+
+  const toggleDaySelection = (day: string) => {
+    if (selectedDays.includes(day)) {
+      // Don't allow deselecting if it's the last selected day
+      if (selectedDays.length > 1) {
+        setSelectedDays(selectedDays.filter(d => d !== day));
+      }
+    } else {
+      setSelectedDays([...selectedDays, day]);
+    }
   };
 
   return (
@@ -203,22 +253,36 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
           
           <div className="bg-muted/50 p-4 rounded-lg border border-border">
             <div className="space-y-3">
-              <Label htmlFor="metric" className="text-primary font-medium">
+              <Label htmlFor="metric" className="text-muted-foreground text-xs font-normal">
                 How will you measure this?
               </Label>
               
-              <Select value={metric} onValueChange={(value) => setMetric(value)}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a metric" />
-                </SelectTrigger>
-                <SelectContent>
-                  {METRIC_OPTIONS.map((option) => (
-                    <SelectItem key={option} value={option}>
-                      {option === 'custom' ? 'Custom metric...' : option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex gap-3 items-center">
+                <div className="w-20">
+                  <Input
+                    placeholder="Amount"
+                    value={metricValue}
+                    onChange={(e) => setMetricValue(e.target.value)}
+                    type="number"
+                    min="0"
+                    className="border-primary/20 focus-visible:ring-primary"
+                  />
+                </div>
+                <div className="flex-1">
+                  <Select value={metric} onValueChange={(value) => setMetric(value)}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select a metric" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {METRIC_OPTIONS.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {option === 'custom' ? 'Custom metric...' : option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
               
               {metric === 'custom' && (
                 <Input
@@ -234,17 +298,74 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
           
           <Separator className="my-4" />
           
-          <div className="space-y-2">
-            <div>
-              <Select value={goalId} onValueChange={(value) => setGoalId(value)}>
-                <SelectTrigger className="bg-background border-muted w-full">
-                  <div className="flex items-center gap-2">
-                    <DynamicIcon name="Goal" className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-muted-foreground text-sm">
-                      {goalId === 'none' ? 'Connect to goal (optional)' : 
-                        threeYearGoals?.find(g => g.id === goalId)?.title || 'Select goal'}
-                    </span>
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg border border-border">
+              <div className="space-y-3">
+                <Label className="text-muted-foreground text-xs font-normal">How often?</Label>
+                
+                <RadioGroup 
+                  value={frequency}
+                  onValueChange={setFrequency}
+                  className="flex flex-wrap gap-4"
+                >
+                  {FREQUENCY_OPTIONS.map((option) => (
+                    <div key={option.value} className="flex items-center space-x-2">
+                      <RadioGroupItem value={option.value} id={option.value} />
+                      <Label htmlFor={option.value}>{option.label}</Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+                
+                {frequency === 'weekly' && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {DAYS_OF_WEEK.map((day) => (
+                      <Button
+                        key={day.value}
+                        type="button"
+                        variant={selectedDays.includes(day.value) ? "default" : "outline"}
+                        size="sm"
+                        className="h-8 px-3"
+                        onClick={() => toggleDaySelection(day.value)}
+                      >
+                        {day.label}
+                      </Button>
+                    ))}
                   </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <Popover open={showDatePicker} onOpenChange={setShowDatePicker}>
+                  <PopoverTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      className="flex items-center gap-2"
+                      type="button"
+                    >
+                      <CalendarIcon className="h-4 w-4" />
+                      {endDate ? format(endDate, 'MMM d, yyyy') : 'End date (optional)'}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={endDate}
+                      onSelect={(date) => {
+                        setEndDate(date);
+                        setShowDatePicker(false);
+                      }}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              
+              <Select value={goalId} onValueChange={(value) => setGoalId(value)}>
+                <SelectTrigger className="bg-background border-muted w-10">
+                  <DynamicIcon name="Goal" className="h-4 w-4 text-muted-foreground" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">None</SelectItem>
