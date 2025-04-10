@@ -1,10 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
-import { Bell, Clock } from 'lucide-react';
+import { Bell, Clock, Plus, X } from 'lucide-react';
 import { FREQUENCY_OPTIONS, DAYS_OF_WEEK } from '../constants/habit-constants';
 
 interface FrequencySelectorProps {
@@ -28,6 +28,19 @@ const FrequencySelector: React.FC<FrequencySelectorProps> = ({
   reminders = [],
   setReminders = () => {}
 }) => {
+  const [newReminderTime, setNewReminderTime] = useState('');
+
+  const addReminder = () => {
+    if (newReminderTime && !reminders.includes(newReminderTime)) {
+      setReminders([...reminders, newReminderTime]);
+      setNewReminderTime('');
+    }
+  };
+
+  const removeReminder = (time: string) => {
+    setReminders(reminders.filter(t => t !== time));
+  };
+
   return (
     <div className="space-y-4">
       <div className="bg-muted/50 p-4 rounded-lg border border-border">
@@ -79,6 +92,54 @@ const FrequencySelector: React.FC<FrequencySelectorProps> = ({
               className="w-auto max-w-[150px]"
             />
           </div>
+        </div>
+      </div>
+      
+      <div className="bg-muted/50 p-4 rounded-lg border border-border">
+        <div className="space-y-3">
+          <Label className="text-muted-foreground text-xs font-normal">Reminder times</Label>
+          
+          <div className="flex items-center gap-2">
+            <Bell className="h-4 w-4 text-muted-foreground" />
+            <Input
+              type="time"
+              value={newReminderTime}
+              onChange={(e) => setNewReminderTime(e.target.value)}
+              placeholder="Add time"
+              className="w-auto max-w-[150px]"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addReminder}
+              disabled={!newReminderTime}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          {reminders.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {reminders.map((time, index) => (
+                <div 
+                  key={index}
+                  className="flex items-center bg-background px-3 py-1 rounded-md border border-border"
+                >
+                  <span className="text-sm">{time}</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0 ml-2"
+                    onClick={() => removeReminder(time)}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
