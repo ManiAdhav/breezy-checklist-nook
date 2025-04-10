@@ -1,11 +1,10 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Bell, Check } from 'lucide-react';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Bell } from 'lucide-react';
 import { FREQUENCY_OPTIONS, DAYS_OF_WEEK, TIME_OF_DAY_OPTIONS } from '../constants/habit-constants';
 
 interface FrequencySelectorProps {
@@ -29,14 +28,6 @@ const FrequencySelector: React.FC<FrequencySelectorProps> = ({
   reminders = [],
   setReminders = () => {}
 }) => {
-  const toggleReminder = (value: string) => {
-    if (reminders.includes(value)) {
-      setReminders(reminders.filter(r => r !== value));
-    } else {
-      setReminders([...reminders, value]);
-    }
-  };
-
   return (
     <div className="space-y-4">
       <div className="bg-muted/50 p-4 rounded-lg border border-border">
@@ -97,46 +88,6 @@ const FrequencySelector: React.FC<FrequencySelectorProps> = ({
               </SelectContent>
             </Select>
           </div>
-          
-          {timeOfDay !== 'anytime' && (
-            <div className="mt-2 space-y-2">
-              <Label className="text-muted-foreground text-xs font-normal">Add reminders</Label>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="flex items-start space-x-2">
-                  <Checkbox 
-                    id="reminder-5min" 
-                    checked={reminders.includes('5min')}
-                    onCheckedChange={() => toggleReminder('5min')}
-                  />
-                  <Label htmlFor="reminder-5min" className="text-sm">5 minutes before</Label>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <Checkbox 
-                    id="reminder-15min" 
-                    checked={reminders.includes('15min')}
-                    onCheckedChange={() => toggleReminder('15min')}
-                  />
-                  <Label htmlFor="reminder-15min" className="text-sm">15 minutes before</Label>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <Checkbox 
-                    id="reminder-30min" 
-                    checked={reminders.includes('30min')}
-                    onCheckedChange={() => toggleReminder('30min')}
-                  />
-                  <Label htmlFor="reminder-30min" className="text-sm">30 minutes before</Label>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <Checkbox 
-                    id="reminder-1hour" 
-                    checked={reminders.includes('1hour')}
-                    onCheckedChange={() => toggleReminder('1hour')}
-                  />
-                  <Label htmlFor="reminder-1hour" className="text-sm">1 hour before</Label>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
