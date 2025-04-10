@@ -10,6 +10,9 @@ export interface Habit {
   tags: string[];
   logs?: HabitLog[];
   icon?: string;
+  frequency?: string;
+  selectedDays?: string[];
+  endDate?: Date;
 }
 
 export interface HabitLog {
