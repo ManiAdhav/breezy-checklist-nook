@@ -43,6 +43,7 @@ const HabitDetail: React.FC<HabitDetailProps> = ({ open, onOpenChange, habit }) 
     
     const newLog: HabitLog = {
       id: `log-${Date.now()}`,
+      habitId: habit.id,
       date: logDate,
       value: numericValue
     };
@@ -145,7 +146,7 @@ const HabitDetail: React.FC<HabitDetailProps> = ({ open, onOpenChange, habit }) 
                 <div className="flex justify-between items-center">
                   <p className="text-sm">Created:</p>
                   <p className="text-sm font-medium">
-                    {format(new Date(habit.created), 'MMM d, yyyy')}
+                    {format(new Date(habit.createdAt), 'MMM d, yyyy')}
                   </p>
                 </div>
                 
@@ -201,9 +202,8 @@ const HabitDetail: React.FC<HabitDetailProps> = ({ open, onOpenChange, habit }) 
             <div>
               <h3 className="text-sm font-medium mb-2">History</h3>
               <HabitLogList 
-                logs={habit.logs || []} 
-                metric={habit.metric}
-                habitId={habit.id}
+                logs={habit.logs || []}
+                habitUnit={habit.metric}
               />
             </div>
           </div>

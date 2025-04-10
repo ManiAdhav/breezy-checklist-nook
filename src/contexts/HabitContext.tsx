@@ -2,11 +2,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Habit, HabitLog, HabitStreak } from '@/types/habit';
-import { useTask } from './TaskContext';
 
 interface HabitContextType {
   habits: Habit[];
   habitLogs: HabitLog[];
+  isLoading: boolean;
   getHabitById: (id: string) => Habit | undefined;
   addHabit: (habit: Omit<Habit, 'id' | 'createdAt' | 'updatedAt'>) => Habit;
   updateHabit: (id: string, updates: Partial<Omit<Habit, 'id' | 'createdAt' | 'updatedAt'>>) => void;
@@ -29,11 +29,12 @@ export const useHabit = () => {
 export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [habitLogs, setHabitLogs] = useState<HabitLog[]>([]);
-  const { tags } = useTask();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // Load habits from localStorage on mount
   useEffect(() => {
     try {
+      setIsLoading(true);
       const storedHabits = localStorage.getItem('habits');
       const storedLogs = localStorage.getItem('habitLogs');
       
@@ -63,6 +64,8 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
     } catch (error) {
       console.error('Error loading habits from localStorage:', error);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -197,6 +200,7 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const value = {
     habits,
     habitLogs,
+    isLoading,
     getHabitById,
     addHabit,
     updateHabit,

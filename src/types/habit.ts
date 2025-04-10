@@ -2,15 +2,13 @@
 export interface Habit {
   id: string;
   name: string;
-  metric: {
-    type: 'count' | 'duration' | 'boolean';
-    unit: string;
-    target: number;
-  };
+  metric: string;
   goalId?: string;
-  tags: string[];
+  streak?: number;
   createdAt: Date;
   updatedAt: Date;
+  tags: string[];
+  logs?: HabitLog[];
 }
 
 export interface HabitLog {

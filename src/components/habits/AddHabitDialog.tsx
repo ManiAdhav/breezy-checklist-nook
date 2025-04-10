@@ -56,8 +56,9 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
       metric,
       goalId: goalId || undefined,
       streak: editHabit?.streak || 0,
-      created: editHabit?.created || new Date(),
-      logs: editHabit?.logs || []
+      createdAt: editHabit?.createdAt || new Date(),
+      logs: editHabit?.logs || [],
+      tags: editHabit?.tags || []
     };
     
     onHabitAdded(newHabit);

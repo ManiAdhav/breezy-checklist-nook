@@ -6,11 +6,14 @@ import HabitList from './HabitList';
 import AddHabitDialog from './AddHabitDialog';
 import { useHabit } from '@/contexts/HabitContext';
 import { Habit } from '@/types/habit';
+import HabitDetail from './HabitDetail';
 
 const HabitTracker: React.FC = () => {
   const { habits, addHabit, isLoading } = useHabit();
   const [isAddHabitOpen, setIsAddHabitOpen] = useState(false);
   const [filteredHabits, setFilteredHabits] = useState<Habit[]>([]);
+  const [selectedHabitId, setSelectedHabitId] = useState<string | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   
   useEffect(() => {
     // Set filtered habits to all habits initially
@@ -22,6 +25,15 @@ const HabitTracker: React.FC = () => {
   const handleHabitAdded = (habit: Habit) => {
     addHabit(habit);
   };
+
+  const handleSelectHabit = (habitId: string) => {
+    setSelectedHabitId(habitId);
+    setIsDetailOpen(true);
+  };
+
+  const selectedHabit = selectedHabitId 
+    ? habits.find(h => h.id === selectedHabitId) || null
+    : null;
 
   return (
     <div className="container p-4 mx-auto max-w-4xl">
@@ -42,13 +54,23 @@ const HabitTracker: React.FC = () => {
           <p className="mt-2 text-muted-foreground">Loading habits...</p>
         </div>
       ) : (
-        <HabitList habits={filteredHabits} />
+        <HabitList 
+          habits={filteredHabits} 
+          selectedHabitId={selectedHabitId}
+          onSelectHabit={handleSelectHabit}
+        />
       )}
       
       <AddHabitDialog
         open={isAddHabitOpen}
         onOpenChange={setIsAddHabitOpen}
         onHabitAdded={handleHabitAdded}
+      />
+      
+      <HabitDetail
+        open={isDetailOpen}
+        onOpenChange={setIsDetailOpen}
+        habit={selectedHabit}
       />
     </div>
   );

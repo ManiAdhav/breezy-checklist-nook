@@ -13,6 +13,7 @@ import ActionsPage from './pages/ActionsPage';
 import NotFound from './pages/NotFound';
 import WeeklyPlanPage from './pages/WeeklyPlanPage';
 import HabitsPage from './pages/HabitsPage';
+import { TaskProvider } from './contexts/TaskContext';
 import { HabitProvider } from './contexts/HabitContext';
 
 // Wrapper component to provide props to GoalDetailView
@@ -25,22 +26,24 @@ const GoalDetailViewWrapper = () => {
 
 function App() {
   return (
-    <HabitProvider>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/goals" element={<GoalsPage />} />
-        <Route path="/goals/:id" element={<GoalDetailViewWrapper />} />
-        <Route path="/milestones" element={<MilestonePage />} />
-        <Route path="/vision" element={<VisionPage />} />
-        <Route path="/plans" element={<PlansPage />} />
-        <Route path="/mindmap" element={<MindMapPage />} />
-        <Route path="/calendar" element={<CalendarPage />} />
-        <Route path="/actions" element={<ActionsPage />} />
-        <Route path="/weekly" element={<WeeklyPlanPage />} />
-        <Route path="/habits" element={<HabitsPage />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </HabitProvider>
+    <TaskProvider>
+      <HabitProvider>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/goals" element={<GoalsPage />} />
+          <Route path="/goals/:id" element={<GoalDetailViewWrapper />} />
+          <Route path="/milestones" element={<MilestonePage />} />
+          <Route path="/vision" element={<VisionPage />} />
+          <Route path="/plans" element={<PlansPage />} />
+          <Route path="/mindmap" element={<MindMapPage />} />
+          <Route path="/calendar" element={<CalendarPage />} />
+          <Route path="/actions" element={<ActionsPage />} />
+          <Route path="/weekly" element={<WeeklyPlanPage />} />
+          <Route path="/habits" element={<HabitsPage />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </HabitProvider>
+    </TaskProvider>
   );
 }
 
