@@ -52,24 +52,12 @@ const HabitList: React.FC<HabitListProps> = ({
   return (
     <div className="space-y-3">
       {sortedHabits.map((habit) => (
-        <div 
+        <HabitCard
           key={habit.id}
+          habit={habit}
           onClick={() => onSelectHabit(habit.id)}
-          className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
-            selectedHabitId === habit.id ? 'ring-2 ring-primary shadow-md' : ''
-          }`}
-        >
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className="font-medium">{habit.name}</h3>
-              <p className="text-sm text-gray-500">{habit.metric}</p>
-            </div>
-            <div className="text-right">
-              <div className="font-semibold">{habit.streak || 0}</div>
-              <div className="text-xs text-gray-500">day streak</div>
-            </div>
-          </div>
-        </div>
+          isSelected={selectedHabitId === habit.id}
+        />
       ))}
     </div>
   );

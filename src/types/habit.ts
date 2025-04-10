@@ -9,6 +9,7 @@ export interface Habit {
   updatedAt: Date;
   tags: string[];
   logs?: HabitLog[];
+  icon?: string;
 }
 
 export interface HabitLog {
