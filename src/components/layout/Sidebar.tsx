@@ -94,7 +94,7 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
-      <Card className={`${sidebarPosition} ${transitionClass} top-[24px] left-[24px] w-[220px] h-[852px] rounded-[16px] bg-[#f4f4f4] border-none shadow-md z-10 overflow-hidden md:left-[24px]`}>
+      <Card className={`${sidebarPosition} ${transitionClass} top-0 left-0 w-[220px] h-screen rounded-r-[16px] bg-[#f4f4f4] border-none shadow-md z-10 overflow-hidden md:left-0`}>
         <div className="flex justify-end p-2 md:hidden">
           <Button 
             variant="ghost" 

@@ -32,7 +32,7 @@ const HabitTracker: React.FC = () => {
     : null;
 
   return (
-    <div className="container p-4 mx-auto max-w-4xl">
+    <div className="h-full overflow-y-auto pb-6">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold">Habit Tracker</h1>
