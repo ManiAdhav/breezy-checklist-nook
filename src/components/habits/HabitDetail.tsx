@@ -15,7 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Habit, HabitLog } from '@/types/habit';
 import { useHabit } from '@/contexts/HabitContext';
 import AddHabitDialog from './AddHabitDialog';
-import { useGoal } from '@/hooks/useGoalContext';
+import { useGoal } from '@/contexts/GoalContext';
 import HabitLogList from './HabitLogList';
 
 interface HabitDetailProps {
