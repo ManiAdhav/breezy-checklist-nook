@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
-import { Bell, Clock, Plus, X } from 'lucide-react';
+import { Bell, Plus, X } from 'lucide-react';
 import { FREQUENCY_OPTIONS, DAYS_OF_WEEK } from '../constants/habit-constants';
 
 interface FrequencySelectorProps {
@@ -76,22 +76,6 @@ const FrequencySelector: React.FC<FrequencySelectorProps> = ({
               ))}
             </div>
           )}
-        </div>
-      </div>
-      
-      <div className="bg-muted/50 p-4 rounded-lg border border-border">
-        <div className="space-y-3">
-          <Label className="text-muted-foreground text-xs font-normal">When do you want to do this?</Label>
-          
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-muted-foreground" />
-            <Input
-              type="time"
-              value={timeOfDay}
-              onChange={(e) => setTimeOfDay(e.target.value)}
-              className="w-auto max-w-[150px]"
-            />
-          </div>
         </div>
       </div>
       
