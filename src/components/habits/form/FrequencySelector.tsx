@@ -3,9 +3,9 @@ import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Bell } from 'lucide-react';
-import { FREQUENCY_OPTIONS, DAYS_OF_WEEK, TIME_OF_DAY_OPTIONS } from '../constants/habit-constants';
+import { Input } from '@/components/ui/input';
+import { Bell, Clock } from 'lucide-react';
+import { FREQUENCY_OPTIONS, DAYS_OF_WEEK } from '../constants/habit-constants';
 
 interface FrequencySelectorProps {
   frequency: string;
@@ -23,7 +23,7 @@ const FrequencySelector: React.FC<FrequencySelectorProps> = ({
   setFrequency,
   selectedDays,
   toggleDaySelection,
-  timeOfDay = 'anytime',
+  timeOfDay = '',
   setTimeOfDay = () => {},
   reminders = [],
   setReminders = () => {}
@@ -71,22 +71,13 @@ const FrequencySelector: React.FC<FrequencySelectorProps> = ({
           <Label className="text-muted-foreground text-xs font-normal">When do you want to do this?</Label>
           
           <div className="flex items-center gap-2">
-            <Bell className="h-4 w-4 text-muted-foreground" />
-            <Select 
-              value={timeOfDay} 
-              onValueChange={setTimeOfDay}
-            >
-              <SelectTrigger className="w-auto min-w-16">
-                <SelectValue placeholder="Time" />
-              </SelectTrigger>
-              <SelectContent>
-                {TIME_OF_DAY_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+            <Input
+              type="time"
+              value={timeOfDay}
+              onChange={(e) => setTimeOfDay(e.target.value)}
+              className="w-auto max-w-[150px]"
+            />
           </div>
         </div>
       </div>

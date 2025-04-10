@@ -24,7 +24,7 @@ export const useHabitForm = (
   const [showIconSelector, setShowIconSelector] = useState(false);
   const [frequency, setFrequency] = useState('daily');
   const [selectedDays, setSelectedDays] = useState<string[]>(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
-  const [timeOfDay, setTimeOfDay] = useState('anytime');
+  const [timeOfDay, setTimeOfDay] = useState('');
   const [reminders, setReminders] = useState<string[]>([]);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -48,7 +48,7 @@ export const useHabitForm = (
         setSelectedIcon(editHabit.icon || 'Activity');
         setFrequency(editHabit.frequency || 'daily');
         setSelectedDays(editHabit.selectedDays || ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
-        setTimeOfDay(editHabit.timeOfDay || 'anytime');
+        setTimeOfDay(editHabit.timeOfDay || '');
         setReminders(editHabit.reminders || []);
         setEndDate(editHabit.endDate);
       } else {
@@ -60,7 +60,7 @@ export const useHabitForm = (
         setSelectedIcon('Activity');
         setFrequency('daily');
         setSelectedDays(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
-        setTimeOfDay('anytime');
+        setTimeOfDay('');
         setReminders([]);
         setEndDate(undefined);
       }
