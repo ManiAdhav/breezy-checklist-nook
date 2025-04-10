@@ -13,6 +13,7 @@ export interface Habit {
   frequency?: string;
   selectedDays?: string[];
   timeOfDay?: string;
+  reminders?: string[];
   endDate?: Date;
 }
 
