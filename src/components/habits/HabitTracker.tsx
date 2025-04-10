@@ -9,7 +9,7 @@ import { Habit } from '@/types/habit';
 import HabitDetail from './HabitDetail';
 
 const HabitTracker: React.FC = () => {
-  const { habits, addHabit, isLoading } = useHabit();
+  const { habits, isLoading } = useHabit();
   const [isAddHabitOpen, setIsAddHabitOpen] = useState(false);
   const [filteredHabits, setFilteredHabits] = useState<Habit[]>([]);
   const [selectedHabitId, setSelectedHabitId] = useState<string | null>(null);
@@ -21,10 +21,6 @@ const HabitTracker: React.FC = () => {
       setFilteredHabits(habits);
     }
   }, [habits]);
-
-  const handleHabitAdded = (habit: Habit) => {
-    addHabit(habit);
-  };
 
   const handleSelectHabit = (habitId: string) => {
     setSelectedHabitId(habitId);
@@ -64,7 +60,6 @@ const HabitTracker: React.FC = () => {
       <AddHabitDialog
         open={isAddHabitOpen}
         onOpenChange={setIsAddHabitOpen}
-        onHabitAdded={handleHabitAdded}
       />
       
       <HabitDetail

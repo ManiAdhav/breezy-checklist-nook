@@ -7,23 +7,25 @@ import { Label } from '@/components/ui/label';
 import { Plus } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useGoal } from '@/contexts/GoalContext';
+import { useHabit } from '@/contexts/HabitContext';
 import { Habit } from '@/types/habit';
+import { useToast } from '@/hooks/use-toast';
 
 interface AddHabitDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onHabitAdded: (habit: Habit) => void;
   editHabit?: Habit;
 }
 
 const AddHabitDialog: React.FC<AddHabitDialogProps> = ({ 
   open, 
   onOpenChange, 
-  onHabitAdded,
   editHabit 
 }) => {
-  // Get goals from context
+  // Get needed context hooks
   const { threeYearGoals } = useGoal();
+  const { addHabit, updateHabit } = useHabit();
+  const { toast } = useToast();
   
   // Form state
   const [name, setName] = React.useState('');
@@ -50,20 +52,43 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
     
     if (!name.trim() || !metric.trim()) return;
     
-    const newHabit: Habit = {
-      id: editHabit?.id || `habit-${Date.now()}`,
-      name,
-      metric,
-      goalId: goalId !== 'none' ? goalId : undefined,
-      streak: editHabit?.streak || 0,
-      createdAt: editHabit?.createdAt || new Date(),
-      updatedAt: new Date(),
-      logs: editHabit?.logs || [],
-      tags: editHabit?.tags || []
-    };
-    
-    onHabitAdded(newHabit);
-    onOpenChange(false);
+    try {
+      if (editHabit) {
+        updateHabit(editHabit.id, {
+          name,
+          metric,
+          goalId: goalId !== 'none' ? goalId : undefined,
+        });
+        toast({
+          title: "Habit updated",
+          description: `${name} has been updated successfully.`
+        });
+      } else {
+        addHabit({
+          name,
+          metric,
+          goalId: goalId !== 'none' ? goalId : undefined,
+          tags: []
+        });
+        toast({
+          title: "Habit added",
+          description: `${name} has been added to your habits.`
+        });
+      }
+      
+      // Reset and close
+      setName('');
+      setMetric('');
+      setGoalId('none');
+      onOpenChange(false);
+    } catch (error) {
+      console.error('Error handling habit:', error);
+      toast({
+        title: "Error",
+        description: "There was a problem saving your habit. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
