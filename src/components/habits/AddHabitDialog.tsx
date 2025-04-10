@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Plus } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useGoal } from '@/hooks/useGoalContext';
+import { useGoal } from '@/contexts/GoalContext';
 import { Habit } from '@/types/habit';
 
 interface AddHabitDialogProps {
@@ -28,7 +28,7 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
   // Form state
   const [name, setName] = React.useState('');
   const [metric, setMetric] = React.useState('');
-  const [goalId, setGoalId] = React.useState('');
+  const [goalId, setGoalId] = React.useState('none');
   
   // Reset form when dialog opens/closes or editing habit changes
   React.useEffect(() => {
@@ -36,11 +36,11 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
       if (editHabit) {
         setName(editHabit.name);
         setMetric(editHabit.metric);
-        setGoalId(editHabit.goalId || '');
+        setGoalId(editHabit.goalId || 'none');
       } else {
         setName('');
         setMetric('');
-        setGoalId('');
+        setGoalId('none');
       }
     }
   }, [open, editHabit]);
@@ -54,10 +54,10 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
       id: editHabit?.id || `habit-${Date.now()}`,
       name,
       metric,
-      goalId: goalId || undefined,
+      goalId: goalId !== 'none' ? goalId : undefined,
       streak: editHabit?.streak || 0,
       createdAt: editHabit?.createdAt || new Date(),
-      updatedAt: new Date(), // Add the missing updatedAt property
+      updatedAt: new Date(),
       logs: editHabit?.logs || [],
       tags: editHabit?.tags || []
     };
@@ -103,7 +103,7 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
                 <SelectValue placeholder="Select a goal" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">None</SelectItem>
+                <SelectItem value="none">None</SelectItem>
                 {threeYearGoals && threeYearGoals.map((goal) => (
                   <SelectItem key={goal.id} value={goal.id}>
                     {goal.title}
