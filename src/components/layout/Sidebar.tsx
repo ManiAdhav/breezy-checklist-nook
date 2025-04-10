@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTask } from '@/contexts/TaskContext';
@@ -5,6 +6,7 @@ import { List } from '@/types/task';
 import TasksSection from './sidebar/TasksSection';
 import CatalystSection from './sidebar/CatalystSection';
 import TagsSection from './sidebar/TagsSection';
+import HabitsSection from './sidebar/HabitsSection';
 import SidebarList from './sidebar/SidebarList';
 import AddListDialog from './sidebar/AddListDialog';
 import CalendarLink from './sidebar/CalendarLink';
@@ -106,6 +108,7 @@ const Sidebar: React.FC = () => {
           <div className="flex-1 overflow-y-auto py-4 px-3">
             <TasksSection />
             <CatalystSection />
+            <HabitsSection />
             <TagsSection />
             <CalendarLink />
             <nav className="space-y-0.5 mt-2"></nav>
