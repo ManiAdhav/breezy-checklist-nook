@@ -74,8 +74,9 @@ const HabitFormContent: React.FC<HabitFormContentProps> = ({
   handleSubmit
 }) => {
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-      <div className="flex items-center gap-3 mb-2">
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Habit Name and Icon */}
+      <div className="flex items-center gap-3">
         <HabitIconSelector
           selectedIcon={selectedIcon}
           setSelectedIcon={setSelectedIcon}
@@ -84,29 +85,29 @@ const HabitFormContent: React.FC<HabitFormContentProps> = ({
         />
         <div className="flex-1">
           <Input
-            placeholder="Enter habit name"
+            placeholder="What habit do you want to build?"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className="border-primary/20 focus-visible:ring-primary"
+            className="text-base border-input/20 focus-visible:ring-primary"
           />
         </div>
       </div>
       
-      <Separator className="my-4" />
+      {/* Metric - How to Measure */}
+      <div className="pt-1">
+        <MetricSelector
+          metric={metric}
+          setMetric={setMetric}
+          metricValue={metricValue}
+          setMetricValue={setMetricValue}
+          customMetric={customMetric}
+          setCustomMetric={setCustomMetric}
+        />
+      </div>
       
-      <MetricSelector
-        metric={metric}
-        setMetric={setMetric}
-        metricValue={metricValue}
-        setMetricValue={setMetricValue}
-        customMetric={customMetric}
-        setCustomMetric={setCustomMetric}
-      />
-      
-      <Separator className="my-4" />
-      
-      <div className="space-y-4">
+      {/* Connected Goal & End Date */}
+      <div className="py-1">
         <DateAndGoalSelector
           endDate={endDate}
           setEndDate={setEndDate}
@@ -116,7 +117,10 @@ const HabitFormContent: React.FC<HabitFormContentProps> = ({
           setGoalId={setGoalId}
           goals={goals}
         />
-        
+      </div>
+      
+      {/* Frequency & Reminders */}
+      <div className="py-1">
         <FrequencySelector
           frequency={frequency}
           setFrequency={setFrequency}
@@ -129,19 +133,22 @@ const HabitFormContent: React.FC<HabitFormContentProps> = ({
         />
       </div>
       
-      <Button type="submit" className="w-full mt-6">
-        {editHabit ? (
-          <>
-            <Check className="mr-2 h-4 w-4" />
-            Save Changes
-          </>
-        ) : (
-          <>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Habit
-          </>
-        )}
-      </Button>
+      {/* Submit Button */}
+      <div className="pt-2">
+        <Button type="submit" className="w-full">
+          {editHabit ? (
+            <>
+              <Check className="mr-2 h-4 w-4" />
+              Save Changes
+            </>
+          ) : (
+            <>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Habit
+            </>
+          )}
+        </Button>
+      </div>
     </form>
   );
 };

@@ -4,9 +4,9 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
-import { Bell, Plus, X, Calendar } from 'lucide-react';
+import { Bell, Plus, X, Calendar, Clock } from 'lucide-react';
 import { FREQUENCY_OPTIONS, DAYS_OF_WEEK } from '../constants/habit-constants';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface FrequencySelectorProps {
   frequency: string;
@@ -43,39 +43,54 @@ const FrequencySelector: React.FC<FrequencySelectorProps> = ({
   };
 
   return (
-    <div className="space-y-4">
-      <Card className="border border-border/50 shadow-sm">
-        <CardHeader className="pb-2 pt-4 px-4">
-          <h3 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+    <div className="space-y-5">
+      {/* Frequency Section */}
+      <Card className="border-border/20 shadow-sm bg-background rounded-lg overflow-hidden">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2 mb-3 text-sm font-medium text-muted-foreground">
             <Calendar className="h-4 w-4 text-primary" />
-            How often?
-          </h3>
-        </CardHeader>
-        
-        <CardContent className="px-4 pb-4">
+            <span>Frequency</span>
+          </div>
+          
           <RadioGroup 
             value={frequency}
             onValueChange={setFrequency}
-            className="flex gap-4 mb-3"
+            className="flex flex-wrap gap-2"
           >
             {FREQUENCY_OPTIONS.map((option) => (
-              <div key={option.value} className="flex items-center space-x-2">
-                <RadioGroupItem value={option.value} id={option.value} />
-                <Label htmlFor={option.value} className="cursor-pointer font-normal text-sm">{option.label}</Label>
+              <div key={option.value} className="flex items-center">
+                <RadioGroupItem
+                  value={option.value}
+                  id={option.value}
+                  className="peer sr-only"
+                />
+                <Label
+                  htmlFor={option.value}
+                  className="px-3 py-1.5 text-sm rounded-full border border-border/30 
+                           cursor-pointer hover:bg-accent/50 transition-colors
+                           peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:border-primary/30
+                           peer-data-[state=checked]:text-primary"
+                >
+                  {option.label}
+                </Label>
               </div>
             ))}
           </RadioGroup>
           
           {frequency === 'weekly' && (
-            <div className="mt-2">
-              <div className="grid grid-cols-7 gap-1.5">
+            <div className="mt-3">
+              <div className="grid grid-cols-7 gap-1.5 mt-2">
                 {DAYS_OF_WEEK.map((day) => (
                   <Button
                     key={day.value}
                     type="button"
                     variant={selectedDays.includes(day.value) ? "default" : "outline"}
                     size="sm"
-                    className={`rounded-full p-0 w-8 h-8 ${selectedDays.includes(day.value) ? 'bg-primary' : 'border-muted-foreground/20'}`}
+                    className={`rounded-full p-0 w-8 h-8 text-xs ${
+                      selectedDays.includes(day.value) 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'bg-transparent text-muted-foreground border-border/20'
+                    }`}
                     onClick={() => toggleDaySelection(day.value)}
                   >
                     {day.label.charAt(0)}
@@ -84,24 +99,37 @@ const FrequencySelector: React.FC<FrequencySelectorProps> = ({
               </div>
             </div>
           )}
+          
+          <div className="mt-3">
+            <div className="flex items-center gap-2 mt-4 mb-2 text-sm font-medium text-muted-foreground">
+              <Clock className="h-4 w-4 text-primary" />
+              <span>Preferred time</span>
+            </div>
+            <Input
+              type="time"
+              value={timeOfDay}
+              onChange={(e) => setTimeOfDay(e.target.value)}
+              className="w-32 border-input/40 focus-visible:ring-primary"
+            />
+          </div>
         </CardContent>
       </Card>
       
-      <Card className="border border-border/50 shadow-sm">
-        <CardHeader className="pb-2 pt-4 px-4">
-          <h3 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+      {/* Reminders Section */}
+      <Card className="border-border/20 shadow-sm bg-background rounded-lg overflow-hidden">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2 mb-3 text-sm font-medium text-muted-foreground">
             <Bell className="h-4 w-4 text-primary" />
-            Reminders
-          </h3>
-        </CardHeader>
-        
-        <CardContent className="px-4 pb-4">
+            <span>Reminders</span>
+          </div>
+          
           <div className="flex items-center gap-2">
             <Input
               type="time"
               value={newReminderTime}
               onChange={(e) => setNewReminderTime(e.target.value)}
-              className="w-28 border-input/50 focus-visible:ring-primary"
+              className="w-32 border-input/40 focus-visible:ring-primary"
+              placeholder="Add time"
             />
             <Button
               type="button"
@@ -109,7 +137,7 @@ const FrequencySelector: React.FC<FrequencySelectorProps> = ({
               variant="outline"
               onClick={addReminder}
               disabled={!newReminderTime}
-              className="text-xs h-8 border-primary/30 text-primary hover:bg-primary/5"
+              className="h-9 border-primary/30 text-primary hover:bg-primary/10"
             >
               <Plus className="h-3.5 w-3.5 mr-1" />
               Add
@@ -117,11 +145,11 @@ const FrequencySelector: React.FC<FrequencySelectorProps> = ({
           </div>
           
           {reminders.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-3">
+            <div className="flex flex-wrap gap-2 mt-3">
               {reminders.map((time, index) => (
                 <div 
                   key={index}
-                  className="inline-flex items-center bg-muted/50 px-2 py-1 rounded-full text-xs"
+                  className="inline-flex items-center bg-muted/30 px-2.5 py-1 rounded-full text-xs"
                 >
                   <span>{time}</span>
                   <Button
