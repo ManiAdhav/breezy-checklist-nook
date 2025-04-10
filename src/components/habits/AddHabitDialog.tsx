@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Check } from 'lucide-react';
+import { Plus, Check, Goal } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useGoal } from '@/contexts/GoalContext';
 import { useHabit } from '@/contexts/HabitContext';
@@ -34,6 +34,21 @@ const HABIT_ICONS = [
   'Water', 'Wine', 'Yoga'
 ];
 
+// Predefined metric options
+const METRIC_OPTIONS = [
+  'steps',
+  'minutes',
+  'hours',
+  'times',
+  'pages',
+  'glasses',
+  'repetitions',
+  'sessions',
+  'kilometers',
+  'miles',
+  'custom'
+];
+
 const AddHabitDialog: React.FC<AddHabitDialogProps> = ({ 
   open, 
   onOpenChange, 
@@ -47,6 +62,7 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
   // Form state
   const [name, setName] = useState('');
   const [metric, setMetric] = useState('');
+  const [customMetric, setCustomMetric] = useState('');
   const [goalId, setGoalId] = useState('none');
   const [selectedIcon, setSelectedIcon] = useState('Activity');
   const [showIconSelector, setShowIconSelector] = useState(false);
@@ -56,12 +72,22 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
     if (open) {
       if (editHabit) {
         setName(editHabit.name);
-        setMetric(editHabit.metric);
+        
+        // Check if metric is one of our predefined options
+        if (METRIC_OPTIONS.includes(editHabit.metric)) {
+          setMetric(editHabit.metric);
+          setCustomMetric('');
+        } else {
+          setMetric('custom');
+          setCustomMetric(editHabit.metric);
+        }
+        
         setGoalId(editHabit.goalId || 'none');
         setSelectedIcon(editHabit.icon || 'Activity');
       } else {
         setName('');
-        setMetric('');
+        setMetric('steps');
+        setCustomMetric('');
         setGoalId('none');
         setSelectedIcon('Activity');
       }
@@ -72,13 +98,18 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name.trim() || !metric.trim()) return;
+    if (!name.trim()) return;
+    
+    // Determine the final metric value
+    const finalMetric = metric === 'custom' ? customMetric : metric;
+    
+    if (!finalMetric.trim()) return;
     
     try {
       if (editHabit) {
         updateHabit(editHabit.id, {
           name,
-          metric,
+          metric: finalMetric,
           goalId: goalId !== 'none' ? goalId : undefined,
           icon: selectedIcon
         });
@@ -89,7 +120,7 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
       } else {
         addHabit({
           name,
-          metric,
+          metric: finalMetric,
           goalId: goalId !== 'none' ? goalId : undefined,
           tags: [],
           icon: selectedIcon
@@ -102,7 +133,8 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
       
       // Reset and close
       setName('');
-      setMetric('');
+      setMetric('steps');
+      setCustomMetric('');
       setGoalId('none');
       setSelectedIcon('Activity');
       onOpenChange(false);
@@ -136,13 +168,12 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
               <DynamicIcon name={selectedIcon} className="h-5 w-5 text-primary" />
             </div>
             <div className="flex-1">
-              <Label htmlFor="name">Habit Name</Label>
               <Input
-                id="name"
-                placeholder="What habit do you want to track?"
+                placeholder="Enter habit name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+                className="border-primary/20 focus-visible:ring-primary"
               />
             </div>
           </div>
@@ -170,41 +201,61 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
           
           <Separator className="my-4" />
           
-          <div className="space-y-2">
-            <Label htmlFor="metric" className="text-primary font-medium flex items-center">
-              <span>Metric</span>
-              <span className="ml-2 text-xs text-muted-foreground">(How will you measure this?)</span>
-            </Label>
-            <Input
-              id="metric"
-              placeholder="e.g., steps, minutes, pages, glasses"
-              value={metric}
-              onChange={(e) => setMetric(e.target.value)}
-              required
-              className="border-primary/20 focus-visible:ring-primary"
-            />
+          <div className="bg-muted/50 p-4 rounded-lg border border-border">
+            <div className="space-y-3">
+              <Label htmlFor="metric" className="text-primary font-medium">
+                How will you measure this?
+              </Label>
+              
+              <Select value={metric} onValueChange={(value) => setMetric(value)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a metric" />
+                </SelectTrigger>
+                <SelectContent>
+                  {METRIC_OPTIONS.map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {option === 'custom' ? 'Custom metric...' : option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              {metric === 'custom' && (
+                <Input
+                  placeholder="Enter custom metric"
+                  value={customMetric}
+                  onChange={(e) => setCustomMetric(e.target.value)}
+                  required
+                  className="mt-2"
+                />
+              )}
+            </div>
           </div>
           
           <Separator className="my-4" />
           
           <div className="space-y-2">
-            <div className="flex items-center">
-              <DynamicIcon name="Goal" className="h-4 w-4 mr-2 text-muted-foreground" />
-              <Label htmlFor="goal" className="text-sm font-normal text-muted-foreground">Connect to Goal</Label>
+            <div>
+              <Select value={goalId} onValueChange={(value) => setGoalId(value)}>
+                <SelectTrigger className="bg-background border-muted w-full">
+                  <div className="flex items-center gap-2">
+                    <DynamicIcon name="Goal" className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground text-sm">
+                      {goalId === 'none' ? 'Connect to goal (optional)' : 
+                        threeYearGoals?.find(g => g.id === goalId)?.title || 'Select goal'}
+                    </span>
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">None</SelectItem>
+                  {threeYearGoals && threeYearGoals.map((goal) => (
+                    <SelectItem key={goal.id} value={goal.id}>
+                      {goal.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            <Select value={goalId} onValueChange={(value) => setGoalId(value)}>
-              <SelectTrigger className="bg-background border-muted">
-                <SelectValue placeholder="Optional" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">None</SelectItem>
-                {threeYearGoals && threeYearGoals.map((goal) => (
-                  <SelectItem key={goal.id} value={goal.id}>
-                    {goal.title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
           
           <Button type="submit" className="w-full mt-6">
