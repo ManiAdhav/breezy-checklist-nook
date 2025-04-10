@@ -62,11 +62,6 @@ const HabitDetail: React.FC<HabitDetailProps> = ({ open, onOpenChange, habit }) 
     });
   };
   
-  const handleEditHabit = (updatedHabit: Habit) => {
-    updateHabit(updatedHabit.id, updatedHabit);
-    setIsEditMode(false);
-  };
-  
   const handleDeleteHabit = () => {
     if (window.confirm('Are you sure you want to delete this habit?')) {
       deleteHabit(habit.id);
@@ -118,7 +113,6 @@ const HabitDetail: React.FC<HabitDetailProps> = ({ open, onOpenChange, habit }) 
         <AddHabitDialog
           open={isEditMode}
           onOpenChange={setIsEditMode}
-          onHabitAdded={handleEditHabit}
           editHabit={habit}
         />
       )}
