@@ -1,18 +1,19 @@
 
 import { useState, useEffect } from 'react';
 import { Habit, HabitLog } from '@/types/habit';
+import { HABITS_STORAGE_KEY, HABIT_LOGS_STORAGE_KEY } from '@/api/services/storage/constants';
 
 export const useHabitStorage = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [habitLogs, setHabitLogs] = useState<HabitLog[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Load habits from localStorage on mount
   useEffect(() => {
     try {
       setIsLoading(true);
-      const storedHabits = localStorage.getItem('habits');
-      const storedLogs = localStorage.getItem('habitLogs');
+      const storedHabits = localStorage.getItem(HABITS_STORAGE_KEY);
+      const storedLogs = localStorage.getItem(HABIT_LOGS_STORAGE_KEY);
       
       if (storedHabits) {
         const parsedHabits = JSON.parse(storedHabits);
@@ -21,7 +22,8 @@ export const useHabitStorage = () => {
         const formattedHabits = parsedHabits.map((habit: any) => ({
           ...habit,
           createdAt: new Date(habit.createdAt),
-          updatedAt: new Date(habit.updatedAt)
+          updatedAt: new Date(habit.updatedAt),
+          endDate: habit.endDate ? new Date(habit.endDate) : undefined
         }));
         
         setHabits(formattedHabits);
@@ -40,6 +42,9 @@ export const useHabitStorage = () => {
       }
     } catch (error) {
       console.error('Error loading habits from localStorage:', error);
+      // Initialize with empty arrays in case of error
+      setHabits([]);
+      setHabitLogs([]);
     } finally {
       setIsLoading(false);
     }
@@ -48,7 +53,7 @@ export const useHabitStorage = () => {
   // Save habits to localStorage whenever they change
   useEffect(() => {
     try {
-      localStorage.setItem('habits', JSON.stringify(habits));
+      localStorage.setItem(HABITS_STORAGE_KEY, JSON.stringify(habits));
     } catch (error) {
       console.error('Error saving habits to localStorage:', error);
     }
@@ -57,7 +62,7 @@ export const useHabitStorage = () => {
   // Save habit logs to localStorage whenever they change
   useEffect(() => {
     try {
-      localStorage.setItem('habitLogs', JSON.stringify(habitLogs));
+      localStorage.setItem(HABIT_LOGS_STORAGE_KEY, JSON.stringify(habitLogs));
     } catch (error) {
       console.error('Error saving habit logs to localStorage:', error);
     }

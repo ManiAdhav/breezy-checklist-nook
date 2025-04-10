@@ -6,3 +6,5 @@ export const THREE_YEAR_GOALS_STORAGE_KEY = 'threeYearGoals';
 export const NINETY_DAY_TARGETS_STORAGE_KEY = 'ninetyDayTargets';
 export const PLANS_STORAGE_KEY = 'plans';
 export const NOTEPAD_STORAGE_KEY = 'notepad_content';
+export const HABITS_STORAGE_KEY = 'habits';
+export const HABIT_LOGS_STORAGE_KEY = 'habitLogs';
