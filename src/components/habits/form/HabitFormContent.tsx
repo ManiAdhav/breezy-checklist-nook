@@ -32,11 +32,13 @@ interface HabitFormContentProps {
   toggleDaySelection: (day: string) => void;
   timeOfDay: string;
   setTimeOfDay: (time: string) => void;
+  reminders: string[];
+  setReminders: (reminders: string[]) => void;
   endDate: Date | undefined;
   setEndDate: (date: Date | undefined) => void;
   showDatePicker: boolean;
   setShowDatePicker: (show: boolean) => void;
-  goals: Array<{ id: string; title: string }>;
+  goals: Array<{ id: string; title: string; icon?: string }>;
   handleSubmit: (e: React.FormEvent) => void;
 }
 
@@ -62,6 +64,8 @@ const HabitFormContent: React.FC<HabitFormContentProps> = ({
   toggleDaySelection,
   timeOfDay,
   setTimeOfDay,
+  reminders,
+  setReminders,
   endDate,
   setEndDate,
   showDatePicker,
@@ -120,6 +124,8 @@ const HabitFormContent: React.FC<HabitFormContentProps> = ({
           toggleDaySelection={toggleDaySelection}
           timeOfDay={timeOfDay}
           setTimeOfDay={setTimeOfDay}
+          reminders={reminders}
+          setReminders={setReminders}
         />
       </div>
       

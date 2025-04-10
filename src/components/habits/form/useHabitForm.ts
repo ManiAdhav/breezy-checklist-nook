@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Habit } from '@/types/habit';
 import { useToast } from '@/hooks/use-toast';
@@ -24,6 +25,7 @@ export const useHabitForm = (
   const [frequency, setFrequency] = useState('daily');
   const [selectedDays, setSelectedDays] = useState<string[]>(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
   const [timeOfDay, setTimeOfDay] = useState('anytime');
+  const [reminders, setReminders] = useState<string[]>([]);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [showDatePicker, setShowDatePicker] = useState(false);
   
@@ -47,6 +49,7 @@ export const useHabitForm = (
         setFrequency(editHabit.frequency || 'daily');
         setSelectedDays(editHabit.selectedDays || ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
         setTimeOfDay(editHabit.timeOfDay || 'anytime');
+        setReminders(editHabit.reminders || []);
         setEndDate(editHabit.endDate);
       } else {
         setName('');
@@ -58,6 +61,7 @@ export const useHabitForm = (
         setFrequency('daily');
         setSelectedDays(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
         setTimeOfDay('anytime');
+        setReminders([]);
         setEndDate(undefined);
       }
       setShowIconSelector(false);
@@ -85,6 +89,7 @@ export const useHabitForm = (
           frequency,
           selectedDays,
           timeOfDay,
+          reminders,
           endDate
         });
         toast({
@@ -101,6 +106,7 @@ export const useHabitForm = (
           frequency,
           selectedDays,
           timeOfDay,
+          reminders,
           endDate
         });
         toast({
@@ -132,6 +138,7 @@ export const useHabitForm = (
     setFrequency('daily');
     setSelectedDays(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
     setTimeOfDay('anytime');
+    setReminders([]);
     setEndDate(undefined);
   };
 
@@ -172,6 +179,8 @@ export const useHabitForm = (
     toggleDaySelection,
     timeOfDay,
     setTimeOfDay,
+    reminders,
+    setReminders,
     endDate,
     setEndDate,
     showDatePicker,
