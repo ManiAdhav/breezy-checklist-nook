@@ -1,8 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { Habit } from '@/types/habit';
 import { useToast } from '@/hooks/use-toast';
 import { useHabit } from '@/contexts/HabitContext';
+import { METRIC_OPTIONS } from '../constants/habit-constants';
 
 export const useHabitForm = (
   open: boolean,
@@ -149,21 +149,6 @@ export const useHabitForm = (
       setSelectedDays([...selectedDays, day]);
     }
   };
-
-  // Import this from MetricSelector
-  const METRIC_OPTIONS = [
-    'steps',
-    'minutes',
-    'hours',
-    'times',
-    'pages',
-    'glasses',
-    'repetitions',
-    'sessions',
-    'kilometers',
-    'miles',
-    'custom'
-  ];
 
   return {
     // Form state
