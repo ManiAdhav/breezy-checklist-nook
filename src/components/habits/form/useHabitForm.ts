@@ -56,7 +56,7 @@ export const useHabitForm = (
       metric: editHabit?.metric || "",
       target: editHabit?.target || 1,
       frequency: (editHabit?.frequency as 'daily' | 'weekly' | 'monthly') || 'daily',
-      startDate: new Date(),
+      startDate: editHabit?.startDate || new Date(),
       endDate: editHabit?.endDate,
       goalId: editHabit?.goalId || undefined,
       icon: editHabit?.icon || 'Activity',
@@ -80,6 +80,8 @@ export const useHabitForm = (
   // Function to handle form submission
   const handleSubmit = async (data: HabitFormData) => {
     try {
+      console.log('Form data submitted:', data);
+      
       // Ensure all required fields are present
       const habitData = {
         name: data.name,                 // Required
@@ -97,6 +99,8 @@ export const useHabitForm = (
         tags: [],                        // Required but can be empty array
       };
       
+      console.log('Processed habit data:', habitData);
+      
       if (editHabit) {
         // Update existing habit
         updateHabit(editHabit.id, habitData);
@@ -106,7 +110,8 @@ export const useHabitForm = (
         });
       } else {
         // Add new habit
-        addHabit(habitData);
+        const newHabit = addHabit(habitData);
+        console.log('New habit created:', newHabit);
         toast({
           title: "Success",
           description: "Habit added successfully.",

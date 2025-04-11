@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import TaskList from '@/components/tasks/TaskList';
 import FloatingActionButton from '@/components/fab/FloatingActionButton';
@@ -8,10 +8,12 @@ import { useHabit } from '@/contexts/HabitContext';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Index: React.FC = () => {
   const { habits, isLoading, loadHabits } = useHabit();
   const navigate = useNavigate();
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   
   useEffect(() => {
     console.log('Index page mounted, habits count:', habits.length);
@@ -23,6 +25,8 @@ const Index: React.FC = () => {
         await loadHabits();
         
         console.log('Index page: Habits data reloaded successfully, count:', habits.length);
+        setInitialLoadComplete(true);
+        
         if (habits.length > 0) {
           toast({
             title: "Data loaded",
@@ -78,23 +82,23 @@ const Index: React.FC = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {habits.slice(0, 3).map((habit) => (
-                <div 
-                  key={habit.id}
-                  className="border rounded-lg p-4 cursor-pointer hover:border-primary"
-                  onClick={() => navigate('/habits')}
-                >
-                  <h3 className="font-medium">{habit.name}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">{habit.metric}</p>
-                  {habit.streak !== undefined && (
-                    <div className="mt-2 text-xs inline-flex items-center bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                      {habit.streak} day streak
-                    </div>
-                  )}
-                </div>
-              ))}
-              
-              {habits.length === 0 && (
+              {habits.length > 0 ? (
+                habits.slice(0, 3).map((habit) => (
+                  <div 
+                    key={habit.id}
+                    className="border rounded-lg p-4 cursor-pointer hover:border-primary"
+                    onClick={() => navigate('/habits')}
+                  >
+                    <h3 className="font-medium">{habit.name}</h3>
+                    <p className="text-sm text-muted-foreground mt-1">{habit.metric}</p>
+                    {habit.streak !== undefined && (
+                      <div className="mt-2 text-xs inline-flex items-center bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                        {habit.streak} day streak
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
                 <div className="col-span-full border border-dashed rounded-lg p-6 text-center">
                   <p className="text-muted-foreground">No habits created yet</p>
                   <Button 

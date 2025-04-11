@@ -129,6 +129,7 @@ export const useHabitStorage = () => {
 
   // Load habits from localStorage on mount
   useEffect(() => {
+    console.log('useHabitStorage: Initial load of habits from storage');
     loadHabitsFromStorage();
     
     // Add event listener for storage changes from other tabs
@@ -148,31 +149,35 @@ export const useHabitStorage = () => {
 
   // Save habits to localStorage whenever they change
   useEffect(() => {
-    try {
-      console.log('Saving habits to localStorage:', habits);
-      localStorage.setItem(HABITS_STORAGE_KEY, JSON.stringify(habits));
-    } catch (error) {
-      console.error('Error saving habits to localStorage:', error);
-      toast({
-        title: "Error saving habits",
-        description: "There was a problem saving your habits.",
-        variant: "destructive"
-      });
+    if (habits.length > 0) {
+      try {
+        console.log('Saving habits to localStorage:', habits);
+        localStorage.setItem(HABITS_STORAGE_KEY, JSON.stringify(habits));
+      } catch (error) {
+        console.error('Error saving habits to localStorage:', error);
+        toast({
+          title: "Error saving habits",
+          description: "There was a problem saving your habits.",
+          variant: "destructive"
+        });
+      }
     }
   }, [habits]);
 
   // Save habit logs to localStorage whenever they change
   useEffect(() => {
-    try {
-      console.log('Saving habit logs to localStorage:', habitLogs);
-      localStorage.setItem(HABIT_LOGS_STORAGE_KEY, JSON.stringify(habitLogs));
-    } catch (error) {
-      console.error('Error saving habit logs to localStorage:', error);
-      toast({
-        title: "Error saving habit logs",
-        description: "There was a problem saving your habit logs.",
-        variant: "destructive"
-      });
+    if (habitLogs.length > 0) {
+      try {
+        console.log('Saving habit logs to localStorage:', habitLogs);
+        localStorage.setItem(HABIT_LOGS_STORAGE_KEY, JSON.stringify(habitLogs));
+      } catch (error) {
+        console.error('Error saving habit logs to localStorage:', error);
+        toast({
+          title: "Error saving habit logs",
+          description: "There was a problem saving your habit logs.",
+          variant: "destructive"
+        });
+      }
     }
   }, [habitLogs]);
 

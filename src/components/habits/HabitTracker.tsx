@@ -20,7 +20,17 @@ const HabitTracker: React.FC = () => {
   // Load habits when component mounts
   useEffect(() => {
     console.log('HabitTracker: Loading habits data');
-    loadHabits();
+    // Force a reload of habits data to ensure we have the latest
+    const loadData = async () => {
+      try {
+        await loadHabits();
+        console.log('HabitTracker: Habits loaded successfully');
+      } catch (err) {
+        console.error('Error loading habits in HabitTracker:', err);
+      }
+    };
+    
+    loadData();
     
     // Log when component mounts to help with debugging
     console.log('HabitTracker mounted');

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HabitContext } from './HabitContext';
 import { useHabitStorage } from './useHabitStorage';
 import { useHabitOperations } from './useHabitOperations';
@@ -7,7 +7,7 @@ import { useStreakCalculation } from './useStreakCalculation';
 import { toast } from '@/hooks/use-toast';
 
 export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { habits, setHabits, habitLogs, setHabitLogs, isLoading, loadHabitsFromStorage } = useHabitStorage();
+  const { habits, setHabits, habitLogs, setHabitLogs, isLoading: storageLoading, loadHabitsFromStorage } = useHabitStorage();
   const { calculateHabitStreak } = useStreakCalculation();
   const [loadingState, setLoadingState] = useState(false);
   
@@ -20,6 +20,12 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     getHabitLogs 
   } = useHabitOperations(habits, setHabits, habitLogs, setHabitLogs);
 
+  // Load habits on component mount
+  useEffect(() => {
+    console.log('HabitProvider mounted, loading habits initially');
+    loadHabits();
+  }, []);
+
   const getHabitStreak = (habitId: string) => {
     return calculateHabitStreak(habitLogs, habitId);
   };
@@ -31,7 +37,7 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     
     try {
       await loadHabitsFromStorage();
-      console.log('HabitProvider: Habits reloaded successfully');
+      console.log('HabitProvider: Habits reloaded successfully', habits);
     } catch (error) {
       console.error('Error loading habits in provider:', error);
       toast({
@@ -44,7 +50,7 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  const combinedIsLoading = isLoading || loadingState;
+  const combinedIsLoading = storageLoading || loadingState;
 
   const value = {
     habits,
@@ -59,6 +65,10 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     getHabitStreak,
     loadHabits
   };
+
+  useEffect(() => {
+    console.log('HabitProvider rendered with', habits.length, 'habits');
+  }, [habits.length]);
 
   return (
     <HabitContext.Provider value={value}>
