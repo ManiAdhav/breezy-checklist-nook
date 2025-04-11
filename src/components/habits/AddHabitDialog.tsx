@@ -27,27 +27,27 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden rounded-xl border border-border/40 shadow-lg">
-        <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border/20">
-          <DialogHeader className="px-6 py-4">
+      <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden rounded-lg border-none shadow-lg">
+        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/10">
+          <DialogHeader className="px-5 py-3.5">
             <div className="flex items-center justify-between">
-              <DialogTitle className="text-xl font-medium">
+              <DialogTitle className="text-lg font-medium">
                 {editHabit ? 'Edit Habit' : 'New Habit'}
               </DialogTitle>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 rounded-full"
+                className="h-7 w-7 rounded-full"
                 onClick={() => onOpenChange(false)}
               >
-                <X className="h-4 w-4" />
+                <X className="h-3.5 w-3.5" />
                 <span className="sr-only">Close</span>
               </Button>
             </div>
           </DialogHeader>
         </div>
         
-        <div className="px-6 py-5 max-h-[80vh] overflow-y-auto">
+        <div className="px-5 py-4 max-h-[80vh] overflow-y-auto">
           <HabitFormContent
             editHabit={editHabit}
             goals={threeYearGoals || []}

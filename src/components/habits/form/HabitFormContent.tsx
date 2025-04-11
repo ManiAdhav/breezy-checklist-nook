@@ -3,7 +3,6 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Check } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
 import { Habit } from '@/types/habit';
 import HabitIconSelector from './HabitIconSelector';
 import MetricSelector from './MetricSelector';
@@ -74,9 +73,9 @@ const HabitFormContent: React.FC<HabitFormContentProps> = ({
   handleSubmit
 }) => {
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-5">
       {/* Habit Name and Icon */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 mb-4">
         <HabitIconSelector
           selectedIcon={selectedIcon}
           setSelectedIcon={setSelectedIcon}
@@ -89,13 +88,13 @@ const HabitFormContent: React.FC<HabitFormContentProps> = ({
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className="text-base border-input/20 focus-visible:ring-primary"
+            className="text-base border-0 bg-muted/30 focus-visible:ring-1 focus-visible:ring-primary"
           />
         </div>
       </div>
       
       {/* Metric - How to Measure */}
-      <div className="pt-1">
+      <div>
         <MetricSelector
           metric={metric}
           setMetric={setMetric}
@@ -107,7 +106,7 @@ const HabitFormContent: React.FC<HabitFormContentProps> = ({
       </div>
       
       {/* Connected Goal & End Date */}
-      <div className="py-1">
+      <div>
         <DateAndGoalSelector
           endDate={endDate}
           setEndDate={setEndDate}
@@ -120,7 +119,7 @@ const HabitFormContent: React.FC<HabitFormContentProps> = ({
       </div>
       
       {/* Frequency & Reminders */}
-      <div className="py-1">
+      <div>
         <FrequencySelector
           frequency={frequency}
           setFrequency={setFrequency}
