@@ -73,9 +73,9 @@ const HabitFormContent: React.FC<HabitFormContentProps> = ({
   handleSubmit
 }) => {
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-4">
       {/* Habit Name and Icon */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-3 mb-3">
         <HabitIconSelector
           selectedIcon={selectedIcon}
           setSelectedIcon={setSelectedIcon}
@@ -88,53 +88,59 @@ const HabitFormContent: React.FC<HabitFormContentProps> = ({
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className="text-base border-0 bg-muted/30 focus-visible:ring-1 focus-visible:ring-primary"
+            className="text-base border-0 border-b border-border/20 rounded-none px-0 py-1.5 focus-visible:ring-0 focus-visible:border-primary transition-colors"
           />
         </div>
       </div>
       
+      {/* Divider */}
+      <div className="border-t border-border/10 my-2"></div>
+      
       {/* Metric - How to Measure */}
-      <div>
-        <MetricSelector
-          metric={metric}
-          setMetric={setMetric}
-          metricValue={metricValue}
-          setMetricValue={setMetricValue}
-          customMetric={customMetric}
-          setCustomMetric={setCustomMetric}
-        />
-      </div>
+      <MetricSelector
+        metric={metric}
+        setMetric={setMetric}
+        metricValue={metricValue}
+        setMetricValue={setMetricValue}
+        customMetric={customMetric}
+        setCustomMetric={setCustomMetric}
+      />
+      
+      {/* Divider */}
+      <div className="border-t border-border/10 my-2"></div>
       
       {/* Connected Goal & End Date */}
-      <div>
-        <DateAndGoalSelector
-          endDate={endDate}
-          setEndDate={setEndDate}
-          showDatePicker={showDatePicker}
-          setShowDatePicker={setShowDatePicker}
-          goalId={goalId}
-          setGoalId={setGoalId}
-          goals={goals}
-        />
-      </div>
+      <DateAndGoalSelector
+        endDate={endDate}
+        setEndDate={setEndDate}
+        showDatePicker={showDatePicker}
+        setShowDatePicker={setShowDatePicker}
+        goalId={goalId}
+        setGoalId={setGoalId}
+        goals={goals}
+      />
+      
+      {/* Divider */}
+      <div className="border-t border-border/10 my-2"></div>
       
       {/* Frequency & Reminders */}
-      <div>
-        <FrequencySelector
-          frequency={frequency}
-          setFrequency={setFrequency}
-          selectedDays={selectedDays}
-          toggleDaySelection={toggleDaySelection}
-          timeOfDay={timeOfDay}
-          setTimeOfDay={setTimeOfDay}
-          reminders={reminders}
-          setReminders={setReminders}
-        />
-      </div>
+      <FrequencySelector
+        frequency={frequency}
+        setFrequency={setFrequency}
+        selectedDays={selectedDays}
+        toggleDaySelection={toggleDaySelection}
+        timeOfDay={timeOfDay}
+        setTimeOfDay={setTimeOfDay}
+        reminders={reminders}
+        setReminders={setReminders}
+      />
       
       {/* Submit Button */}
       <div className="pt-2">
-        <Button type="submit" className="w-full">
+        <Button 
+          type="submit" 
+          className="w-full transition-all hover:shadow-md"
+        >
           {editHabit ? (
             <>
               <Check className="mr-2 h-4 w-4" />

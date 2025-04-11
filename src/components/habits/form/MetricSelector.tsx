@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { METRIC_OPTIONS } from '../constants/habit-constants';
@@ -24,9 +23,9 @@ const MetricSelector: React.FC<MetricSelectorProps> = ({
   setCustomMetric
 }) => {
   return (
-    <div className="space-y-3">
-      <div className="flex items-center text-sm font-medium text-muted-foreground">
-        <BarChart2 className="h-4 w-4 text-primary mr-2" />
+    <div className="space-y-2">
+      <div className="flex items-center text-sm font-medium text-muted-foreground mb-2">
+        <BarChart2 className="h-4 w-4 text-primary/70 mr-2" />
         <span>Measurement</span>
       </div>
       
@@ -38,13 +37,13 @@ const MetricSelector: React.FC<MetricSelectorProps> = ({
             onChange={(e) => setMetricValue(e.target.value)}
             type="number"
             min="0"
-            className="bg-muted/30 border-0 focus-visible:ring-1 focus-visible:ring-primary"
+            className="border-0 border-b border-border/20 rounded-none px-0 py-1.5 focus-visible:ring-0 focus-visible:border-primary transition-colors"
             aria-label="Target amount"
           />
         </div>
         <div className="flex-1">
           <Select value={metric} onValueChange={(value) => setMetric(value)}>
-            <SelectTrigger className="bg-muted/30 border-0 focus:ring-1 focus:ring-primary">
+            <SelectTrigger className="border-0 border-b border-border/20 rounded-none px-0 py-1.5 focus:ring-0 focus:border-primary transition-colors">
               <SelectValue placeholder="Select unit" />
             </SelectTrigger>
             <SelectContent>
@@ -59,13 +58,13 @@ const MetricSelector: React.FC<MetricSelectorProps> = ({
       </div>
       
       {metric === 'custom' && (
-        <div>
+        <div className="mt-2">
           <Input
             placeholder="e.g. chapters, lessons, etc."
             value={customMetric}
             onChange={(e) => setCustomMetric(e.target.value)}
             required
-            className="bg-muted/30 border-0 focus-visible:ring-1 focus-visible:ring-primary"
+            className="border-0 border-b border-border/20 rounded-none px-0 py-1.5 focus-visible:ring-0 focus-visible:border-primary transition-colors"
           />
         </div>
       )}

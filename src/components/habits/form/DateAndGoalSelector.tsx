@@ -36,19 +36,19 @@ const DateAndGoalSelector: React.FC<DateAndGoalSelectorProps> = ({
   const selectedGoal = goals.find(goal => goal.id === goalId);
 
   return (
-    <div className="space-y-5">
-      <div className="space-y-3">
-        <div className="flex items-center text-sm font-medium text-muted-foreground">
-          <Link2 className="h-4 w-4 text-primary mr-2" />
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <div className="flex items-center text-sm font-medium text-muted-foreground mb-2">
+          <Link2 className="h-4 w-4 text-primary/70 mr-2" />
           <span>Connected Goal</span>
         </div>
         
         <Select value={goalId} onValueChange={(value) => setGoalId(value)}>
-          <SelectTrigger className="bg-muted/30 border-0 focus:ring-1 focus:ring-primary flex items-center gap-2">
+          <SelectTrigger className="border-0 border-b border-border/20 rounded-none px-0 py-1.5 focus:ring-0 focus:border-primary transition-colors">
             {selectedGoal?.icon ? (
-              <DynamicIcon name={selectedGoal.icon} className="h-4 w-4 text-muted-foreground" />
+              <DynamicIcon name={selectedGoal.icon} className="h-4 w-4 text-muted-foreground mr-2" />
             ) : (
-              <Target className="h-4 w-4 text-muted-foreground" />
+              <Target className="h-4 w-4 text-muted-foreground mr-2" />
             )}
             <span className="truncate">{selectedGoal?.title || 'Select goal'}</span>
           </SelectTrigger>
@@ -71,21 +71,23 @@ const DateAndGoalSelector: React.FC<DateAndGoalSelectorProps> = ({
         </Select>
       </div>
       
-      <div className="space-y-3">
-        <div className="flex items-center text-sm font-medium text-muted-foreground">
-          <CalendarIcon className="h-4 w-4 text-primary mr-2" />
+      <div className="space-y-2">
+        <div className="flex items-center text-sm font-medium text-muted-foreground mb-2">
+          <CalendarIcon className="h-4 w-4 text-primary/70 mr-2" />
           <span>Target Date</span>
         </div>
         
         <Popover open={showDatePicker} onOpenChange={setShowDatePicker}>
           <PopoverTrigger asChild>
             <Button 
-              variant="outline" 
-              className="w-full justify-start text-left font-normal bg-muted/30 border-0 hover:bg-muted/50 focus:ring-1 focus:ring-primary"
+              variant="ghost" 
+              className="w-full justify-start text-left font-normal border-0 border-b border-border/20 rounded-none px-0 py-1.5 hover:bg-transparent focus:ring-0 h-9"
               type="button"
             >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {endDate ? format(endDate, 'MMM d, yyyy') : 'Choose target date'}
+              <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+              <span className={endDate ? "text-foreground" : "text-muted-foreground"}>
+                {endDate ? format(endDate, 'MMM d, yyyy') : 'Choose target date'}
+              </span>
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
