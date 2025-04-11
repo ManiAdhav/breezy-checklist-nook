@@ -20,6 +20,8 @@ const HabitList: React.FC<HabitListProps> = ({
   onAddHabit 
 }) => {
   const { getHabitStreak } = useHabit();
+  
+  console.log('HabitList rendering with', habits.length, 'habits:', habits);
 
   // Sort habits by streak (descending) and then by name
   const sortedHabits = [...habits].sort((a, b) => {

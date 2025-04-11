@@ -2,68 +2,70 @@
 import { HabitLog, HabitStreak } from '@/types/habit';
 
 export const useStreakCalculation = () => {
-  const calculateHabitStreak = (logs: HabitLog[], habitId: string): HabitStreak => {
-    if (logs.length === 0) {
+  const calculateHabitStreak = (habitLogs: HabitLog[], habitId: string): HabitStreak => {
+    // Filter logs for this habit and sort by date (oldest first)
+    const logsForHabit = habitLogs
+      .filter(log => log.habitId === habitId)
+      .sort((a, b) => a.date.getTime() - b.date.getTime());
+    
+    if (logsForHabit.length === 0) {
       return { current: 0, longest: 0 };
     }
     
-    // Sort logs by date in ascending order
-    const habitLogs = logs.filter(log => log.habitId === habitId);
-    const sortedLogs = [...habitLogs].sort((a, b) => a.date.getTime() - b.date.getTime());
-    
-    // Initialize variables
     let currentStreak = 0;
     let longestStreak = 0;
     let lastDate: Date | null = null;
     
-    // Calculate streak
-    sortedLogs.forEach(log => {
+    // Calculate streak based on consecutive days
+    logsForHabit.forEach(log => {
       const logDate = new Date(log.date);
       logDate.setHours(0, 0, 0, 0);
       
       if (!lastDate) {
         // First log
         currentStreak = 1;
-        longestStreak = 1;
+        lastDate = logDate;
       } else {
-        const dayDiff = Math.floor((logDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
+        const lastDay = new Date(lastDate);
+        lastDay.setDate(lastDay.getDate() + 1);
+        lastDay.setHours(0, 0, 0, 0);
         
-        if (dayDiff === 1) {
+        if (logDate.getTime() === lastDay.getTime()) {
           // Consecutive day
-          currentStreak++;
-          longestStreak = Math.max(longestStreak, currentStreak);
-        } else if (dayDiff > 1) {
-          // Break in streak
+          currentStreak += 1;
+          lastDate = logDate;
+        } else if (logDate.getTime() > lastDay.getTime()) {
+          // Gap detected, reset streak
           currentStreak = 1;
+          lastDate = logDate;
         }
+        // If date is the same or earlier, ignore duplicate logs
       }
       
-      lastDate = logDate;
+      // Update longest streak if current is greater
+      if (currentStreak > longestStreak) {
+        longestStreak = currentStreak;
+      }
     });
     
-    // Check if the streak is current (last log is from today or yesterday)
+    // Check if current streak is still active (last log within last day)
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    const lastLogDate = habitLogs[0]?.date;
-    if (lastLogDate) {
-      const lastLogDay = new Date(lastLogDate);
-      lastLogDay.setHours(0, 0, 0, 0);
-      
-      const daysSinceLastLog = Math.floor((today.getTime() - lastLogDay.getTime()) / (1000 * 60 * 60 * 24));
-      
-      // If the last log is older than yesterday, reset current streak
-      if (daysSinceLastLog > 1) {
-        currentStreak = 0;
-      }
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    // If the last logged date is before yesterday, the streak is broken
+    if (lastDate && lastDate.getTime() < yesterday.getTime()) {
+      currentStreak = 0;
     }
     
     return {
       current: currentStreak,
       longest: longestStreak,
-      lastLoggedDate: habitLogs[0]?.date
+      lastLoggedDate: logsForHabit.length > 0 ? logsForHabit[logsForHabit.length - 1].date : undefined
     };
   };
-
+  
   return { calculateHabitStreak };
 };

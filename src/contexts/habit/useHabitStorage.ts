@@ -15,6 +15,8 @@ export const useHabitStorage = () => {
       const storedHabits = localStorage.getItem(HABITS_STORAGE_KEY);
       const storedLogs = localStorage.getItem(HABIT_LOGS_STORAGE_KEY);
       
+      console.log('Loading habits from storage:', storedHabits);
+      
       if (storedHabits) {
         const parsedHabits = JSON.parse(storedHabits);
         
@@ -26,7 +28,10 @@ export const useHabitStorage = () => {
           endDate: habit.endDate ? new Date(habit.endDate) : undefined
         }));
         
+        console.log('Parsed habits:', formattedHabits);
         setHabits(formattedHabits);
+      } else {
+        console.log('No habits found in storage');
       }
       
       if (storedLogs) {
@@ -53,6 +58,7 @@ export const useHabitStorage = () => {
   // Save habits to localStorage whenever they change
   useEffect(() => {
     try {
+      console.log('Saving habits to localStorage:', habits);
       localStorage.setItem(HABITS_STORAGE_KEY, JSON.stringify(habits));
     } catch (error) {
       console.error('Error saving habits to localStorage:', error);

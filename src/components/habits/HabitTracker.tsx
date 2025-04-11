@@ -18,6 +18,7 @@ const HabitTracker: React.FC = () => {
   useEffect(() => {
     // Set filtered habits to all habits initially
     if (habits) {
+      console.log('HabitTracker: Setting filtered habits', habits);
       setFilteredHabits(habits);
     }
   }, [habits]);
@@ -30,6 +31,8 @@ const HabitTracker: React.FC = () => {
   const selectedHabit = selectedHabitId 
     ? habits.find(h => h.id === selectedHabitId) || null
     : null;
+
+  console.log('HabitTracker rendering, habits count:', habits.length);
 
   return (
     <div className="h-full overflow-y-auto pb-6">
