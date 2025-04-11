@@ -18,18 +18,20 @@ interface AddHabitDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   editHabit?: Habit;
+  onSuccess?: () => void;
 }
 
 const AddHabitDialog: React.FC<AddHabitDialogProps> = ({ 
   open, 
   onOpenChange, 
-  editHabit 
+  editHabit,
+  onSuccess 
 }) => {
   // Get the goals context
   const { threeYearGoals } = useGoal();
   
   // Use our custom hook to handle form state and logic
-  const formState = useHabitForm(open, onOpenChange, editHabit);
+  const formState = useHabitForm(open, onOpenChange, editHabit, onSuccess);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
