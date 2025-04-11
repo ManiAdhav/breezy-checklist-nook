@@ -7,6 +7,7 @@ import AddHabitDialog from './AddHabitDialog';
 import { useHabit } from '@/contexts/HabitContext';
 import { Habit } from '@/types/habit';
 import HabitDetail from './HabitDetail';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const HabitTracker: React.FC = () => {
   const { habits, isLoading } = useHabit();
@@ -20,8 +21,13 @@ const HabitTracker: React.FC = () => {
     if (habits) {
       console.log('HabitTracker: Setting filtered habits', habits);
       setFilteredHabits(habits);
+      
+      // If we have habits but none selected, select the first one
+      if (habits.length > 0 && !selectedHabitId) {
+        setSelectedHabitId(habits[0].id);
+      }
     }
-  }, [habits]);
+  }, [habits, selectedHabitId]);
 
   const handleSelectHabit = (habitId: string) => {
     setSelectedHabitId(habitId);
@@ -48,9 +54,10 @@ const HabitTracker: React.FC = () => {
       </div>
       
       {isLoading ? (
-        <div className="text-center py-10">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
-          <p className="mt-2 text-muted-foreground">Loading habits...</p>
+        <div className="space-y-3">
+          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-24 w-full" />
         </div>
       ) : (
         <HabitList 

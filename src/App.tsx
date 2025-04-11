@@ -16,6 +16,7 @@ import HabitsPage from './pages/HabitsPage';
 import { TaskProvider } from './contexts/TaskContext';
 import { HabitProvider } from './contexts/HabitContext';
 import { GoalProvider } from './contexts/GoalContext';
+import { Toaster } from "@/components/ui/toaster";
 
 // Wrapper component to provide props to GoalDetailView
 const GoalDetailViewWrapper = () => {
@@ -44,6 +45,7 @@ function App() {
             <Route path="/habits" element={<HabitsPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <Toaster />
         </HabitProvider>
       </GoalProvider>
     </TaskProvider>

@@ -56,11 +56,21 @@ const HabitList: React.FC<HabitListProps> = ({
       {sortedHabits.map((habit) => (
         <HabitCard
           key={habit.id}
-          habit={habit}
+          habit={{
+            ...habit,
+            streak: getHabitStreak(habit.id).current
+          }}
           onClick={() => onSelectHabit(habit.id)}
           isSelected={selectedHabitId === habit.id}
         />
       ))}
+      
+      <div className="mt-6 text-center">
+        <Button onClick={onAddHabit} variant="outline">
+          <PlusCircle className="mr-2 h-4 w-4" />
+          Add Another Habit
+        </Button>
+      </div>
     </div>
   );
 };
