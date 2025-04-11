@@ -2,7 +2,7 @@
 export interface Habit {
   id: string;
   name: string;
-  description?: string;
+  description: string;
   metric: string;
   target: number;
   goalId?: string;
@@ -11,12 +11,12 @@ export interface Habit {
   updatedAt: Date;
   tags: string[];
   logs?: HabitLog[];
-  icon?: string;
+  icon: string;
   frequency: 'daily' | 'weekly' | 'monthly';
-  selectedDays?: string[];
-  timeOfDay?: string;
-  reminders?: string[];
-  startDate?: Date;
+  selectedDays: string[];
+  timeOfDay: string;
+  reminders: string[];
+  startDate: Date;
   endDate?: Date;
 }
 

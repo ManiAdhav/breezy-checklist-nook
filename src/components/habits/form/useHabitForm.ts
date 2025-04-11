@@ -80,14 +80,21 @@ export const useHabitForm = (
   // Function to handle form submission
   const handleSubmit = async (data: HabitFormData) => {
     try {
-      // Merge form data with other state values
+      // Ensure all required fields are present
       const habitData = {
-        ...data,
+        name: data.name,                 // Required
+        description: data.description || "",
+        metric: data.metric,             // Required
+        target: data.target,             // Required
+        frequency: data.frequency,       // Required
+        startDate: data.startDate,       // Required
+        endDate: data.endDate,
+        goalId: data.goalId,
         icon: selectedIcon,
         selectedDays,
         timeOfDay,
         reminders,
-        tags: [], // Add empty tags array to satisfy the type requirement
+        tags: [],                        // Required but can be empty array
       };
       
       if (editHabit) {
@@ -114,6 +121,7 @@ export const useHabitForm = (
         onSuccess();
       }
     } catch (error) {
+      console.error("Error submitting habit form:", error);
       toast({
         title: "Error",
         description: "Failed to save habit. Please try again.",
