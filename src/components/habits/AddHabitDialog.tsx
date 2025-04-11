@@ -5,7 +5,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from '@/components/ui/dialog';
 import { useGoal } from '@/contexts/GoalContext';
 import { Habit } from '@/types/habit';
@@ -52,9 +51,22 @@ const AddHabitDialog: React.FC<AddHabitDialogProps> = ({
         </DialogHeader>
         
         <HabitFormContent
+          form={formState.form}
           editHabit={editHabit}
           goals={threeYearGoals || []}
-          {...formState}
+          selectedIcon={formState.selectedIcon}
+          setSelectedIcon={formState.setSelectedIcon}
+          showIconSelector={formState.showIconSelector}
+          toggleIconSelector={formState.toggleIconSelector}
+          selectedDays={formState.selectedDays}
+          toggleDaySelection={formState.toggleDaySelection}
+          timeOfDay={formState.timeOfDay}
+          setTimeOfDay={formState.setTimeOfDay}
+          reminders={formState.reminders}
+          setReminders={formState.setReminders}
+          showDatePicker={formState.showDatePicker}
+          setShowDatePicker={formState.setShowDatePicker}
+          onSubmit={formState.onSubmit}
         />
       </DialogContent>
     </Dialog>
