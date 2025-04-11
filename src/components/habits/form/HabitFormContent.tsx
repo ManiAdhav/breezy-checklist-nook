@@ -9,6 +9,7 @@ import MetricSelector from './MetricSelector';
 import FrequencySelector from './FrequencySelector';
 import DateAndGoalSelector from './DateAndGoalSelector';
 import { DialogFooter } from '@/components/ui/dialog';
+import { Form } from '@/components/ui/form';
 
 interface HabitFormContentProps {
   editHabit?: Habit;

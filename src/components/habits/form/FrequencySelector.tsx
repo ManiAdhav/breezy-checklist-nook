@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Bell, Plus, X, Calendar } from 'lucide-react';
 import { DAYS_OF_WEEK } from '../constants/habit-constants';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { FormItem, FormLabel } from '@/components/ui/form';
 
 interface FrequencySelectorProps {
   frequency: string;
@@ -44,11 +43,11 @@ const FrequencySelector: React.FC<FrequencySelectorProps> = ({
   return (
     <div className="flex flex-col gap-4">
       {/* Frequency Section */}
-      <FormItem>
-        <FormLabel className="flex items-center text-sm font-medium text-muted-foreground">
+      <div className="space-y-2">
+        <div className="flex items-center text-sm font-medium text-muted-foreground">
           <Calendar className="h-4 w-4 text-primary/70 mr-2" />
           <span>Frequency</span>
-        </FormLabel>
+        </div>
         
         <div className="mt-2">
           <ToggleGroup 
@@ -90,14 +89,14 @@ const FrequencySelector: React.FC<FrequencySelectorProps> = ({
             </div>
           </div>
         )}
-      </FormItem>
+      </div>
       
       {/* Reminders Section */}
-      <FormItem>
-        <FormLabel className="flex items-center text-sm font-medium text-muted-foreground">
+      <div className="space-y-2">
+        <div className="flex items-center text-sm font-medium text-muted-foreground">
           <Bell className="h-4 w-4 text-primary/70 mr-2" />
           <span>Reminders</span>
-        </FormLabel>
+        </div>
         
         <div className="flex items-center gap-2 mt-2">
           <Input
@@ -142,7 +141,7 @@ const FrequencySelector: React.FC<FrequencySelectorProps> = ({
             ))}
           </div>
         )}
-      </FormItem>
+      </div>
     </div>
   );
 };
