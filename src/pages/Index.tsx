@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import TaskList from '@/components/tasks/TaskList';
 import FloatingActionButton from '@/components/fab/FloatingActionButton';
@@ -10,20 +10,50 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 
 const Index: React.FC = () => {
-  const { habits, isLoading } = useHabit();
+  const { habits, isLoading, loadHabits } = useHabit();
+  const [isInitialized, setIsInitialized] = useState(false);
   const navigate = useNavigate();
   
   useEffect(() => {
     console.log('Index page mounted, habits count:', habits.length);
     
-    if (habits.length > 0) {
-      console.log('Loaded habits on index page:', habits);
-    }
+    // Force reload habits when component mounts
+    const loadData = async () => {
+      try {
+        if (!isInitialized) {
+          console.log('Index page: Forcing reload of habits data');
+          await loadHabits();
+          setIsInitialized(true);
+          
+          console.log('Index page: Habits data reloaded successfully, count:', habits.length);
+          if (habits.length > 0) {
+            toast({
+              title: "Data loaded",
+              description: `${habits.length} habits loaded successfully`,
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error loading habits on index page:', error);
+        toast({
+          title: "Error loading data",
+          description: "There was a problem loading your habits",
+          variant: "destructive",
+        });
+      }
+    };
+    
+    loadData();
     
     return () => {
       console.log('Index page unmounted');
     };
-  }, [habits.length]);
+  }, [loadHabits, isInitialized]);
+
+  useEffect(() => {
+    // Log whenever habits change
+    console.log('Habits updated on index page, count:', habits.length, habits);
+  }, [habits]);
 
   return (
     <Layout>
@@ -60,6 +90,11 @@ const Index: React.FC = () => {
                 >
                   <h3 className="font-medium">{habit.name}</h3>
                   <p className="text-sm text-muted-foreground mt-1">{habit.metric}</p>
+                  {habit.streak !== undefined && (
+                    <div className="mt-2 text-xs inline-flex items-center bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                      {habit.streak} day streak
+                    </div>
+                  )}
                 </div>
               ))}
               

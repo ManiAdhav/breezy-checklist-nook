@@ -11,11 +11,30 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/hooks/use-toast';
 
 const HabitTracker: React.FC = () => {
-  const { habits, isLoading } = useHabit();
+  const { habits, isLoading, loadHabits } = useHabit();
   const [isAddHabitOpen, setIsAddHabitOpen] = useState(false);
   const [filteredHabits, setFilteredHabits] = useState<Habit[]>([]);
   const [selectedHabitId, setSelectedHabitId] = useState<string | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+  
+  // Load habits when component mounts
+  useEffect(() => {
+    const initializeData = async () => {
+      if (!isInitialized) {
+        console.log('HabitTracker: Initializing data');
+        try {
+          await loadHabits();
+          setIsInitialized(true);
+          console.log('HabitTracker: Data initialized');
+        } catch (error) {
+          console.error('Error initializing habit tracker data:', error);
+        }
+      }
+    };
+    
+    initializeData();
+  }, [loadHabits, isInitialized]);
   
   useEffect(() => {
     // Set filtered habits when habits change
@@ -51,6 +70,12 @@ const HabitTracker: React.FC = () => {
   const handleSelectHabit = (habitId: string) => {
     setSelectedHabitId(habitId);
     setIsDetailOpen(true);
+  };
+  
+  const handleAddHabitSuccess = () => {
+    setIsAddHabitOpen(false);
+    // Reload habits after adding a new one
+    loadHabits();
   };
 
   const selectedHabit = selectedHabitId 
@@ -90,6 +115,7 @@ const HabitTracker: React.FC = () => {
       <AddHabitDialog
         open={isAddHabitOpen}
         onOpenChange={setIsAddHabitOpen}
+        onSuccess={handleAddHabitSuccess}
       />
       
       <HabitDetail

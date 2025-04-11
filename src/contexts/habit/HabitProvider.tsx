@@ -1,13 +1,16 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { HabitContext } from './HabitContext';
 import { useHabitStorage } from './useHabitStorage';
 import { useHabitOperations } from './useHabitOperations';
 import { useStreakCalculation } from './useStreakCalculation';
+import { toast } from '@/hooks/use-toast';
 
 export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { habits, setHabits, habitLogs, setHabitLogs, isLoading } = useHabitStorage();
+  const { habits, setHabits, habitLogs, setHabitLogs, isLoading, loadHabitsFromStorage } = useHabitStorage();
   const { calculateHabitStreak } = useStreakCalculation();
+  const [loadingState, setLoadingState] = useState(false);
+  
   const { 
     getHabitById, 
     addHabit, 
@@ -20,18 +23,41 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const getHabitStreak = (habitId: string) => {
     return calculateHabitStreak(habitLogs, habitId);
   };
+  
+  // Function to load habits data
+  const loadHabits = async () => {
+    console.log('HabitProvider: Forcing reload of habits data');
+    setLoadingState(true);
+    
+    try {
+      await loadHabitsFromStorage();
+      console.log('HabitProvider: Habits reloaded successfully');
+    } catch (error) {
+      console.error('Error loading habits in provider:', error);
+      toast({
+        title: "Error loading habits",
+        description: "There was a problem loading your habits. Please try refreshing the page.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoadingState(false);
+    }
+  };
+
+  const combinedIsLoading = isLoading || loadingState;
 
   const value = {
     habits,
     habitLogs,
-    isLoading,
+    isLoading: combinedIsLoading,
     getHabitById,
     addHabit,
     updateHabit,
     deleteHabit,
     logProgress,
     getHabitLogs,
-    getHabitStreak
+    getHabitStreak,
+    loadHabits
   };
 
   return (

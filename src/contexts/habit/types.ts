@@ -12,4 +12,5 @@ export interface HabitContextType {
   logProgress: (log: Omit<HabitLog, 'id'>) => void;
   getHabitLogs: (habitId: string) => HabitLog[];
   getHabitStreak: (habitId: string) => HabitStreak;
+  loadHabits: () => Promise<void>;
 }
