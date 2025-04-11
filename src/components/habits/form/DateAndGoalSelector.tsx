@@ -13,6 +13,7 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import DynamicIcon from '@/components/ui/dynamic-icon';
+import { FormItem, FormLabel } from '@/components/ui/form';
 
 interface DateAndGoalSelectorProps {
   endDate: Date | undefined;
@@ -36,15 +37,15 @@ const DateAndGoalSelector: React.FC<DateAndGoalSelectorProps> = ({
   const selectedGoal = goals.find(goal => goal.id === goalId);
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <div className="flex items-center text-sm font-medium text-muted-foreground mb-2">
+    <div className="flex flex-wrap gap-3">
+      <FormItem className="flex-1">
+        <FormLabel className="flex items-center text-sm font-medium text-muted-foreground">
           <Link2 className="h-4 w-4 text-primary/70 mr-2" />
           <span>Connected Goal</span>
-        </div>
+        </FormLabel>
         
         <Select value={goalId} onValueChange={(value) => setGoalId(value)}>
-          <SelectTrigger className="border-0 border-b border-border/20 rounded-none px-0 py-1.5 focus:ring-0 focus:border-primary transition-colors">
+          <SelectTrigger className="mt-2 border-0 border-b border-border/20 rounded-none px-0 py-1.5 focus:ring-0 focus:border-primary transition-colors">
             {selectedGoal?.icon ? (
               <DynamicIcon name={selectedGoal.icon} className="h-4 w-4 text-muted-foreground mr-2" />
             ) : (
@@ -69,19 +70,19 @@ const DateAndGoalSelector: React.FC<DateAndGoalSelectorProps> = ({
             ))}
           </SelectContent>
         </Select>
-      </div>
+      </FormItem>
       
-      <div className="space-y-2">
-        <div className="flex items-center text-sm font-medium text-muted-foreground mb-2">
+      <FormItem className="flex-1">
+        <FormLabel className="flex items-center text-sm font-medium text-muted-foreground">
           <CalendarIcon className="h-4 w-4 text-primary/70 mr-2" />
           <span>Target Date</span>
-        </div>
+        </FormLabel>
         
         <Popover open={showDatePicker} onOpenChange={setShowDatePicker}>
           <PopoverTrigger asChild>
             <Button 
               variant="ghost" 
-              className="w-full justify-start text-left font-normal border-0 border-b border-border/20 rounded-none px-0 py-1.5 hover:bg-transparent focus:ring-0 h-9"
+              className="mt-2 w-full justify-start text-left font-normal border-0 border-b border-border/20 rounded-none px-0 py-1.5 hover:bg-transparent focus:ring-0 h-9"
               type="button"
             >
               <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -103,7 +104,7 @@ const DateAndGoalSelector: React.FC<DateAndGoalSelectorProps> = ({
             />
           </PopoverContent>
         </Popover>
-      </div>
+      </FormItem>
     </div>
   );
 };

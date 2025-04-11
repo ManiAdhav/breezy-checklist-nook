@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Bell, Plus, X, Calendar } from 'lucide-react';
 import { DAYS_OF_WEEK } from '../constants/habit-constants';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { FormItem, FormLabel } from '@/components/ui/form';
 
 interface FrequencySelectorProps {
   frequency: string;
@@ -41,29 +42,31 @@ const FrequencySelector: React.FC<FrequencySelectorProps> = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       {/* Frequency Section */}
-      <div className="space-y-2">
-        <div className="flex items-center text-sm font-medium text-muted-foreground mb-2">
+      <FormItem>
+        <FormLabel className="flex items-center text-sm font-medium text-muted-foreground">
           <Calendar className="h-4 w-4 text-primary/70 mr-2" />
           <span>Frequency</span>
-        </div>
+        </FormLabel>
         
-        <ToggleGroup 
-          type="single" 
-          value={frequency}
-          onValueChange={(value) => {
-            if (value) setFrequency(value);
-          }}
-          className="flex justify-start gap-2"
-        >
-          <ToggleGroupItem value="daily" className="text-xs border-0 bg-muted/30 data-[state=on]:bg-primary/20 data-[state=on]:text-primary">
-            Daily
-          </ToggleGroupItem>
-          <ToggleGroupItem value="weekly" className="text-xs border-0 bg-muted/30 data-[state=on]:bg-primary/20 data-[state=on]:text-primary">
-            Weekly
-          </ToggleGroupItem>
-        </ToggleGroup>
+        <div className="mt-2">
+          <ToggleGroup 
+            type="single" 
+            value={frequency}
+            onValueChange={(value) => {
+              if (value) setFrequency(value);
+            }}
+            className="flex justify-start gap-2"
+          >
+            <ToggleGroupItem value="daily" className="text-xs border-0 bg-muted/30 data-[state=on]:bg-primary/20 data-[state=on]:text-primary">
+              Daily
+            </ToggleGroupItem>
+            <ToggleGroupItem value="weekly" className="text-xs border-0 bg-muted/30 data-[state=on]:bg-primary/20 data-[state=on]:text-primary">
+              Weekly
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
         
         {frequency === 'weekly' && (
           <div className="mt-2">
@@ -87,16 +90,16 @@ const FrequencySelector: React.FC<FrequencySelectorProps> = ({
             </div>
           </div>
         )}
-      </div>
+      </FormItem>
       
       {/* Reminders Section */}
-      <div className="space-y-2">
-        <div className="flex items-center text-sm font-medium text-muted-foreground mb-2">
+      <FormItem>
+        <FormLabel className="flex items-center text-sm font-medium text-muted-foreground">
           <Bell className="h-4 w-4 text-primary/70 mr-2" />
           <span>Reminders</span>
-        </div>
+        </FormLabel>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mt-2">
           <Input
             type="time"
             value={newReminderTime}
@@ -139,7 +142,7 @@ const FrequencySelector: React.FC<FrequencySelectorProps> = ({
             ))}
           </div>
         )}
-      </div>
+      </FormItem>
     </div>
   );
 };

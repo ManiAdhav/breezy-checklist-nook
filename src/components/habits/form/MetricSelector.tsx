@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { METRIC_OPTIONS } from '../constants/habit-constants';
 import { BarChart2 } from 'lucide-react';
+import { FormItem, FormLabel } from '@/components/ui/form';
 
 interface MetricSelectorProps {
   metric: string;
@@ -23,13 +24,13 @@ const MetricSelector: React.FC<MetricSelectorProps> = ({
   setCustomMetric
 }) => {
   return (
-    <div className="space-y-2">
-      <div className="flex items-center text-sm font-medium text-muted-foreground mb-2">
+    <FormItem>
+      <FormLabel className="flex items-center text-sm font-medium text-muted-foreground">
         <BarChart2 className="h-4 w-4 text-primary/70 mr-2" />
         <span>Measurement</span>
-      </div>
+      </FormLabel>
       
-      <div className="flex gap-3 items-center">
+      <div className="flex gap-3 items-center mt-2">
         <div className="w-1/3">
           <Input
             placeholder="Amount"
@@ -68,7 +69,7 @@ const MetricSelector: React.FC<MetricSelectorProps> = ({
           />
         </div>
       )}
-    </div>
+    </FormItem>
   );
 };
 
