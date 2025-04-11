@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { CalendarIcon, Target, Link2 } from 'lucide-react';
+import { CalendarIcon, Target } from 'lucide-react';
 import { format } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
@@ -37,14 +37,9 @@ const DateAndGoalSelector: React.FC<DateAndGoalSelectorProps> = ({
 
   return (
     <div className="flex flex-wrap gap-3">
-      <div className="flex-1 space-y-2">
-        <div className="flex items-center text-sm font-medium text-muted-foreground">
-          <Link2 className="h-4 w-4 text-primary/70 mr-2" />
-          <span>Connected Goal</span>
-        </div>
-        
+      <div className="flex-1">        
         <Select value={goalId} onValueChange={(value) => setGoalId(value)}>
-          <SelectTrigger className="mt-2 border-0 border-b border-border/20 rounded-none px-0 py-1.5 focus:ring-0 focus:border-primary transition-colors">
+          <SelectTrigger className="border-0 border-b border-border/20 rounded-none px-0 py-1.5 focus:ring-0 focus:border-primary transition-colors">
             {selectedGoal?.icon ? (
               <DynamicIcon name={selectedGoal.icon} className="h-4 w-4 text-muted-foreground mr-2" />
             ) : (
@@ -71,17 +66,12 @@ const DateAndGoalSelector: React.FC<DateAndGoalSelectorProps> = ({
         </Select>
       </div>
       
-      <div className="flex-1 space-y-2">
-        <div className="flex items-center text-sm font-medium text-muted-foreground">
-          <CalendarIcon className="h-4 w-4 text-primary/70 mr-2" />
-          <span>Target Date</span>
-        </div>
-        
+      <div className="flex-1">        
         <Popover open={showDatePicker} onOpenChange={setShowDatePicker}>
           <PopoverTrigger asChild>
             <Button 
               variant="ghost" 
-              className="mt-2 w-full justify-start text-left font-normal border-0 border-b border-border/20 rounded-none px-0 py-1.5 hover:bg-transparent focus:ring-0 h-9"
+              className="w-full justify-start text-left font-normal border-0 border-b border-border/20 rounded-none px-0 py-1.5 hover:bg-transparent focus:ring-0 h-9"
               type="button"
             >
               <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Bell, Plus, X, Calendar } from 'lucide-react';
+import { Bell, Plus, X } from 'lucide-react';
 import { DAYS_OF_WEEK } from '../constants/habit-constants';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
@@ -43,13 +43,8 @@ const FrequencySelector: React.FC<FrequencySelectorProps> = ({
   return (
     <div className="flex flex-col gap-4">
       {/* Frequency Section */}
-      <div className="space-y-2">
-        <div className="flex items-center text-sm font-medium text-muted-foreground">
-          <Calendar className="h-4 w-4 text-primary/70 mr-2" />
-          <span>Frequency</span>
-        </div>
-        
-        <div className="mt-2">
+      <div className="space-y-2">        
+        <div>
           <ToggleGroup 
             type="single" 
             value={frequency}
@@ -98,7 +93,7 @@ const FrequencySelector: React.FC<FrequencySelectorProps> = ({
           <span>Reminders</span>
         </div>
         
-        <div className="flex items-center gap-2 mt-2">
+        <div className="flex items-center gap-2">
           <Input
             type="time"
             value={newReminderTime}
