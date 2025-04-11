@@ -16,25 +16,19 @@ const HabitTracker: React.FC = () => {
   const [filteredHabits, setFilteredHabits] = useState<Habit[]>([]);
   const [selectedHabitId, setSelectedHabitId] = useState<string | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
   
   // Load habits when component mounts
   useEffect(() => {
-    const initializeData = async () => {
-      if (!isInitialized) {
-        console.log('HabitTracker: Initializing data');
-        try {
-          await loadHabits();
-          setIsInitialized(true);
-          console.log('HabitTracker: Data initialized');
-        } catch (error) {
-          console.error('Error initializing habit tracker data:', error);
-        }
-      }
-    };
+    console.log('HabitTracker: Loading habits data');
+    loadHabits();
     
-    initializeData();
-  }, [loadHabits, isInitialized]);
+    // Log when component mounts to help with debugging
+    console.log('HabitTracker mounted');
+    
+    return () => {
+      console.log('HabitTracker unmounted');
+    };
+  }, [loadHabits]);
   
   useEffect(() => {
     // Set filtered habits when habits change
@@ -51,22 +45,6 @@ const HabitTracker: React.FC = () => {
     }
   }, [habits, selectedHabitId]);
 
-  useEffect(() => {
-    // Log when component mounts to help with debugging
-    console.log('HabitTracker mounted, habits count:', habits.length);
-    
-    if (habits.length > 0) {
-      toast({
-        title: "Habits loaded",
-        description: `${habits.length} habits loaded successfully`,
-      });
-    }
-    
-    return () => {
-      console.log('HabitTracker unmounted');
-    };
-  }, []);
-
   const handleSelectHabit = (habitId: string) => {
     setSelectedHabitId(habitId);
     setIsDetailOpen(true);
@@ -75,7 +53,13 @@ const HabitTracker: React.FC = () => {
   const handleAddHabitSuccess = () => {
     setIsAddHabitOpen(false);
     // Reload habits after adding a new one
+    console.log('HabitTracker: Habit added, reloading habits');
     loadHabits();
+    
+    toast({
+      title: "Success",
+      description: "Habit added successfully",
+    });
   };
 
   const selectedHabit = selectedHabitId 

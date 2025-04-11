@@ -20,6 +20,9 @@ export const useHabitStorage = () => {
     if (item.hasOwnProperty('updatedAt')) {
       item.updatedAt = new Date(item.updatedAt);
     }
+    if (item.hasOwnProperty('startDate') && item.startDate) {
+      item.startDate = new Date(item.startDate);
+    }
     if (item.hasOwnProperty('endDate') && item.endDate) {
       item.endDate = new Date(item.endDate);
     }
@@ -146,10 +149,8 @@ export const useHabitStorage = () => {
   // Save habits to localStorage whenever they change
   useEffect(() => {
     try {
-      if (habits.length > 0) {
-        console.log('Saving habits to localStorage:', habits);
-        localStorage.setItem(HABITS_STORAGE_KEY, JSON.stringify(habits));
-      }
+      console.log('Saving habits to localStorage:', habits);
+      localStorage.setItem(HABITS_STORAGE_KEY, JSON.stringify(habits));
     } catch (error) {
       console.error('Error saving habits to localStorage:', error);
       toast({
@@ -163,10 +164,8 @@ export const useHabitStorage = () => {
   // Save habit logs to localStorage whenever they change
   useEffect(() => {
     try {
-      if (habitLogs.length > 0) {
-        console.log('Saving habit logs to localStorage:', habitLogs);
-        localStorage.setItem(HABIT_LOGS_STORAGE_KEY, JSON.stringify(habitLogs));
-      }
+      console.log('Saving habit logs to localStorage:', habitLogs);
+      localStorage.setItem(HABIT_LOGS_STORAGE_KEY, JSON.stringify(habitLogs));
     } catch (error) {
       console.error('Error saving habit logs to localStorage:', error);
       toast({

@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Layout from '@/components/layout/Layout';
 import TaskList from '@/components/tasks/TaskList';
 import FloatingActionButton from '@/components/fab/FloatingActionButton';
@@ -11,7 +11,6 @@ import { toast } from '@/hooks/use-toast';
 
 const Index: React.FC = () => {
   const { habits, isLoading, loadHabits } = useHabit();
-  const [isInitialized, setIsInitialized] = useState(false);
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -20,18 +19,15 @@ const Index: React.FC = () => {
     // Force reload habits when component mounts
     const loadData = async () => {
       try {
-        if (!isInitialized) {
-          console.log('Index page: Forcing reload of habits data');
-          await loadHabits();
-          setIsInitialized(true);
-          
-          console.log('Index page: Habits data reloaded successfully, count:', habits.length);
-          if (habits.length > 0) {
-            toast({
-              title: "Data loaded",
-              description: `${habits.length} habits loaded successfully`,
-            });
-          }
+        console.log('Index page: Forcing reload of habits data');
+        await loadHabits();
+        
+        console.log('Index page: Habits data reloaded successfully, count:', habits.length);
+        if (habits.length > 0) {
+          toast({
+            title: "Data loaded",
+            description: `${habits.length} habits loaded successfully`,
+          });
         }
       } catch (error) {
         console.error('Error loading habits on index page:', error);
@@ -48,7 +44,7 @@ const Index: React.FC = () => {
     return () => {
       console.log('Index page unmounted');
     };
-  }, [loadHabits, isInitialized]);
+  }, [loadHabits]);
 
   useEffect(() => {
     // Log whenever habits change
