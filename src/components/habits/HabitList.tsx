@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Habit } from '@/types/habit';
 import { useHabit } from '@/contexts/HabitContext';
 import HabitCard from './HabitCard';
 import { PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { toast } from '@/hooks/use-toast';
 
 interface HabitListProps {
   habits: Habit[];
@@ -21,6 +22,14 @@ const HabitList: React.FC<HabitListProps> = ({
 }) => {
   const { getHabitStreak } = useHabit();
   
+  useEffect(() => {
+    console.log('HabitList mounted with', habits.length, 'habits');
+    
+    return () => {
+      console.log('HabitList unmounted');
+    };
+  }, [habits.length]);
+
   console.log('HabitList rendering with', habits.length, 'habits:', habits);
 
   // Sort habits by streak (descending) and then by name

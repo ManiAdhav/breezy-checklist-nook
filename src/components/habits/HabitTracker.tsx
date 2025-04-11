@@ -8,6 +8,7 @@ import { useHabit } from '@/contexts/HabitContext';
 import { Habit } from '@/types/habit';
 import HabitDetail from './HabitDetail';
 import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from '@/hooks/use-toast';
 
 const HabitTracker: React.FC = () => {
   const { habits, isLoading } = useHabit();
@@ -17,7 +18,7 @@ const HabitTracker: React.FC = () => {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   
   useEffect(() => {
-    // Set filtered habits to all habits initially
+    // Set filtered habits when habits change
     if (habits) {
       console.log('HabitTracker: Setting filtered habits', habits);
       setFilteredHabits(habits);
@@ -25,9 +26,27 @@ const HabitTracker: React.FC = () => {
       // If we have habits but none selected, select the first one
       if (habits.length > 0 && !selectedHabitId) {
         setSelectedHabitId(habits[0].id);
+      } else if (habits.length === 0) {
+        setSelectedHabitId(null);
       }
     }
   }, [habits, selectedHabitId]);
+
+  useEffect(() => {
+    // Log when component mounts to help with debugging
+    console.log('HabitTracker mounted, habits count:', habits.length);
+    
+    if (habits.length > 0) {
+      toast({
+        title: "Habits loaded",
+        description: `${habits.length} habits loaded successfully`,
+      });
+    }
+    
+    return () => {
+      console.log('HabitTracker unmounted');
+    };
+  }, []);
 
   const handleSelectHabit = (habitId: string) => {
     setSelectedHabitId(habitId);

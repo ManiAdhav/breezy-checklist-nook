@@ -80,10 +80,8 @@ export const useHabitStorage = () => {
   // Save habits to localStorage whenever they change
   useEffect(() => {
     try {
-      if (habits.length > 0) {
-        console.log('Saving habits to localStorage:', habits);
-        localStorage.setItem(HABITS_STORAGE_KEY, JSON.stringify(habits));
-      }
+      console.log('Saving habits to localStorage:', habits);
+      localStorage.setItem(HABITS_STORAGE_KEY, JSON.stringify(habits));
     } catch (error) {
       console.error('Error saving habits to localStorage:', error);
       toast({
