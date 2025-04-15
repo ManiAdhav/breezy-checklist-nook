@@ -8,7 +8,6 @@ import { useHabit } from '@/contexts/HabitContext';
 import HabitDetail from './HabitDetail';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/hooks/use-toast';
-import { Habit } from '@/types/habit';
 
 const HabitTracker: React.FC = () => {
   const { habits, isLoading, loadHabits, getHabitStreak } = useHabit();
@@ -32,7 +31,6 @@ const HabitTracker: React.FC = () => {
     };
     
     loadData();
-    // Include loadHabits in dependency array to satisfy React hooks rules
   }, [loadHabits]);
   
   // Prepare habits with streak data for display using useMemo
