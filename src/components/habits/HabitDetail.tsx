@@ -19,7 +19,7 @@ interface HabitDetailProps {
   habit: Habit | null;
 }
 
-const HabitDetail: React.FC<HabitDetailProps> = ({ open, onOpenChange, habit }) => {
+const HabitDetail: React.FC<HabitDetailProps> = memo(({ open, onOpenChange, habit }) => {
   const { updateHabit, deleteHabit } = useHabit();
   const { threeYearGoals } = useGoal();
   const [isEditMode, setIsEditMode] = useState(false);
@@ -120,6 +120,22 @@ const HabitDetail: React.FC<HabitDetailProps> = ({ open, onOpenChange, habit }) 
       )}
     </>
   );
-};
+}, (prevProps, nextProps) => {
+  // Deep comparison for the habit prop to prevent unnecessary rerenders
+  if (prevProps.open !== nextProps.open) return false;
+  if (!prevProps.habit && !nextProps.habit) return true;
+  if (!prevProps.habit || !nextProps.habit) return false;
+  
+  // Only update if habit ID changes or if meaningful data changes 
+  return (
+    prevProps.habit.id === nextProps.habit.id &&
+    prevProps.habit.name === nextProps.habit.name &&
+    prevProps.habit.streak === nextProps.habit.streak &&
+    prevProps.habit.updatedAt === nextProps.habit.updatedAt &&
+    JSON.stringify(prevProps.habit.logs) === JSON.stringify(nextProps.habit.logs)
+  );
+});
 
-export default memo(HabitDetail);
+HabitDetail.displayName = 'HabitDetail';
+
+export default HabitDetail;

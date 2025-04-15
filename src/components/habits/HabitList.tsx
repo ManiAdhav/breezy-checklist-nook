@@ -1,11 +1,10 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, memo, useMemo } from 'react';
 import { Habit } from '@/types/habit';
 import { useHabit } from '@/contexts/HabitContext';
 import HabitCard from './HabitCard';
 import { PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { toast } from '@/hooks/use-toast';
 
 interface HabitListProps {
   habits: Habit[];
@@ -14,7 +13,7 @@ interface HabitListProps {
   onAddHabit: () => void;
 }
 
-const HabitList: React.FC<HabitListProps> = ({ 
+const HabitList: React.FC<HabitListProps> = memo(({ 
   habits, 
   selectedHabitId, 
   onSelectHabit,
@@ -30,19 +29,22 @@ const HabitList: React.FC<HabitListProps> = ({
     };
   }, [habits.length]);
 
-  console.log('HabitList rendering with', habits.length, 'habits:', habits);
-
-  // Sort habits by streak (descending) and then by name
-  const sortedHabits = [...habits].sort((a, b) => {
-    const streakA = getHabitStreak(a.id).current;
-    const streakB = getHabitStreak(b.id).current;
+  // Memoize the sorted habits to prevent re-sorting on every render
+  const sortedHabits = useMemo(() => {
+    console.log('HabitList sorting', habits.length, 'habits');
     
-    if (streakA !== streakB) {
-      return streakB - streakA; // Sort by streak (descending)
-    }
-    
-    return a.name.localeCompare(b.name); // Then by name
-  });
+    // Create a new array and sort it
+    return [...habits].sort((a, b) => {
+      const streakA = getHabitStreak(a.id).current;
+      const streakB = getHabitStreak(b.id).current;
+      
+      if (streakA !== streakB) {
+        return streakB - streakA; // Sort by streak (descending)
+      }
+      
+      return a.name.localeCompare(b.name); // Then by name
+    });
+  }, [habits, getHabitStreak]);
 
   if (habits.length === 0) {
     return (
@@ -64,7 +66,7 @@ const HabitList: React.FC<HabitListProps> = ({
     <div className="space-y-3">
       {sortedHabits.map((habit) => (
         <HabitCard
-          key={habit.id}
+          key={`habit-card-${habit.id}`}
           habit={{
             ...habit,
             streak: getHabitStreak(habit.id).current
@@ -82,6 +84,17 @@ const HabitList: React.FC<HabitListProps> = ({
       </div>
     </div>
   );
-};
+}, (prevProps, nextProps) => {
+  if (prevProps.selectedHabitId !== nextProps.selectedHabitId) return false;
+  if (prevProps.habits.length !== nextProps.habits.length) return false;
+  
+  // Compare habit IDs to see if the array contents have changed
+  const prevIds = prevProps.habits.map(h => h.id).sort().join(',');
+  const nextIds = nextProps.habits.map(h => h.id).sort().join(',');
+  
+  return prevIds === nextIds;
+});
+
+HabitList.displayName = 'HabitList';
 
 export default HabitList;

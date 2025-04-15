@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import HabitList from './HabitList';
@@ -18,21 +18,23 @@ const HabitTracker: React.FC = () => {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
   
+  // Reference to track if the component is mounted
+  const isMounted = useRef(true);
+  
   // Load habits only once when component mounts
   useEffect(() => {
-    let mounted = true;
     console.log('HabitTracker: Initial load of habits data');
     
     const initialLoad = async () => {
       try {
         await loadHabits();
-        if (mounted) {
+        if (isMounted.current) {
           console.log('HabitTracker: Initial habits load complete');
           setInitialLoadDone(true);
         }
       } catch (err) {
         console.error('Error loading habits in HabitTracker:', err);
-        if (mounted) {
+        if (isMounted.current) {
           toast({
             title: "Error loading habits",
             description: "Failed to load habits data. Please refresh the page.",
@@ -46,7 +48,7 @@ const HabitTracker: React.FC = () => {
     
     // Cleanup function to prevent state updates after unmount
     return () => {
-      mounted = false;
+      isMounted.current = false;
       console.log('HabitTracker unmounted');
     };
   }, [loadHabits]);
@@ -61,7 +63,7 @@ const HabitTracker: React.FC = () => {
   
   // Set filtered habits only when sorted habits change and component is mounted
   useEffect(() => {
-    if (sortedHabits.length > 0) {
+    if (sortedHabits.length > 0 && isMounted.current) {
       console.log('HabitTracker: Setting filtered habits', sortedHabits.length);
       setFilteredHabits(sortedHabits);
       
@@ -162,7 +164,7 @@ const HabitTracker: React.FC = () => {
       
       {selectedHabit && (
         <HabitDetail
-          key={selectedHabit.id}
+          key={`habit-detail-${selectedHabit.id}`}
           open={isDetailOpen}
           onOpenChange={handleDetailOpenChange}
           habit={selectedHabit}
