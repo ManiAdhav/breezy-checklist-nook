@@ -39,32 +39,35 @@ const HabitTracker: React.FC = () => {
     
     initialLoad();
     
-    // Log when component mounts to help with debugging
-    console.log('HabitTracker mounted');
-    
     return () => {
       console.log('HabitTracker unmounted');
     };
   }, [loadHabits]);
   
+  // Update filtered habits when habits array changes
   useEffect(() => {
-    // Set filtered habits when habits change
     if (habits) {
       console.log('HabitTracker: Setting filtered habits', habits.length);
       setFilteredHabits(habits);
       
-      // If we have habits but none selected, select the first one
-      if (habits.length > 0 && !selectedHabitId) {
+      // Only set the selected habit on initial load if none is selected
+      if (habits.length > 0 && !selectedHabitId && !isDetailOpen) {
         setSelectedHabitId(habits[0].id);
       } else if (habits.length === 0) {
         setSelectedHabitId(null);
       }
     }
-  }, [habits, selectedHabitId]);
+  }, [habits, selectedHabitId, isDetailOpen]);
 
   const handleSelectHabit = (habitId: string) => {
-    setSelectedHabitId(habitId);
-    setIsDetailOpen(true);
+    if (selectedHabitId === habitId) {
+      // If the same habit is clicked, just toggle the detail view
+      setIsDetailOpen(!isDetailOpen);
+    } else {
+      // If a different habit is clicked, select it and open detail view
+      setSelectedHabitId(habitId);
+      setIsDetailOpen(true);
+    }
   };
   
   const handleAddHabitSuccess = async () => {
@@ -79,11 +82,10 @@ const HabitTracker: React.FC = () => {
     });
   };
 
-  const selectedHabit = selectedHabitId 
+  // Only find the selected habit when needed
+  const selectedHabit = isDetailOpen && selectedHabitId
     ? habits.find(h => h.id === selectedHabitId) || null
     : null;
-
-  console.log('HabitTracker rendering, habits count:', habits.length);
 
   return (
     <div className="h-full overflow-y-auto pb-6">
@@ -128,11 +130,13 @@ const HabitTracker: React.FC = () => {
         onSuccess={handleAddHabitSuccess}
       />
       
-      <HabitDetail
-        open={isDetailOpen}
-        onOpenChange={setIsDetailOpen}
-        habit={selectedHabit}
-      />
+      {selectedHabit && (
+        <HabitDetail
+          open={isDetailOpen}
+          onOpenChange={setIsDetailOpen}
+          habit={selectedHabit}
+        />
+      )}
     </div>
   );
 };

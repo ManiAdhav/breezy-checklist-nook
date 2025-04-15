@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { 
   Dialog, 
   DialogContent,
@@ -26,7 +26,8 @@ const HabitDetail: React.FC<HabitDetailProps> = ({ open, onOpenChange, habit }) 
   
   if (!habit) return null;
   
-  const handleAddLog = (newLog: HabitLog) => {
+  // Memoize the handler to avoid recreating on every render
+  const handleAddLog = useCallback((newLog: HabitLog) => {
     const updatedLogs = [...(habit.logs || []), newLog];
     
     // Calculate new streak
@@ -60,14 +61,14 @@ const HabitDetail: React.FC<HabitDetailProps> = ({ open, onOpenChange, habit }) 
       logs: updatedLogs,
       streak
     });
-  };
+  }, [habit, updateHabit]);
   
-  const handleDeleteHabit = () => {
+  const handleDeleteHabit = useCallback(() => {
     if (window.confirm('Are you sure you want to delete this habit?')) {
       deleteHabit(habit.id);
       onOpenChange(false);
     }
-  };
+  }, [habit.id, deleteHabit, onOpenChange]);
   
   // Get associated goal if any
   const associatedGoal = habit.goalId 
