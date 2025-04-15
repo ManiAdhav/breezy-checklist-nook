@@ -19,7 +19,7 @@ interface HabitDetailProps {
   habit: Habit | null;
 }
 
-const HabitDetail: React.FC<HabitDetailProps> = memo(({ open, onOpenChange, habit }) => {
+const HabitDetail = memo(({ open, onOpenChange, habit }: HabitDetailProps) => {
   const { updateHabit, deleteHabit } = useHabit();
   const { threeYearGoals } = useGoal();
   const [isEditMode, setIsEditMode] = useState(false);
@@ -27,43 +27,17 @@ const HabitDetail: React.FC<HabitDetailProps> = memo(({ open, onOpenChange, habi
   // If no habit is provided, render nothing
   if (!habit) return null;
   
-  // Memoize the handler to avoid recreating on every render
+  // Handler for adding logs
   const handleAddLog = useCallback((newLog: HabitLog) => {
     const updatedLogs = [...(habit.logs || []), newLog];
     
-    // Calculate new streak
-    let streak = habit.streak || 0;
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    
-    const isToday = newLog.date.toDateString() === today.toDateString();
-    const isYesterday = newLog.date.toDateString() === yesterday.toDateString();
-    
-    if (isToday) {
-      // Log for today - increment streak if there was a log yesterday
-      const hasYesterdayLog = habit.logs?.some(
-        log => new Date(log.date).toDateString() === yesterday.toDateString()
-      );
-      if (hasYesterdayLog) {
-        streak += 1;
-      } else {
-        streak = 1; // Reset streak to 1 if today but no yesterday log
-      }
-    } else if (isYesterday) {
-      // Log for yesterday - set streak to 1 if there wasn't already a streak
-      if (streak === 0) {
-        streak = 1;
-      }
-    }
-    
-    // Update the habit with new logs and streak
+    // Update the habit with new logs
     updateHabit(habit.id, { 
-      logs: updatedLogs,
-      streak
+      logs: updatedLogs
     });
   }, [habit, updateHabit]);
   
+  // Handler for deleting habits
   const handleDeleteHabit = useCallback(() => {
     if (window.confirm('Are you sure you want to delete this habit?')) {
       deleteHabit(habit.id);
@@ -121,16 +95,14 @@ const HabitDetail: React.FC<HabitDetailProps> = memo(({ open, onOpenChange, habi
     </>
   );
 }, (prevProps, nextProps) => {
-  // Deep comparison for the habit prop to prevent unnecessary rerenders
+  // Only render if these specific props change
   if (prevProps.open !== nextProps.open) return false;
   if (!prevProps.habit && !nextProps.habit) return true;
   if (!prevProps.habit || !nextProps.habit) return false;
   
-  // Only update if habit ID changes or if meaningful data changes 
   return (
     prevProps.habit.id === nextProps.habit.id &&
     prevProps.habit.name === nextProps.habit.name &&
-    prevProps.habit.streak === nextProps.habit.streak &&
     prevProps.habit.updatedAt === nextProps.habit.updatedAt &&
     JSON.stringify(prevProps.habit.logs) === JSON.stringify(nextProps.habit.logs)
   );

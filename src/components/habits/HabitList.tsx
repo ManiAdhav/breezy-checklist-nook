@@ -1,7 +1,6 @@
 
-import React, { useEffect, memo, useMemo } from 'react';
+import React, { memo } from 'react';
 import { Habit } from '@/types/habit';
-import { useHabit } from '@/contexts/HabitContext';
 import HabitCard from './HabitCard';
 import { PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,39 +12,12 @@ interface HabitListProps {
   onAddHabit: () => void;
 }
 
-const HabitList: React.FC<HabitListProps> = memo(({ 
+const HabitList = memo(({ 
   habits, 
   selectedHabitId, 
   onSelectHabit,
   onAddHabit 
-}) => {
-  const { getHabitStreak } = useHabit();
-  
-  useEffect(() => {
-    console.log('HabitList mounted with', habits.length, 'habits');
-    
-    return () => {
-      console.log('HabitList unmounted');
-    };
-  }, [habits.length]);
-
-  // Memoize the sorted habits to prevent re-sorting on every render
-  const sortedHabits = useMemo(() => {
-    console.log('HabitList sorting', habits.length, 'habits');
-    
-    // Create a new array and sort it
-    return [...habits].sort((a, b) => {
-      const streakA = getHabitStreak(a.id).current;
-      const streakB = getHabitStreak(b.id).current;
-      
-      if (streakA !== streakB) {
-        return streakB - streakA; // Sort by streak (descending)
-      }
-      
-      return a.name.localeCompare(b.name); // Then by name
-    });
-  }, [habits, getHabitStreak]);
-
+}: HabitListProps) => {
   if (habits.length === 0) {
     return (
       <div className="text-center py-10 border-2 border-dashed border-gray-200 rounded-lg">
@@ -64,13 +36,10 @@ const HabitList: React.FC<HabitListProps> = memo(({
 
   return (
     <div className="space-y-3">
-      {sortedHabits.map((habit) => (
+      {habits.map((habit) => (
         <HabitCard
-          key={`habit-card-${habit.id}`}
-          habit={{
-            ...habit,
-            streak: getHabitStreak(habit.id).current
-          }}
+          key={habit.id}
+          habit={habit}
           onClick={() => onSelectHabit(habit.id)}
           isSelected={selectedHabitId === habit.id}
         />
@@ -85,6 +54,7 @@ const HabitList: React.FC<HabitListProps> = memo(({
     </div>
   );
 }, (prevProps, nextProps) => {
+  // Only re-render if these specific props change
   if (prevProps.selectedHabitId !== nextProps.selectedHabitId) return false;
   if (prevProps.habits.length !== nextProps.habits.length) return false;
   

@@ -1,122 +1,67 @@
 
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import HabitList from './HabitList';
 import AddHabitDialog from './AddHabitDialog';
 import { useHabit } from '@/contexts/HabitContext';
-import { Habit } from '@/types/habit';
 import HabitDetail from './HabitDetail';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/hooks/use-toast';
 
 const HabitTracker: React.FC = () => {
-  const { habits, isLoading, loadHabits } = useHabit();
+  const { habits, isLoading, loadHabits, getHabitStreak } = useHabit();
   const [isAddHabitOpen, setIsAddHabitOpen] = useState(false);
-  const [filteredHabits, setFilteredHabits] = useState<Habit[]>([]);
   const [selectedHabitId, setSelectedHabitId] = useState<string | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [initialLoadDone, setInitialLoadDone] = useState(false);
-  
-  // Reference to track if the component is mounted
-  const isMounted = useRef(true);
   
   // Load habits only once when component mounts
   useEffect(() => {
-    console.log('HabitTracker: Initial load of habits data');
-    
-    const initialLoad = async () => {
+    const loadData = async () => {
       try {
         await loadHabits();
-        if (isMounted.current) {
-          console.log('HabitTracker: Initial habits load complete');
-          setInitialLoadDone(true);
-        }
       } catch (err) {
-        console.error('Error loading habits in HabitTracker:', err);
-        if (isMounted.current) {
-          toast({
-            title: "Error loading habits",
-            description: "Failed to load habits data. Please refresh the page.",
-            variant: "destructive"
-          });
-        }
+        toast({
+          title: "Error loading habits",
+          description: "Failed to load habits data. Please refresh the page.",
+          variant: "destructive"
+        });
       }
     };
     
-    initialLoad();
-    
-    // Cleanup function to prevent state updates after unmount
-    return () => {
-      isMounted.current = false;
-      console.log('HabitTracker unmounted');
-    };
+    loadData();
   }, [loadHabits]);
   
-  // Memoize the sorted habits to prevent unnecessary recalculations
-  const sortedHabits = useMemo(() => {
-    if (!habits || habits.length === 0) return [];
-    console.log('HabitTracker: Creating sorted habits list', habits.length);
-    // Create a new array to avoid modifying the original
-    return [...habits];
-  }, [habits]);
-  
-  // Set filtered habits only when sorted habits change and component is mounted
-  useEffect(() => {
-    if (sortedHabits.length > 0 && isMounted.current) {
-      console.log('HabitTracker: Setting filtered habits', sortedHabits.length);
-      setFilteredHabits(sortedHabits);
-      
-      // Only set the selected habit on initial load if none is selected
-      if (initialLoadDone && sortedHabits.length > 0 && !selectedHabitId && !isDetailOpen) {
-        setSelectedHabitId(sortedHabits[0].id);
-      } else if (sortedHabits.length === 0) {
-        setSelectedHabitId(null);
-      }
+  // Prepare habits with streak data for display
+  const preparedHabits = habits.map(habit => ({
+    ...habit,
+    streak: getHabitStreak(habit.id).current
+  })).sort((a, b) => {
+    // Sort by streak (descending)
+    if (a.streak !== b.streak) {
+      return b.streak - a.streak;
     }
-  }, [sortedHabits, selectedHabitId, isDetailOpen, initialLoadDone]);
-
-  // Strictly memoize all handler functions
+    // Then by name (ascending)
+    return a.name.localeCompare(b.name);
+  });
+  
+  // Find the selected habit object
+  const selectedHabit = selectedHabitId 
+    ? habits.find(h => h.id === selectedHabitId) 
+    : null;
+  
+  // Callbacks for habit actions
   const handleSelectHabit = useCallback((habitId: string) => {
-    setSelectedHabitId(previousId => {
-      if (previousId === habitId) {
-        // If the same habit is clicked, just toggle the detail view
-        setIsDetailOpen(prev => !prev);
-        return previousId;
-      } else {
-        // If a different habit is clicked, select it and open detail view
-        setIsDetailOpen(true);
-        return habitId;
-      }
-    });
+    setSelectedHabitId(habitId);
+    setIsDetailOpen(true);
   }, []);
   
-  const handleAddHabitSuccess = useCallback(async () => {
-    setIsAddHabitOpen(false);
-    // Reload habits after adding a new one
-    console.log('HabitTracker: Habit added, reloading habits');
-    await loadHabits();
-    
-    toast({
-      title: "Success",
-      description: "Habit added successfully",
-    });
-  }, [loadHabits]);
-
-  // Find the selected habit only when needed, and memoize the result
-  const selectedHabit = useMemo(() => {
-    if (!isDetailOpen || !selectedHabitId || !habits.length) return null;
-    return habits.find(h => h.id === selectedHabitId) || null;
-  }, [habits, selectedHabitId, isDetailOpen]);
-
-  // Memoize the dialog open state change handler
-  const handleDetailOpenChange = useCallback((open: boolean) => {
-    setIsDetailOpen(open);
-  }, []);
-
-  // Memoize the add habit dialog handler
   const handleAddHabitClick = useCallback(() => {
     setIsAddHabitOpen(true);
+  }, []);
+  
+  const handleDetailOpenChange = useCallback((open: boolean) => {
+    setIsDetailOpen(open);
   }, []);
 
   return (
@@ -138,18 +83,9 @@ const HabitTracker: React.FC = () => {
           <Skeleton className="h-24 w-full" />
           <Skeleton className="h-24 w-full" />
         </div>
-      ) : habits.length === 0 && initialLoadDone ? (
-        <div className="text-center py-12 border border-dashed rounded-lg">
-          <h3 className="text-lg font-medium mb-2">No habits created yet</h3>
-          <p className="text-muted-foreground mb-4">Start tracking your habits to build consistency</p>
-          <Button onClick={handleAddHabitClick}>
-            <Plus className="mr-2 h-4 w-4" />
-            Create Your First Habit
-          </Button>
-        </div>
       ) : (
         <HabitList 
-          habits={filteredHabits} 
+          habits={preparedHabits} 
           selectedHabitId={selectedHabitId}
           onSelectHabit={handleSelectHabit}
           onAddHabit={handleAddHabitClick}
@@ -159,7 +95,14 @@ const HabitTracker: React.FC = () => {
       <AddHabitDialog
         open={isAddHabitOpen}
         onOpenChange={setIsAddHabitOpen}
-        onSuccess={handleAddHabitSuccess}
+        onSuccess={async () => {
+          setIsAddHabitOpen(false);
+          await loadHabits();
+          toast({
+            title: "Success",
+            description: "Habit added successfully",
+          });
+        }}
       />
       
       {selectedHabit && (
@@ -174,4 +117,4 @@ const HabitTracker: React.FC = () => {
   );
 };
 
-export default React.memo(HabitTracker);
+export default HabitTracker;
