@@ -4,6 +4,7 @@ import { Habit } from '@/types/habit';
 import HabitCard from './HabitCard';
 import { PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import isEqual from 'lodash.isequal';
 
 interface HabitListProps {
   habits: Array<Habit & { streak: number }>;
@@ -18,6 +19,8 @@ function HabitList({
   onSelectHabit,
   onAddHabit 
 }: HabitListProps) {
+  console.log('HabitList re-rendered'); // Debugging
+
   // Empty state
   if (habits.length === 0) {
     return (
@@ -59,22 +62,8 @@ function HabitList({
 
 // Optimize memo comparison to prevent unnecessary re-renders
 export default React.memo(HabitList, (prevProps, nextProps) => {
-  // Only re-render if these specific props change
-  if (prevProps.selectedHabitId !== nextProps.selectedHabitId) {
-    return false;
-  }
-  
-  if (prevProps.habits.length !== nextProps.habits.length) {
-    return false;
-  }
-  
-  // Deep comparison of habits array content
-  return prevProps.habits.every((prevHabit, index) => {
-    const nextHabit = nextProps.habits[index];
-    return (
-      prevHabit.id === nextHabit.id &&
-      prevHabit.name === nextHabit.name &&
-      prevHabit.streak === nextHabit.streak
-    );
-  });
+  return (
+    prevProps.selectedHabitId === nextProps.selectedHabitId &&
+    isEqual(prevProps.habits, nextProps.habits)
+  );
 });
