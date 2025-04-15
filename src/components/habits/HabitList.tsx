@@ -1,5 +1,5 @@
 
-import React, { memo } from 'react';
+import React from 'react';
 import { Habit } from '@/types/habit';
 import HabitCard from './HabitCard';
 import { PlusCircle } from 'lucide-react';
@@ -12,12 +12,14 @@ interface HabitListProps {
   onAddHabit: () => void;
 }
 
-const HabitList = memo(({ 
+// Rebuild HabitList as a pure functional component with proper props
+function HabitList({ 
   habits, 
   selectedHabitId, 
   onSelectHabit,
   onAddHabit 
-}: HabitListProps) => {
+}: HabitListProps) {
+  // Empty state
   if (habits.length === 0) {
     return (
       <div className="text-center py-10 border-2 border-dashed border-gray-200 rounded-lg">
@@ -34,6 +36,7 @@ const HabitList = memo(({
     );
   }
 
+  // Render list of habits
   return (
     <div className="space-y-3">
       {habits.map((habit) => (
@@ -53,7 +56,9 @@ const HabitList = memo(({
       </div>
     </div>
   );
-}, (prevProps, nextProps) => {
+}
+
+export default React.memo(HabitList, (prevProps, nextProps) => {
   // Only re-render if these specific props change
   if (prevProps.selectedHabitId !== nextProps.selectedHabitId) return false;
   if (prevProps.habits.length !== nextProps.habits.length) return false;
@@ -64,7 +69,3 @@ const HabitList = memo(({
   
   return prevIds === nextIds;
 });
-
-HabitList.displayName = 'HabitList';
-
-export default HabitList;

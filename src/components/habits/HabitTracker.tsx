@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import HabitList from './HabitList';
@@ -33,25 +33,28 @@ const HabitTracker: React.FC = () => {
     loadData();
   }, [loadHabits]);
   
-  // Prepare habits with streak data for display
-  const preparedHabits = habits.map(habit => ({
-    ...habit,
-    streak: getHabitStreak(habit.id).current
-  })).sort((a, b) => {
-    // Sort by streak (descending)
-    if (a.streak !== b.streak) {
-      return b.streak - a.streak;
-    }
-    // Then by name (ascending)
-    return a.name.localeCompare(b.name);
-  });
+  // Prepare habits with streak data for display using useMemo to prevent recalculations
+  const preparedHabits = useMemo(() => {
+    return habits.map(habit => ({
+      ...habit,
+      streak: getHabitStreak(habit.id).current
+    })).sort((a, b) => {
+      // Sort by streak (descending)
+      if (a.streak !== b.streak) {
+        return b.streak - a.streak;
+      }
+      // Then by name (ascending)
+      return a.name.localeCompare(b.name);
+    });
+  }, [habits, getHabitStreak]);
   
-  // Find the selected habit object
-  const selectedHabit = selectedHabitId 
-    ? habits.find(h => h.id === selectedHabitId) 
-    : null;
+  // Find the selected habit object - use useMemo to prevent unnecessary recalculations
+  const selectedHabit = useMemo(() => {
+    if (!selectedHabitId) return null;
+    return habits.find(h => h.id === selectedHabitId) || null;
+  }, [selectedHabitId, habits]);
   
-  // Callbacks for habit actions
+  // Callbacks for habit actions - using useCallback to prevent recreation on each render
   const handleSelectHabit = useCallback((habitId: string) => {
     setSelectedHabitId(habitId);
     setIsDetailOpen(true);
@@ -63,7 +66,23 @@ const HabitTracker: React.FC = () => {
   
   const handleDetailOpenChange = useCallback((open: boolean) => {
     setIsDetailOpen(open);
+    if (!open) {
+      // When dialog closes, clear selected habit after a short delay
+      // This prevents flickering when closing and reopening quickly
+      setTimeout(() => {
+        setSelectedHabitId(null);
+      }, 100);
+    }
   }, []);
+
+  const handleAddHabitSuccess = useCallback(async () => {
+    setIsAddHabitOpen(false);
+    await loadHabits();
+    toast({
+      title: "Success",
+      description: "Habit added successfully",
+    });
+  }, [loadHabits]);
 
   return (
     <div className="h-full overflow-y-auto pb-6">
@@ -96,14 +115,7 @@ const HabitTracker: React.FC = () => {
       <AddHabitDialog
         open={isAddHabitOpen}
         onOpenChange={setIsAddHabitOpen}
-        onSuccess={async () => {
-          setIsAddHabitOpen(false);
-          await loadHabits();
-          toast({
-            title: "Success",
-            description: "Habit added successfully",
-          });
-        }}
+        onSuccess={handleAddHabitSuccess}
       />
       
       {selectedHabit && (

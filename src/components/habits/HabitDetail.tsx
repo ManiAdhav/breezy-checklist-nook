@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, memo } from 'react';
+import React, { useState, useCallback } from 'react';
 import { 
   Dialog, 
   DialogContent,
@@ -19,7 +19,7 @@ interface HabitDetailProps {
   habit: Habit | null;
 }
 
-const HabitDetail = memo(({ open, onOpenChange, habit }: HabitDetailProps) => {
+function HabitDetail({ open, onOpenChange, habit }: HabitDetailProps) {
   const { updateHabit, deleteHabit } = useHabit();
   const { threeYearGoals } = useGoal();
   const [isEditMode, setIsEditMode] = useState(false);
@@ -94,7 +94,10 @@ const HabitDetail = memo(({ open, onOpenChange, habit }: HabitDetailProps) => {
       )}
     </>
   );
-}, (prevProps, nextProps) => {
+}
+
+// Use React.memo with custom comparison to prevent unnecessary re-renders
+export default React.memo(HabitDetail, (prevProps, nextProps) => {
   // Only render if these specific props change
   if (prevProps.open !== nextProps.open) return false;
   if (!prevProps.habit && !nextProps.habit) return true;
@@ -107,7 +110,3 @@ const HabitDetail = memo(({ open, onOpenChange, habit }: HabitDetailProps) => {
     JSON.stringify(prevProps.habit.logs) === JSON.stringify(nextProps.habit.logs)
   );
 });
-
-HabitDetail.displayName = 'HabitDetail';
-
-export default HabitDetail;

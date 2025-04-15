@@ -9,7 +9,7 @@ interface HabitCardProps {
   isSelected: boolean;
 }
 
-const HabitCard: React.FC<HabitCardProps> = ({ habit, onClick, isSelected }) => {
+const HabitCard = React.memo(({ habit, onClick, isSelected }: HabitCardProps) => {
   return (
     <div 
       onClick={onClick}
@@ -34,6 +34,8 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onClick, isSelected }) => 
       </div>
     </div>
   );
-};
+});
+
+HabitCard.displayName = 'HabitCard';
 
 export default HabitCard;
