@@ -1,192 +1,155 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Habit, HabitLog } from '@/types/habit';
-import { HABITS_STORAGE_KEY, HABIT_LOGS_STORAGE_KEY } from '@/api/services/storage/constants';
 import { toast } from '@/hooks/use-toast';
+
+// Local storage keys
+const HABITS_STORAGE_KEY = 'habits';
+const HABIT_LOGS_STORAGE_KEY = 'habitLogs';
 
 export const useHabitStorage = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [habitLogs, setHabitLogs] = useState<HabitLog[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Function to properly parse dates from localStorage
-  const parseDates = (item: any): any => {
-    if (item === null || typeof item !== 'object') return item;
+  // Helper function to safely parse dates in objects
+  const parseDatesInObject = (obj: any): any => {
+    const dateProperties = ['createdAt', 'updatedAt', 'startDate', 'endDate', 'date'];
     
-    // Handle Date objects
-    if (item.hasOwnProperty('createdAt')) {
-      item.createdAt = new Date(item.createdAt);
-    }
-    if (item.hasOwnProperty('updatedAt')) {
-      item.updatedAt = new Date(item.updatedAt);
-    }
-    if (item.hasOwnProperty('startDate') && item.startDate) {
-      item.startDate = new Date(item.startDate);
-    }
-    if (item.hasOwnProperty('endDate') && item.endDate) {
-      item.endDate = new Date(item.endDate);
-    }
-    if (item.hasOwnProperty('date') && item.date) {
-      item.date = new Date(item.date);
-    }
-    
-    // Process arrays recursively
-    if (Array.isArray(item)) {
-      return item.map(element => parseDates(element));
-    }
-    
-    // Process objects recursively
-    const result = { ...item };
-    for (const key in result) {
-      if (result.hasOwnProperty(key) && typeof result[key] === 'object' && result[key] !== null) {
-        result[key] = parseDates(result[key]);
+    const parsed = { ...obj };
+    for (const key of dateProperties) {
+      if (parsed[key] && typeof parsed[key] === 'string') {
+        parsed[key] = new Date(parsed[key]);
       }
     }
-    
-    return result;
+    return parsed;
   };
 
-  // Load habits from localStorage
+  // Load habits and logs from storage
   const loadHabitsFromStorage = useCallback(async () => {
+    console.log('Loading habits and logs from storage');
+    setIsLoading(true);
+    
     try {
-      setIsLoading(true);
-      console.log('Loading habits and logs from storage');
-      
       // Load habits
-      const storedHabits = localStorage.getItem(HABITS_STORAGE_KEY);
-      console.log('Raw habits from storage:', storedHabits);
+      const habitsJson = localStorage.getItem(HABITS_STORAGE_KEY);
+      console.log('Raw habits from storage:', habitsJson);
       
-      if (storedHabits) {
+      let parsedHabits: Habit[] = [];
+      if (habitsJson) {
         try {
-          const parsedHabits = JSON.parse(storedHabits);
+          parsedHabits = JSON.parse(habitsJson);
           console.log('Parsed habits before date conversion:', parsedHabits);
           
-          // Convert string dates to Date objects
-          const formattedHabits = parseDates(parsedHabits);
-          console.log('Formatted habits after date conversion:', formattedHabits);
-          
-          setHabits(formattedHabits);
-        } catch (parseError) {
-          console.error('Error parsing habits JSON:', parseError);
-          setHabits([]);
+          // Parse dates in habits
+          parsedHabits = parsedHabits.map(habit => parseDatesInObject(habit));
+          console.log('Formatted habits after date conversion:', parsedHabits);
+        } catch (e) {
+          console.error('Error parsing habits from storage:', e);
           toast({
-            title: "Error loading habits",
-            description: "Invalid habit data format. Starting with empty habits.",
+            title: "Error",
+            description: "Failed to load habits data. The data might be corrupted.",
             variant: "destructive"
           });
         }
-      } else {
-        console.log('No habits found in storage');
-        setHabits([]);
       }
       
       // Load habit logs
-      const storedLogs = localStorage.getItem(HABIT_LOGS_STORAGE_KEY);
-      console.log('Raw habit logs from storage:', storedLogs);
+      const logsJson = localStorage.getItem(HABIT_LOGS_STORAGE_KEY);
+      console.log('Raw habit logs from storage:', logsJson);
       
-      if (storedLogs) {
+      let parsedLogs: HabitLog[] = [];
+      if (logsJson) {
         try {
-          const parsedLogs = JSON.parse(storedLogs);
+          parsedLogs = JSON.parse(logsJson);
           console.log('Parsed logs before date conversion:', parsedLogs);
           
-          // Convert string dates to Date objects
-          const formattedLogs = parseDates(parsedLogs);
-          console.log('Formatted logs after date conversion:', formattedLogs);
-          
-          setHabitLogs(formattedLogs);
-        } catch (parseError) {
-          console.error('Error parsing habit logs JSON:', parseError);
-          setHabitLogs([]);
+          // Parse dates in logs
+          parsedLogs = parsedLogs.map(log => parseDatesInObject(log));
+          console.log('Formatted logs after date conversion:', parsedLogs);
+        } catch (e) {
+          console.error('Error parsing habit logs from storage:', e);
           toast({
-            title: "Error loading habit logs",
-            description: "Invalid log data format. Starting with empty logs.",
+            title: "Error",
+            description: "Failed to load habit logs data. The data might be corrupted.",
             variant: "destructive"
           });
         }
-      } else {
-        console.log('No habit logs found in storage');
-        setHabitLogs([]);
       }
       
-      return true;
+      // Update state with parsed data
+      setHabits(parsedHabits);
+      setHabitLogs(parsedLogs);
+      console.log('Finished loading habits and logs from storage');
+      
+      return { habits: parsedHabits, habitLogs: parsedLogs };
     } catch (error) {
-      console.error('Error loading data from localStorage:', error);
+      console.error('Error loading from storage:', error);
       toast({
         title: "Error loading data",
-        description: "There was a problem loading your habits. Please try refreshing the page.",
+        description: "Failed to load data from storage",
         variant: "destructive"
       });
-      
-      // Initialize with empty arrays in case of error
-      setHabits([]);
-      setHabitLogs([]);
-      return false;
+      return { habits: [], habitLogs: [] };
     } finally {
       setIsLoading(false);
-      console.log('Finished loading habits and logs from storage');
     }
   }, []);
 
-  // Load habits from localStorage on mount
-  useEffect(() => {
-    console.log('useHabitStorage: Initial load of habits from storage');
-    loadHabitsFromStorage();
-    
-    // Add event listener for storage changes from other tabs
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === HABITS_STORAGE_KEY || event.key === HABIT_LOGS_STORAGE_KEY) {
-        console.log('Storage changed in another tab, reloading data');
-        loadHabitsFromStorage();
-      }
-    };
-    
-    window.addEventListener('storage', handleStorageChange);
-    
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, [loadHabitsFromStorage]);
-
-  // Save habits to localStorage whenever they change
-  useEffect(() => {
-    if (habits.length > 0) {
-      try {
-        console.log('Saving habits to localStorage:', habits);
-        localStorage.setItem(HABITS_STORAGE_KEY, JSON.stringify(habits));
-      } catch (error) {
-        console.error('Error saving habits to localStorage:', error);
-        toast({
-          title: "Error saving habits",
-          description: "There was a problem saving your habits.",
-          variant: "destructive"
-        });
-      }
+  // Save habits to storage
+  const saveHabitsToStorage = useCallback(async (habitsToSave: Habit[]) => {
+    console.log('Saving habits to storage:', habitsToSave);
+    try {
+      localStorage.setItem(HABITS_STORAGE_KEY, JSON.stringify(habitsToSave));
+      console.log('Habits saved successfully');
+    } catch (error) {
+      console.error('Error saving habits to storage:', error);
+      toast({
+        title: "Error saving data",
+        description: "Failed to save habits data to storage",
+        variant: "destructive"
+      });
     }
-  }, [habits]);
+  }, []);
 
-  // Save habit logs to localStorage whenever they change
-  useEffect(() => {
-    if (habitLogs.length > 0) {
-      try {
-        console.log('Saving habit logs to localStorage:', habitLogs);
-        localStorage.setItem(HABIT_LOGS_STORAGE_KEY, JSON.stringify(habitLogs));
-      } catch (error) {
-        console.error('Error saving habit logs to localStorage:', error);
-        toast({
-          title: "Error saving habit logs",
-          description: "There was a problem saving your habit logs.",
-          variant: "destructive"
-        });
-      }
+  // Save habit logs to storage
+  const saveHabitLogsToStorage = useCallback(async (logsToSave: HabitLog[]) => {
+    console.log('Saving habit logs to storage:', logsToSave);
+    try {
+      localStorage.setItem(HABIT_LOGS_STORAGE_KEY, JSON.stringify(logsToSave));
+      console.log('Habit logs saved successfully');
+    } catch (error) {
+      console.error('Error saving habit logs to storage:', error);
+      toast({
+        title: "Error saving data",
+        description: "Failed to save habit logs data to storage",
+        variant: "destructive"
+      });
     }
-  }, [habitLogs]);
+  }, []);
 
-  return { 
-    habits, 
-    setHabits, 
-    habitLogs, 
-    setHabitLogs, 
+  // Update habits state and save to storage
+  const updateHabits = useCallback((newHabits: Habit[]) => {
+    console.log('Updating habits state and storage:', newHabits.length, 'habits');
+    setHabits(newHabits);
+    saveHabitsToStorage(newHabits);
+  }, [saveHabitsToStorage]);
+
+  // Update habit logs state and save to storage
+  const updateHabitLogs = useCallback((newLogs: HabitLog[]) => {
+    console.log('Updating habit logs state and storage:', newLogs.length, 'logs');
+    setHabitLogs(newLogs);
+    saveHabitLogsToStorage(newLogs);
+  }, [saveHabitLogsToStorage]);
+
+  return {
+    habits,
+    setHabits: updateHabits,
+    habitLogs,
+    setHabitLogs: updateHabitLogs,
     isLoading,
-    loadHabitsFromStorage 
+    loadHabitsFromStorage,
+    saveHabitsToStorage,
+    saveHabitLogsToStorage
   };
 };

@@ -39,7 +39,7 @@ export const useHabitForm = (
   editHabit?: Habit,
   onSuccess?: () => void
 ) => {
-  const { addHabit, updateHabit } = useHabit();
+  const { addHabit, updateHabit, loadHabits } = useHabit();
   const [selectedIcon, setSelectedIcon] = useState<string>(editHabit?.icon || 'Activity');
   const [showIconSelector, setShowIconSelector] = useState(false);
   const [selectedDays, setSelectedDays] = useState<string[]>(editHabit?.selectedDays || []);
@@ -82,21 +82,21 @@ export const useHabitForm = (
     try {
       console.log('Form data submitted:', data);
       
-      // Ensure all required fields are present
+      // Ensure all required fields are present and correctly typed
       const habitData = {
-        name: data.name,                 // Required
+        name: data.name,                 // Required string
         description: data.description || "",
-        metric: data.metric,             // Required
-        target: data.target,             // Required
-        frequency: data.frequency,       // Required
-        startDate: data.startDate,       // Required
-        endDate: data.endDate,
-        goalId: data.goalId,
-        icon: selectedIcon,
-        selectedDays,
-        timeOfDay,
-        reminders,
-        tags: [],                        // Required but can be empty array
+        metric: data.metric,             // Required string
+        target: Number(data.target),     // Required number
+        frequency: data.frequency,       // Required enum
+        startDate: data.startDate,       // Required date
+        endDate: data.endDate,           // Optional date
+        goalId: data.goalId || "",       // Optional string
+        icon: selectedIcon,              // String
+        selectedDays,                    // Array of strings
+        timeOfDay,                       // String
+        reminders,                       // Array of strings
+        tags: [],                        // Required array
       };
       
       console.log('Processed habit data:', habitData);
@@ -117,6 +117,9 @@ export const useHabitForm = (
           description: "Habit added successfully.",
         });
       }
+      
+      // Force reload habits to ensure UI is updated
+      await loadHabits();
       
       form.reset();
       onOpenChange(false);

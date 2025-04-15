@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { HabitContext } from './HabitContext';
 import { useHabitStorage } from './useHabitStorage';
 import { useHabitOperations } from './useHabitOperations';
@@ -7,7 +7,16 @@ import { useStreakCalculation } from './useStreakCalculation';
 import { toast } from '@/hooks/use-toast';
 
 export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { habits, setHabits, habitLogs, setHabitLogs, isLoading: storageLoading, loadHabitsFromStorage } = useHabitStorage();
+  const { 
+    habits, 
+    setHabits, 
+    habitLogs, 
+    setHabitLogs, 
+    isLoading: storageLoading, 
+    loadHabitsFromStorage,
+    saveHabitsToStorage 
+  } = useHabitStorage();
+  
   const { calculateHabitStreak } = useStreakCalculation();
   const [loadingState, setLoadingState] = useState(false);
   
@@ -26,18 +35,38 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     loadHabits();
   }, []);
 
-  const getHabitStreak = (habitId: string) => {
+  // Function to calculate streak for a habit
+  const getHabitStreak = useCallback((habitId: string) => {
     return calculateHabitStreak(habitLogs, habitId);
-  };
+  }, [habitLogs, calculateHabitStreak]);
   
   // Function to load habits data
-  const loadHabits = async () => {
+  const loadHabits = useCallback(async () => {
     console.log('HabitProvider: Forcing reload of habits data');
     setLoadingState(true);
     
     try {
-      await loadHabitsFromStorage();
-      console.log('HabitProvider: Habits reloaded successfully', habits);
+      const { habits: loadedHabits } = await loadHabitsFromStorage();
+      
+      // Update habit streaks
+      if (loadedHabits && loadedHabits.length > 0) {
+        const habitsWithStreaks = loadedHabits.map(habit => {
+          const streak = calculateHabitStreak(habitLogs, habit.id);
+          return { ...habit, streak };
+        });
+        
+        setHabits(habitsWithStreaks);
+      }
+      
+      console.log('HabitProvider: Habits reloaded successfully', habits.length);
+      
+      // Show toast if habits were loaded successfully
+      if (loadedHabits && loadedHabits.length > 0) {
+        toast({
+          title: "Habits loaded",
+          description: `${loadedHabits.length} habits loaded successfully`,
+        });
+      }
     } catch (error) {
       console.error('Error loading habits in provider:', error);
       toast({
@@ -48,10 +77,17 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } finally {
       setLoadingState(false);
     }
-  };
+  }, [loadHabitsFromStorage, habitLogs, calculateHabitStreak, setHabits]);
+
+  // Force save all habits
+  const saveAllHabits = useCallback(() => {
+    console.log('HabitProvider: Force saving all habits');
+    saveHabitsToStorage(habits);
+  }, [habits, saveHabitsToStorage]);
 
   const combinedIsLoading = storageLoading || loadingState;
 
+  // Context value with all habit operations
   const value = {
     habits,
     habitLogs,
@@ -63,9 +99,11 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     logProgress,
     getHabitLogs,
     getHabitStreak,
-    loadHabits
+    loadHabits,
+    saveAllHabits
   };
 
+  // Log when habits change for debugging
   useEffect(() => {
     console.log('HabitProvider rendered with', habits.length, 'habits');
   }, [habits.length]);

@@ -77,7 +77,7 @@ const Index: React.FC = () => {
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-24 animate-pulse bg-gray-200 rounded-lg"></div>
+                <Skeleton key={i} className="h-24 w-full" />
               ))}
             </div>
           ) : (
@@ -98,7 +98,7 @@ const Index: React.FC = () => {
                     )}
                   </div>
                 ))
-              ) : (
+              ) : initialLoadComplete ? (
                 <div className="col-span-full border border-dashed rounded-lg p-6 text-center">
                   <p className="text-muted-foreground">No habits created yet</p>
                   <Button 
@@ -109,6 +109,10 @@ const Index: React.FC = () => {
                   >
                     Create a Habit
                   </Button>
+                </div>
+              ) : (
+                <div className="col-span-full text-center p-4">
+                  <p className="text-muted-foreground">Loading habits...</p>
                 </div>
               )}
             </div>

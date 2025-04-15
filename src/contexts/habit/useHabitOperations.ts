@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Habit, HabitLog } from '@/types/habit';
 import { v4 as uuidv4 } from 'uuid';
+import { toast } from '@/hooks/use-toast';
 
 export const useHabitOperations = (
   habits: Habit[],
@@ -18,6 +19,17 @@ export const useHabitOperations = (
   const addHabit = (habitData: Omit<Habit, 'id' | 'createdAt' | 'updatedAt'>): Habit => {
     console.log('Adding new habit with data:', habitData);
     
+    // Validate required fields
+    if (!habitData.name || !habitData.metric || !habitData.target || !habitData.frequency) {
+      console.error('Missing required fields for habit:', habitData);
+      toast({
+        title: "Error",
+        description: "Missing required fields for habit",
+        variant: "destructive",
+      });
+      throw new Error('Missing required habit fields');
+    }
+    
     const now = new Date();
     const newHabit: Habit = {
       id: uuidv4(),
@@ -28,7 +40,12 @@ export const useHabitOperations = (
     };
 
     console.log('Created new habit object:', newHabit);
-    setHabits(prev => [...prev, newHabit]);
+    
+    // Update state with new habit
+    const updatedHabits = [...habits, newHabit];
+    setHabits(updatedHabits);
+    
+    // Return the newly created habit
     return newHabit;
   };
 
@@ -37,7 +54,7 @@ export const useHabitOperations = (
     console.log(`Updating habit ${id} with:`, updates);
     
     setHabits(prev => {
-      return prev.map(habit => {
+      const updatedHabits = prev.map(habit => {
         if (habit.id === id) {
           const updatedHabit = {
             ...habit,
@@ -49,6 +66,9 @@ export const useHabitOperations = (
         }
         return habit;
       });
+      
+      console.log('Updated habits state with', updatedHabits.length, 'habits');
+      return updatedHabits;
     });
   };
 
@@ -57,10 +77,18 @@ export const useHabitOperations = (
     console.log(`Deleting habit ${id}`);
     
     // Remove the habit
-    setHabits(prev => prev.filter(habit => habit.id !== id));
+    setHabits(prev => {
+      const updatedHabits = prev.filter(habit => habit.id !== id);
+      console.log('Habits after deletion:', updatedHabits.length);
+      return updatedHabits;
+    });
     
     // Remove all logs associated with this habit
-    setHabitLogs(prev => prev.filter(log => log.habitId !== id));
+    setHabitLogs(prev => {
+      const updatedLogs = prev.filter(log => log.habitId !== id);
+      console.log('Logs after habit deletion:', updatedLogs.length);
+      return updatedLogs;
+    });
   };
 
   // Log progress for a habit
@@ -73,7 +101,11 @@ export const useHabitOperations = (
     };
     
     // Add the new log
-    setHabitLogs(prev => [...prev, newLog]);
+    setHabitLogs(prev => {
+      const updatedLogs = [...prev, newLog];
+      console.log('Updated habit logs:', updatedLogs.length);
+      return updatedLogs;
+    });
     
     // Update the habit's updatedAt timestamp
     setHabits(prev => {
@@ -86,6 +118,12 @@ export const useHabitOperations = (
         }
         return habit;
       });
+    });
+    
+    // Show success toast
+    toast({
+      title: "Progress Logged",
+      description: "Your habit progress has been recorded",
     });
   };
 

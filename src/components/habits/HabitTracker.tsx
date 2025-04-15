@@ -16,21 +16,28 @@ const HabitTracker: React.FC = () => {
   const [filteredHabits, setFilteredHabits] = useState<Habit[]>([]);
   const [selectedHabitId, setSelectedHabitId] = useState<string | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
   
   // Load habits when component mounts
   useEffect(() => {
-    console.log('HabitTracker: Loading habits data');
-    // Force a reload of habits data to ensure we have the latest
-    const loadData = async () => {
+    console.log('HabitTracker: Initial load of habits data');
+    
+    const initialLoad = async () => {
       try {
         await loadHabits();
-        console.log('HabitTracker: Habits loaded successfully');
+        console.log('HabitTracker: Initial habits load complete');
+        setInitialLoadDone(true);
       } catch (err) {
         console.error('Error loading habits in HabitTracker:', err);
+        toast({
+          title: "Error loading habits",
+          description: "Failed to load habits data. Please refresh the page.",
+          variant: "destructive"
+        });
       }
     };
     
-    loadData();
+    initialLoad();
     
     // Log when component mounts to help with debugging
     console.log('HabitTracker mounted');
@@ -43,7 +50,7 @@ const HabitTracker: React.FC = () => {
   useEffect(() => {
     // Set filtered habits when habits change
     if (habits) {
-      console.log('HabitTracker: Setting filtered habits', habits);
+      console.log('HabitTracker: Setting filtered habits', habits.length);
       setFilteredHabits(habits);
       
       // If we have habits but none selected, select the first one
@@ -60,11 +67,11 @@ const HabitTracker: React.FC = () => {
     setIsDetailOpen(true);
   };
   
-  const handleAddHabitSuccess = () => {
+  const handleAddHabitSuccess = async () => {
     setIsAddHabitOpen(false);
     // Reload habits after adding a new one
     console.log('HabitTracker: Habit added, reloading habits');
-    loadHabits();
+    await loadHabits();
     
     toast({
       title: "Success",
@@ -96,6 +103,15 @@ const HabitTracker: React.FC = () => {
           <Skeleton className="h-24 w-full" />
           <Skeleton className="h-24 w-full" />
           <Skeleton className="h-24 w-full" />
+        </div>
+      ) : habits.length === 0 && initialLoadDone ? (
+        <div className="text-center py-12 border border-dashed rounded-lg">
+          <h3 className="text-lg font-medium mb-2">No habits created yet</h3>
+          <p className="text-muted-foreground mb-4">Start tracking your habits to build consistency</p>
+          <Button onClick={() => setIsAddHabitOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Create Your First Habit
+          </Button>
         </div>
       ) : (
         <HabitList 

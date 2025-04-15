@@ -1,19 +1,28 @@
 
-import React, { createContext, useContext } from 'react';
-import { HabitContextType } from './types';
+import { createContext, useContext } from 'react';
+import { Habit, HabitLog } from '@/types/habit';
 
-const HabitContext = createContext<HabitContextType | null>(null);
+interface HabitContextType {
+  habits: Habit[];
+  habitLogs: HabitLog[];
+  isLoading: boolean;
+  getHabitById: (id: string) => Habit | undefined;
+  addHabit: (habit: Omit<Habit, 'id' | 'createdAt' | 'updatedAt'>) => Habit;
+  updateHabit: (id: string, updates: Partial<Omit<Habit, 'id' | 'createdAt' | 'updatedAt'>>) => void;
+  deleteHabit: (id: string) => void;
+  logProgress: (log: Omit<HabitLog, 'id'>) => void;
+  getHabitLogs: (habitId: string) => HabitLog[];
+  getHabitStreak: (habitId: string) => number;
+  loadHabits: () => Promise<void>;
+  saveAllHabits?: () => void;
+}
 
-export const useHabit = () => {
+export const HabitContext = createContext<HabitContextType | undefined>(undefined);
+
+export const useHabit = (): HabitContextType => {
   const context = useContext(HabitContext);
   if (!context) {
     throw new Error('useHabit must be used within a HabitProvider');
   }
   return context;
 };
-
-// Export the context for use in the provider
-export { HabitContext };
-
-// Re-export the provider from its dedicated file
-export { HabitProvider } from './HabitProvider';
