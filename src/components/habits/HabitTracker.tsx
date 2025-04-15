@@ -33,7 +33,6 @@ const HabitTracker: React.FC = () => {
     
     loadData();
     // Include loadHabits in dependency array to satisfy React hooks rules
-    // but ensure it doesn't cause infinite loops in HabitProvider
   }, [loadHabits]);
   
   // Prepare habits with streak data for display using useMemo
@@ -58,7 +57,7 @@ const HabitTracker: React.FC = () => {
     return habits.find(h => h.id === selectedHabitId) || null;
   }, [selectedHabitId, habits]);
   
-  // Callbacks for habit actions
+  // Callbacks for habit actions - memoize all callbacks to prevent re-rendering
   const handleSelectHabit = useCallback((habitId: string) => {
     setSelectedHabitId(habitId);
     setIsDetailOpen(true);
@@ -74,6 +73,10 @@ const HabitTracker: React.FC = () => {
       // Clear selected habit on dialog close to prevent stale state
       setSelectedHabitId(null);
     }
+  }, []);
+
+  const handleAddHabitDialogOpenChange = useCallback((open: boolean) => {
+    setIsAddHabitOpen(open);
   }, []);
 
   const handleAddHabitSuccess = useCallback(async () => {
@@ -115,7 +118,7 @@ const HabitTracker: React.FC = () => {
       
       <AddHabitDialog
         open={isAddHabitOpen}
-        onOpenChange={setIsAddHabitOpen}
+        onOpenChange={handleAddHabitDialogOpenChange}
         onSuccess={handleAddHabitSuccess}
       />
       

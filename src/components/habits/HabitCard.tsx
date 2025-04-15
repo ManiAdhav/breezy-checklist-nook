@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Habit } from '@/types/habit';
 import DynamicIcon from '@/components/ui/dynamic-icon';
 
@@ -9,10 +9,15 @@ interface HabitCardProps {
   isSelected: boolean;
 }
 
-const HabitCard = React.memo(({ habit, onClick, isSelected }: HabitCardProps) => {
+const HabitCard = ({ habit, onClick, isSelected }: HabitCardProps) => {
+  // Memoize the click handler to prevent unnecessary re-renders
+  const handleClick = useCallback(() => {
+    onClick();
+  }, [onClick]);
+
   return (
     <div 
-      onClick={onClick}
+      onClick={handleClick}
       className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
         isSelected ? 'ring-2 ring-primary shadow-md' : ''
       }`}
@@ -34,17 +39,21 @@ const HabitCard = React.memo(({ habit, onClick, isSelected }: HabitCardProps) =>
       </div>
     </div>
   );
-}, (prevProps, nextProps) => {
+};
+
+// Optimize memo comparison with a custom comparison function
+const MemoizedHabitCard = React.memo(HabitCard, (prevProps, nextProps) => {
   // Only re-render if these specific props change
   return (
     prevProps.isSelected === nextProps.isSelected &&
     prevProps.habit.id === nextProps.habit.id &&
     prevProps.habit.name === nextProps.habit.name &&
     prevProps.habit.updatedAt === nextProps.habit.updatedAt &&
-    prevProps.habit.streak === nextProps.habit.streak
+    prevProps.habit.streak === nextProps.habit.streak &&
+    prevProps.onClick === nextProps.onClick
   );
 });
 
-HabitCard.displayName = 'HabitCard';
+MemoizedHabitCard.displayName = 'HabitCard';
 
-export default HabitCard;
+export default MemoizedHabitCard;

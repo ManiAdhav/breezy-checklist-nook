@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Habit } from '@/types/habit';
 import HabitCard from './HabitCard';
 import { PlusCircle } from 'lucide-react';
@@ -19,8 +19,11 @@ function HabitList({
   onSelectHabit,
   onAddHabit 
 }: HabitListProps) {
-  console.log('HabitList re-rendered'); // Debugging
-
+  // Memoize the select handler to prevent unnecessary re-renders
+  const handleSelectHabit = useCallback((habitId: string) => {
+    onSelectHabit(habitId);
+  }, [onSelectHabit]);
+  
   // Empty state
   if (habits.length === 0) {
     return (
@@ -38,17 +41,22 @@ function HabitList({
     );
   }
 
+  // Memoize the habit cards to prevent re-rendering when not needed
+  const habitCards = useMemo(() => {
+    return habits.map((habit) => (
+      <HabitCard
+        key={habit.id}
+        habit={habit}
+        onClick={() => handleSelectHabit(habit.id)}
+        isSelected={selectedHabitId === habit.id}
+      />
+    ));
+  }, [habits, selectedHabitId, handleSelectHabit]);
+
   // Render list of habits
   return (
     <div className="space-y-3">
-      {habits.map((habit) => (
-        <HabitCard
-          key={habit.id}
-          habit={habit}
-          onClick={() => onSelectHabit(habit.id)}
-          isSelected={selectedHabitId === habit.id}
-        />
-      ))}
+      {habitCards}
       
       <div className="mt-6 text-center">
         <Button onClick={onAddHabit} variant="outline">
@@ -64,6 +72,8 @@ function HabitList({
 export default React.memo(HabitList, (prevProps, nextProps) => {
   return (
     prevProps.selectedHabitId === nextProps.selectedHabitId &&
+    prevProps.onSelectHabit === nextProps.onSelectHabit &&
+    prevProps.onAddHabit === nextProps.onAddHabit &&
     isEqual(prevProps.habits, nextProps.habits)
   );
 });

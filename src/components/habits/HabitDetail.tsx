@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { 
   Dialog, 
   DialogContent,
@@ -27,6 +27,13 @@ function HabitDetail({ open, onOpenChange, habit }: HabitDetailProps) {
   // If no habit is provided, render nothing
   if (!habit) return null;
   
+  // Memoize the associated goal to prevent unnecessary recalculations
+  const associatedGoal = useMemo(() => {
+    return habit.goalId 
+      ? threeYearGoals?.find(goal => goal.id === habit.goalId)
+      : null;
+  }, [habit.goalId, threeYearGoals]);
+  
   // Handler for adding logs
   const handleAddLog = useCallback((newLog: HabitLog) => {
     // Ensure we have logs array or default to empty array
@@ -46,10 +53,15 @@ function HabitDetail({ open, onOpenChange, habit }: HabitDetailProps) {
     }
   }, [habit.id, deleteHabit, onOpenChange]);
   
-  // Get associated goal if any
-  const associatedGoal = habit.goalId 
-    ? threeYearGoals?.find(goal => goal.id === habit.goalId)
-    : null;
+  // Handler for edit mode
+  const handleEditClick = useCallback(() => {
+    setIsEditMode(true);
+  }, []);
+  
+  // Handler for dialog open change
+  const handleEditDialogOpenChange = useCallback((open: boolean) => {
+    setIsEditMode(open);
+  }, []);
 
   return (
     <>
@@ -57,7 +69,7 @@ function HabitDetail({ open, onOpenChange, habit }: HabitDetailProps) {
         <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
           <HabitDetailHeader 
             habitName={habit.name}
-            onEdit={() => setIsEditMode(true)}
+            onEdit={handleEditClick}
             onDelete={handleDeleteHabit}
           />
           
@@ -89,7 +101,7 @@ function HabitDetail({ open, onOpenChange, habit }: HabitDetailProps) {
       {isEditMode && (
         <AddHabitDialog
           open={isEditMode}
-          onOpenChange={setIsEditMode}
+          onOpenChange={handleEditDialogOpenChange}
           editHabit={habit}
         />
       )}
@@ -109,6 +121,7 @@ export default React.memo(HabitDetail, (prevProps, nextProps) => {
     prevProps.habit.id === nextProps.habit.id &&
     prevProps.habit.name === nextProps.habit.name &&
     prevProps.habit.updatedAt === nextProps.habit.updatedAt &&
-    JSON.stringify(prevProps.habit.logs) === JSON.stringify(nextProps.habit.logs)
+    JSON.stringify(prevProps.habit.logs || []) === JSON.stringify(nextProps.habit.logs || []) &&
+    prevProps.onOpenChange === nextProps.onOpenChange
   );
 });
