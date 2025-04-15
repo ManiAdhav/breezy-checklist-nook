@@ -24,6 +24,7 @@ const HabitDetail: React.FC<HabitDetailProps> = ({ open, onOpenChange, habit }) 
   const { threeYearGoals } = useGoal();
   const [isEditMode, setIsEditMode] = useState(false);
   
+  // If no habit is provided, render nothing
   if (!habit) return null;
   
   // Memoize the handler to avoid recreating on every render
@@ -121,5 +122,4 @@ const HabitDetail: React.FC<HabitDetailProps> = ({ open, onOpenChange, habit }) 
   );
 };
 
-// Memoize the entire component to prevent unnecessary re-renders
 export default memo(HabitDetail);
