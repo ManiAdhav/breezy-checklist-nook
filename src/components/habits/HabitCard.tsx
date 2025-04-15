@@ -4,7 +4,7 @@ import { Habit } from '@/types/habit';
 import DynamicIcon from '@/components/ui/dynamic-icon';
 
 interface HabitCardProps {
-  habit: Habit;
+  habit: Habit & { streak: number };
   onClick: () => void;
   isSelected: boolean;
 }

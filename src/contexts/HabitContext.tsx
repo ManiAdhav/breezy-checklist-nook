@@ -1,4 +1,5 @@
 
-import { HabitProvider, useHabit } from './habit/HabitContext';
+import { HabitContext, useHabit } from './habit/HabitContext';
+import { HabitProvider } from './habit/HabitProvider';
 
-export { HabitProvider, useHabit };
+export { HabitContext, HabitProvider, useHabit };

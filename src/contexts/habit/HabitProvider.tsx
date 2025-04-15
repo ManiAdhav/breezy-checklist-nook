@@ -5,6 +5,7 @@ import { useHabitStorage } from './useHabitStorage';
 import { useHabitOperations } from './useHabitOperations';
 import { useStreakCalculation } from './useStreakCalculation';
 import { toast } from '@/hooks/use-toast';
+import { Habit } from '@/types/habit';
 
 export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { 
@@ -47,16 +48,6 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     
     try {
       const { habits: loadedHabits } = await loadHabitsFromStorage();
-      
-      // Update habit streaks
-      if (loadedHabits && loadedHabits.length > 0) {
-        const habitsWithStreaks = loadedHabits.map(habit => {
-          const streak = calculateHabitStreak(habitLogs, habit.id);
-          return { ...habit, streak };
-        });
-        
-        setHabits(habitsWithStreaks);
-      }
       
       console.log('HabitProvider: Habits reloaded successfully', habits.length);
       

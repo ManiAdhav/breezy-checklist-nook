@@ -1,6 +1,6 @@
 
 import { createContext, useContext } from 'react';
-import { Habit, HabitLog } from '@/types/habit';
+import { Habit, HabitLog, HabitStreak } from '@/types/habit';
 
 interface HabitContextType {
   habits: Habit[];
@@ -12,7 +12,7 @@ interface HabitContextType {
   deleteHabit: (id: string) => void;
   logProgress: (log: Omit<HabitLog, 'id'>) => void;
   getHabitLogs: (habitId: string) => HabitLog[];
-  getHabitStreak: (habitId: string) => number;
+  getHabitStreak: (habitId: string) => HabitStreak;
   loadHabits: () => Promise<void>;
   saveAllHabits?: () => void;
 }
