@@ -6,7 +6,7 @@ import { PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface HabitListProps {
-  habits: Habit[];
+  habits: Array<Habit & { streak: number }>;
   selectedHabitId: string | null;
   onSelectHabit: (habitId: string) => void;
   onAddHabit: () => void;

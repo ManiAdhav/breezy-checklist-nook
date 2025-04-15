@@ -28,7 +28,7 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onClick, isSelected }) => 
           </div>
         </div>
         <div className="text-right">
-          <div className="font-semibold">{habit.streak || 0}</div>
+          <div className="font-semibold">{habit.streak}</div>
           <div className="text-xs text-gray-500">day streak</div>
         </div>
       </div>
