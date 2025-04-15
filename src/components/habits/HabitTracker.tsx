@@ -22,6 +22,7 @@ const HabitTracker: React.FC = () => {
       try {
         await loadHabits();
       } catch (err) {
+        console.error('Error loading habits:', err);
         toast({
           title: "Error loading habits",
           description: "Failed to load habits data. Please refresh the page.",
@@ -31,10 +32,13 @@ const HabitTracker: React.FC = () => {
     };
     
     loadData();
+    // Include loadHabits in dependency array to satisfy React hooks rules
+    // but ensure it doesn't cause infinite loops in HabitProvider
   }, [loadHabits]);
   
-  // Prepare habits with streak data for display using useMemo to prevent recalculations
+  // Prepare habits with streak data for display using useMemo
   const preparedHabits = useMemo(() => {
+    // Avoid unnecessary recalculation by memoizing the result
     return habits.map(habit => ({
       ...habit,
       streak: getHabitStreak(habit.id).current
@@ -54,7 +58,7 @@ const HabitTracker: React.FC = () => {
     return habits.find(h => h.id === selectedHabitId) || null;
   }, [selectedHabitId, habits]);
   
-  // Callbacks for habit actions - using useCallback to prevent recreation on each render
+  // Callbacks for habit actions
   const handleSelectHabit = useCallback((habitId: string) => {
     setSelectedHabitId(habitId);
     setIsDetailOpen(true);
@@ -67,11 +71,8 @@ const HabitTracker: React.FC = () => {
   const handleDetailOpenChange = useCallback((open: boolean) => {
     setIsDetailOpen(open);
     if (!open) {
-      // When dialog closes, clear selected habit after a short delay
-      // This prevents flickering when closing and reopening quickly
-      setTimeout(() => {
-        setSelectedHabitId(null);
-      }, 100);
+      // Clear selected habit on dialog close to prevent stale state
+      setSelectedHabitId(null);
     }
   }, []);
 
@@ -120,7 +121,7 @@ const HabitTracker: React.FC = () => {
       
       {selectedHabit && (
         <HabitDetail
-          key={`habit-detail-${selectedHabit.id}`}
+          key={`habit-detail-${selectedHabitId}`}
           open={isDetailOpen}
           onOpenChange={handleDetailOpenChange}
           habit={selectedHabit}
@@ -130,4 +131,4 @@ const HabitTracker: React.FC = () => {
   );
 };
 
-export default HabitTracker;
+export default React.memo(HabitTracker);

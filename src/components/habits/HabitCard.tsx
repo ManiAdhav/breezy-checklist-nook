@@ -34,6 +34,15 @@ const HabitCard = React.memo(({ habit, onClick, isSelected }: HabitCardProps) =>
       </div>
     </div>
   );
+}, (prevProps, nextProps) => {
+  // Only re-render if these specific props change
+  return (
+    prevProps.isSelected === nextProps.isSelected &&
+    prevProps.habit.id === nextProps.habit.id &&
+    prevProps.habit.name === nextProps.habit.name &&
+    prevProps.habit.updatedAt === nextProps.habit.updatedAt &&
+    prevProps.habit.streak === nextProps.habit.streak
+  );
 });
 
 HabitCard.displayName = 'HabitCard';

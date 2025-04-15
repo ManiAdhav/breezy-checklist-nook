@@ -12,7 +12,6 @@ interface HabitListProps {
   onAddHabit: () => void;
 }
 
-// Rebuild HabitList as a pure functional component with proper props
 function HabitList({ 
   habits, 
   selectedHabitId, 
@@ -58,14 +57,24 @@ function HabitList({
   );
 }
 
+// Optimize memo comparison to prevent unnecessary re-renders
 export default React.memo(HabitList, (prevProps, nextProps) => {
   // Only re-render if these specific props change
-  if (prevProps.selectedHabitId !== nextProps.selectedHabitId) return false;
-  if (prevProps.habits.length !== nextProps.habits.length) return false;
+  if (prevProps.selectedHabitId !== nextProps.selectedHabitId) {
+    return false;
+  }
   
-  // Compare habit IDs to see if the array contents have changed
-  const prevIds = prevProps.habits.map(h => h.id).sort().join(',');
-  const nextIds = nextProps.habits.map(h => h.id).sort().join(',');
+  if (prevProps.habits.length !== nextProps.habits.length) {
+    return false;
+  }
   
-  return prevIds === nextIds;
+  // Deep comparison of habits array content
+  return prevProps.habits.every((prevHabit, index) => {
+    const nextHabit = nextProps.habits[index];
+    return (
+      prevHabit.id === nextHabit.id &&
+      prevHabit.name === nextHabit.name &&
+      prevHabit.streak === nextHabit.streak
+    );
+  });
 });

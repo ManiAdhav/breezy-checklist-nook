@@ -29,6 +29,7 @@ function HabitDetail({ open, onOpenChange, habit }: HabitDetailProps) {
   
   // Handler for adding logs
   const handleAddLog = useCallback((newLog: HabitLog) => {
+    // Ensure we have logs array or default to empty array
     const updatedLogs = [...(habit.logs || []), newLog];
     
     // Update the habit with new logs
@@ -103,6 +104,7 @@ export default React.memo(HabitDetail, (prevProps, nextProps) => {
   if (!prevProps.habit && !nextProps.habit) return true;
   if (!prevProps.habit || !nextProps.habit) return false;
   
+  // Deep comparison of habit properties that would affect rendering
   return (
     prevProps.habit.id === nextProps.habit.id &&
     prevProps.habit.name === nextProps.habit.name &&
