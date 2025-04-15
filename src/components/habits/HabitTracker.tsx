@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import HabitList from './HabitList';
@@ -44,22 +44,30 @@ const HabitTracker: React.FC = () => {
     };
   }, [loadHabits]);
   
-  // Update filtered habits when habits array changes
+  // Update filtered habits when habits array changes - use useMemo
+  const sortedHabits = useMemo(() => {
+    if (!habits || habits.length === 0) return [];
+    console.log('HabitTracker: Creating sorted habits list', habits.length);
+    return [...habits];
+  }, [habits]);
+  
+  // Update filtered habits with the sorted result
   useEffect(() => {
-    if (habits) {
-      console.log('HabitTracker: Setting filtered habits', habits.length);
-      setFilteredHabits(habits);
+    if (sortedHabits.length > 0) {
+      console.log('HabitTracker: Setting filtered habits', sortedHabits.length);
+      setFilteredHabits(sortedHabits);
       
       // Only set the selected habit on initial load if none is selected
-      if (habits.length > 0 && !selectedHabitId && !isDetailOpen) {
-        setSelectedHabitId(habits[0].id);
-      } else if (habits.length === 0) {
+      if (sortedHabits.length > 0 && !selectedHabitId && !isDetailOpen && initialLoadDone) {
+        setSelectedHabitId(sortedHabits[0].id);
+      } else if (sortedHabits.length === 0) {
         setSelectedHabitId(null);
       }
     }
-  }, [habits, selectedHabitId, isDetailOpen]);
+  }, [sortedHabits, selectedHabitId, isDetailOpen, initialLoadDone]);
 
-  const handleSelectHabit = (habitId: string) => {
+  // Memoize handlers to prevent recreating on each render
+  const handleSelectHabit = useCallback((habitId: string) => {
     if (selectedHabitId === habitId) {
       // If the same habit is clicked, just toggle the detail view
       setIsDetailOpen(!isDetailOpen);
@@ -68,9 +76,9 @@ const HabitTracker: React.FC = () => {
       setSelectedHabitId(habitId);
       setIsDetailOpen(true);
     }
-  };
+  }, [selectedHabitId, isDetailOpen]);
   
-  const handleAddHabitSuccess = async () => {
+  const handleAddHabitSuccess = useCallback(async () => {
     setIsAddHabitOpen(false);
     // Reload habits after adding a new one
     console.log('HabitTracker: Habit added, reloading habits');
@@ -80,12 +88,18 @@ const HabitTracker: React.FC = () => {
       title: "Success",
       description: "Habit added successfully",
     });
-  };
+  }, [loadHabits]);
 
   // Only find the selected habit when needed
-  const selectedHabit = isDetailOpen && selectedHabitId
-    ? habits.find(h => h.id === selectedHabitId) || null
-    : null;
+  const selectedHabit = useMemo(() => {
+    if (!isDetailOpen || !selectedHabitId || !habits.length) return null;
+    return habits.find(h => h.id === selectedHabitId) || null;
+  }, [habits, selectedHabitId, isDetailOpen]);
+
+  // Memoize the dialog open state change handler
+  const handleDetailOpenChange = useCallback((open: boolean) => {
+    setIsDetailOpen(open);
+  }, []);
 
   return (
     <div className="h-full overflow-y-auto pb-6">
@@ -132,8 +146,9 @@ const HabitTracker: React.FC = () => {
       
       {selectedHabit && (
         <HabitDetail
+          key={selectedHabit.id}
           open={isDetailOpen}
-          onOpenChange={setIsDetailOpen}
+          onOpenChange={handleDetailOpenChange}
           habit={selectedHabit}
         />
       )}

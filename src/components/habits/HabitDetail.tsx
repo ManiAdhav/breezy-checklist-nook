@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { 
   Dialog, 
   DialogContent,
@@ -121,4 +121,5 @@ const HabitDetail: React.FC<HabitDetailProps> = ({ open, onOpenChange, habit }) 
   );
 };
 
-export default HabitDetail;
+// Memoize the entire component to prevent unnecessary re-renders
+export default memo(HabitDetail);
