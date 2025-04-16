@@ -14,6 +14,7 @@ import { Card } from '@/components/ui/card';
 import { useSidebar } from '@/components/ui/sidebar';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
@@ -88,13 +89,13 @@ const Sidebar: React.FC = () => {
     navigate('/');
   };
 
-  // Determine sidebar position based on state
-  const sidebarPosition = state === 'expanded' ? 'fixed' : 'fixed -left-[220px]';
+  // Determine sidebar position and styles
+  const sidebarPosition = state === 'expanded' ? 'block' : 'hidden md:block';
   const transitionClass = 'transition-all duration-200 ease-in-out';
 
   return (
     <>
-      <Card className={`${sidebarPosition} ${transitionClass} top-0 left-0 w-[220px] h-screen rounded-r-[16px] bg-[#f4f4f4] border-none shadow-md z-10 overflow-hidden md:left-0`}>
+      <div className={`${sidebarPosition} ${transitionClass} w-[220px] h-screen bg-sidebar fixed top-0 left-0 z-10 border-r border-border overflow-hidden`}>
         <div className="flex justify-end p-2 md:hidden">
           <Button 
             variant="ghost" 
@@ -107,8 +108,11 @@ const Sidebar: React.FC = () => {
         <div className="flex flex-col h-full overflow-hidden">
           <div className="flex-1 overflow-y-auto py-4 px-3">
             <TasksSection />
+            <Separator className="my-2 bg-gray-200" />
             <CatalystSection />
+            <Separator className="my-2 bg-gray-200" />
             <HabitsSection />
+            <Separator className="my-2 bg-gray-200" />
             <TagsSection />
             <CalendarLink />
             <nav className="space-y-0.5 mt-2"></nav>
@@ -135,7 +139,7 @@ const Sidebar: React.FC = () => {
           selectedIcon={selectedIcon}
           setSelectedIcon={setSelectedIcon}
         />
-      </Card>
+      </div>
     </>
   );
 };

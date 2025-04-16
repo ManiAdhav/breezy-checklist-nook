@@ -29,7 +29,7 @@ const TargetsLayout: React.FC<TargetsLayoutProps> = ({ user, onSignOut }) => {
                 <div className="flex flex-1 overflow-hidden">
                   <Sidebar />
                   <MobileSidebar />
-                  <main className="flex-1 overflow-y-auto">
+                  <main className="flex-1 overflow-y-auto md:pl-[220px]">
                     <MilestoneList2 />
                   </main>
                 </div>

@@ -31,7 +31,7 @@ const VisionPage: React.FC = () => {
                 <div className="flex flex-1 overflow-hidden">
                   <Sidebar />
                   <MobileSidebar />
-                  <main className="flex-1 overflow-y-auto">
+                  <main className="flex-1 overflow-y-auto md:pl-[220px]">
                     <VisionList />
                   </main>
                 </div>
