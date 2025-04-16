@@ -19,11 +19,6 @@ function HabitList({
   onSelectHabit,
   onAddHabit 
 }: HabitListProps) {
-  // Memoize the select handler to prevent unnecessary re-renders
-  const handleSelectHabit = useCallback((habitId: string) => {
-    onSelectHabit(habitId);
-  }, [onSelectHabit]);
-  
   // Empty state
   if (habits.length === 0) {
     return (
@@ -43,15 +38,16 @@ function HabitList({
 
   // Memoize the habit cards to prevent re-rendering when not needed
   const habitCards = useMemo(() => {
+    console.log('Rendering habit cards, count:', habits.length);
     return habits.map((habit) => (
       <HabitCard
         key={habit.id}
         habit={habit}
-        onClick={() => handleSelectHabit(habit.id)}
+        onClick={() => onSelectHabit(habit.id)}
         isSelected={selectedHabitId === habit.id}
       />
     ));
-  }, [habits, selectedHabitId, handleSelectHabit]);
+  }, [habits, selectedHabitId, onSelectHabit]);
 
   // Render list of habits
   return (
@@ -68,8 +64,9 @@ function HabitList({
   );
 }
 
-// Optimize memo comparison to prevent unnecessary re-renders
+// Use a strict equality check for the habits array to prevent unnecessary re-renders
 export default React.memo(HabitList, (prevProps, nextProps) => {
+  // Only re-render if these specific props change
   return (
     prevProps.selectedHabitId === nextProps.selectedHabitId &&
     prevProps.onSelectHabit === nextProps.onSelectHabit &&

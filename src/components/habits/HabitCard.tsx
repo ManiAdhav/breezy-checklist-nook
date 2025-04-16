@@ -1,5 +1,5 @@
 
-import React, { useCallback } from 'react';
+import React from 'react';
 import { Habit } from '@/types/habit';
 import DynamicIcon from '@/components/ui/dynamic-icon';
 
@@ -10,14 +10,10 @@ interface HabitCardProps {
 }
 
 const HabitCard = ({ habit, onClick, isSelected }: HabitCardProps) => {
-  // Memoize the click handler to prevent unnecessary re-renders
-  const handleClick = useCallback(() => {
-    onClick();
-  }, [onClick]);
-
+  // Use React.memo to prevent unnecessary re-renders
   return (
     <div 
-      onClick={handleClick}
+      onClick={onClick}
       className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
         isSelected ? 'ring-2 ring-primary shadow-md' : ''
       }`}
@@ -42,15 +38,22 @@ const HabitCard = ({ habit, onClick, isSelected }: HabitCardProps) => {
 };
 
 // Optimize memo comparison with a custom comparison function
+// This helps prevent unnecessary re-renders by doing a more precise comparison
 const MemoizedHabitCard = React.memo(HabitCard, (prevProps, nextProps) => {
-  // Only re-render if these specific props change
+  // Only re-render if any of these specific props change
+  if (prevProps.isSelected !== nextProps.isSelected) return false;
+  if (prevProps.onClick !== nextProps.onClick) return false;
+  
+  // Deep comparison of the habit object properties that affect rendering
+  const prevHabit = prevProps.habit;
+  const nextHabit = nextProps.habit;
+  
   return (
-    prevProps.isSelected === nextProps.isSelected &&
-    prevProps.habit.id === nextProps.habit.id &&
-    prevProps.habit.name === nextProps.habit.name &&
-    prevProps.habit.updatedAt === nextProps.habit.updatedAt &&
-    prevProps.habit.streak === nextProps.habit.streak &&
-    prevProps.onClick === nextProps.onClick
+    prevHabit.id === nextHabit.id &&
+    prevHabit.name === nextHabit.name &&
+    prevHabit.metric === nextHabit.metric &&
+    prevHabit.icon === nextHabit.icon &&
+    prevHabit.streak === nextHabit.streak
   );
 });
 

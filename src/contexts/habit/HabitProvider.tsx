@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { HabitContext } from './HabitContext';
 import { useHabitStorage } from './useHabitStorage';
 import { useHabitOperations } from './useHabitOperations';
@@ -21,6 +21,7 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const { calculateHabitStreak } = useStreakCalculation();
   const [loadingState, setLoadingState] = useState(false);
   
+  // Memoize the habit operations to prevent unnecessary re-renders
   const { 
     getHabitById, 
     addHabit, 
@@ -33,8 +34,14 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Load habits on component mount
   useEffect(() => {
     console.log('HabitProvider mounted, loading habits initially');
-    loadHabits();
-  }, []);
+    // Use a ref to prevent loading habits multiple times
+    const initialLoadDone = React.useRef(false);
+    
+    if (!initialLoadDone.current) {
+      loadHabits();
+      initialLoadDone.current = true;
+    }
+  }, []); // Empty dependency array to run only once
 
   // Function to calculate streak for a habit
   const getHabitStreak = useCallback((habitId: string) => {
@@ -44,14 +51,21 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Function to load habits data
   const loadHabits = useCallback(async () => {
     console.log('HabitProvider: Forcing reload of habits data');
+    
+    // Prevent multiple simultaneous loading operations
+    if (loadingState) {
+      console.log('Already loading habits, skipping duplicate call');
+      return;
+    }
+    
     setLoadingState(true);
     
     try {
       const { habits: loadedHabits } = await loadHabitsFromStorage();
       
-      console.log('HabitProvider: Habits reloaded successfully', habits.length);
+      console.log('HabitProvider: Habits reloaded successfully', loadedHabits?.length);
       
-      // Show toast if habits were loaded successfully
+      // Only show toast if habits were loaded successfully and there are habits
       if (loadedHabits && loadedHabits.length > 0) {
         toast({
           title: "Habits loaded",
@@ -68,7 +82,7 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } finally {
       setLoadingState(false);
     }
-  }, [loadHabitsFromStorage, habitLogs, calculateHabitStreak, setHabits]);
+  }, [loadHabitsFromStorage]); // Removed dependencies that could cause re-renders
 
   // Force save all habits
   const saveAllHabits = useCallback(() => {
@@ -78,8 +92,8 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const combinedIsLoading = storageLoading || loadingState;
 
-  // Context value with all habit operations
-  const value = {
+  // Memoize the context value to prevent unnecessary re-renders
+  const value = useMemo(() => ({
     habits,
     habitLogs,
     isLoading: combinedIsLoading,
@@ -92,7 +106,20 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     getHabitStreak,
     loadHabits,
     saveAllHabits
-  };
+  }), [
+    habits,
+    habitLogs,
+    combinedIsLoading,
+    getHabitById,
+    addHabit,
+    updateHabit,
+    deleteHabit,
+    logProgress,
+    getHabitLogs,
+    getHabitStreak,
+    loadHabits,
+    saveAllHabits
+  ]);
 
   // Log when habits change for debugging
   useEffect(() => {

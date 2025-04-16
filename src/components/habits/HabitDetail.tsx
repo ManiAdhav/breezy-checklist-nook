@@ -111,17 +111,34 @@ function HabitDetail({ open, onOpenChange, habit }: HabitDetailProps) {
 
 // Use React.memo with custom comparison to prevent unnecessary re-renders
 export default React.memo(HabitDetail, (prevProps, nextProps) => {
-  // Only render if these specific props change
+  // First check if open state has changed - this should trigger a re-render
   if (prevProps.open !== nextProps.open) return false;
+  
+  // If both habits are null, no re-render needed
   if (!prevProps.habit && !nextProps.habit) return true;
+  
+  // If one is null and the other isn't, we need to re-render
   if (!prevProps.habit || !nextProps.habit) return false;
   
-  // Deep comparison of habit properties that would affect rendering
-  return (
-    prevProps.habit.id === nextProps.habit.id &&
-    prevProps.habit.name === nextProps.habit.name &&
-    prevProps.habit.updatedAt === nextProps.habit.updatedAt &&
-    JSON.stringify(prevProps.habit.logs || []) === JSON.stringify(nextProps.habit.logs || []) &&
-    prevProps.onOpenChange === nextProps.onOpenChange
-  );
+  // Check if the relevant properties of the habit have changed
+  const prevHabit = prevProps.habit;
+  const nextHabit = nextProps.habit;
+  
+  // Only re-render if these specific properties have changed
+  const habitPropsEqual = 
+    prevHabit.id === nextHabit.id &&
+    prevHabit.name === nextHabit.name &&
+    prevHabit.updatedAt === nextHabit.updatedAt &&
+    prevHabit.icon === nextHabit.icon &&
+    prevHabit.metric === nextHabit.metric &&
+    prevHabit.goalId === nextHabit.goalId;
+    
+  // Deep comparison of logs array - stringify for comparison
+  const logsEqual = JSON.stringify(prevHabit.logs || []) === JSON.stringify(nextHabit.logs || []);
+  
+  // Check if the onOpenChange callback has changed
+  const callbacksEqual = prevProps.onOpenChange === nextProps.onOpenChange;
+  
+  // Return true (don't re-render) if everything is equal
+  return habitPropsEqual && logsEqual && callbacksEqual;
 });

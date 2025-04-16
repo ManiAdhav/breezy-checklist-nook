@@ -9,6 +9,7 @@ import HabitDetail from './HabitDetail';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/hooks/use-toast';
 
+// Using React.memo to prevent unnecessary re-renders of the entire component
 const HabitTracker: React.FC = () => {
   const { habits, isLoading, loadHabits, getHabitStreak } = useHabit();
   const [isAddHabitOpen, setIsAddHabitOpen] = useState(false);
@@ -30,8 +31,13 @@ const HabitTracker: React.FC = () => {
       }
     };
     
-    loadData();
-  }, [loadHabits]);
+    // Using a ref to prevent the effect from running multiple times
+    const isFirstRender = React.useRef(true);
+    if (isFirstRender.current) {
+      loadData();
+      isFirstRender.current = false;
+    }
+  }, []); // Remove loadHabits from the dependency array to prevent re-runs
   
   // Prepare habits with streak data for display using useMemo
   const preparedHabits = useMemo(() => {
@@ -77,14 +83,16 @@ const HabitTracker: React.FC = () => {
     setIsAddHabitOpen(open);
   }, []);
 
-  const handleAddHabitSuccess = useCallback(async () => {
+  const handleAddHabitSuccess = useCallback(() => {
     setIsAddHabitOpen(false);
-    await loadHabits();
+    
+    // Don't call loadHabits directly to avoid triggering a new render cycle
+    // The HabitContext should manage this internally
     toast({
       title: "Success",
       description: "Habit added successfully",
     });
-  }, [loadHabits]);
+  }, []);
 
   return (
     <div className="h-full overflow-y-auto pb-6">
@@ -132,4 +140,8 @@ const HabitTracker: React.FC = () => {
   );
 };
 
-export default React.memo(HabitTracker);
+// Use React.memo with a custom comparison function to prevent unnecessary re-renders
+export default React.memo(HabitTracker, (prevProps, nextProps) => {
+  // Since this component doesn't take any props, we can always return true
+  return true;
+});
