@@ -57,9 +57,20 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const { habits: loadedHabits, habitLogs: loadedLogs } = await loadHabitsFromStorage();
       
       console.log('HabitProvider: Habits loaded successfully', {
-        habitsLength: loadedHabits?.length,
-        logsLength: loadedLogs?.length
+        habitsLength: loadedHabits?.length || 0,
+        logsLength: loadedLogs?.length || 0
       });
+      
+      // Explicitly set the data in state
+      if (loadedHabits) {
+        console.log('Setting habits state with loaded data:', loadedHabits);
+        setHabits(loadedHabits);
+      }
+      
+      if (loadedLogs) {
+        console.log('Setting habitLogs state with loaded data:', loadedLogs);
+        setHabitLogs(loadedLogs);
+      }
       
     } catch (error) {
       console.error('Error loading habits in provider:', error);
@@ -81,8 +92,8 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Force save all habits
   const saveAllHabits = useCallback(() => {
     console.log('HabitProvider: Force saving all habits', habits.length);
-    saveHabitsToStorage(habits);
-  }, [habits, saveHabitsToStorage]);
+    saveHabitsToStorage(habits, habitLogs);
+  }, [habits, habitLogs, saveHabitsToStorage]);
 
   const combinedIsLoading = storageLoading || loadingState;
 

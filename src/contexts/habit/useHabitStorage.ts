@@ -89,11 +89,17 @@ export const useHabitStorage = () => {
   }, []);
 
   // Save habits to storage
-  const saveHabitsToStorage = useCallback(async (habitsToSave: Habit[]) => {
+  const saveHabitsToStorage = useCallback(async (habitsToSave: Habit[], logsToSave?: HabitLog[]) => {
     console.log('Saving habits to storage:', habitsToSave.length, 'habits');
     try {
       localStorage.setItem(HABITS_STORAGE_KEY, JSON.stringify(habitsToSave));
       console.log(`Habits saved successfully to ${HABITS_STORAGE_KEY}`);
+      
+      // If logs are also provided, save them too
+      if (logsToSave) {
+        localStorage.setItem(HABIT_LOGS_STORAGE_KEY, JSON.stringify(logsToSave));
+        console.log(`Habit logs saved successfully to ${HABIT_LOGS_STORAGE_KEY}`);
+      }
     } catch (error) {
       console.error('Error saving habits to storage:', error);
       toast({

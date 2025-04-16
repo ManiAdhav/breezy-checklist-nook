@@ -39,6 +39,11 @@ const HabitTracker: React.FC = () => {
     };
     
     loadData();
+    
+    // Force refresh when returning to this page
+    return () => {
+      isFirstRender.current = true;
+    };
   }, [loadHabits]);
   
   // Prepare habits with streak data for display using useMemo
@@ -94,6 +99,7 @@ const HabitTracker: React.FC = () => {
     setIsAddHabitOpen(false);
     
     // After adding a habit, reload the habits to update the list
+    console.log("New habit added, refreshing habits list");
     await loadHabits();
     
     toast({

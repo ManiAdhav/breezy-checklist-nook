@@ -44,33 +44,53 @@ export const useHabitOperations = (
     // Update state with new habit - create a new array to ensure React detects the change
     const updatedHabits = [...habits, newHabit];
     console.log('Setting habits with new habit included, new count:', updatedHabits.length);
+    
+    // Use setHabits to update and persist the habits
     setHabits(updatedHabits);
+    
+    // Force the localStorage update (even though this should already happen via setHabits)
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem('habits', JSON.stringify(updatedHabits));
+        console.log('Manually forced saving habits to localStorage, count:', updatedHabits.length);
+      } catch (err) {
+        console.error('Error manually saving habits to localStorage:', err);
+      }
+    }
     
     // Return the newly created habit
     return newHabit;
   };
 
   // Update an existing habit
-  const updateHabit =  async (id: string, updates: Partial<Omit<Habit, 'id' | 'createdAt' | 'updatedAt'>>): Promise<void> => {
+  const updateHabit = async (id: string, updates: Partial<Omit<Habit, 'id' | 'createdAt' | 'updatedAt'>>): Promise<void> => {
     console.log(`Updating habit ${id} with:`, updates);
     
-    setHabits(prev => {
-      const updatedHabits = prev.map(habit => {
-        if (habit.id === id) {
-          const updatedHabit = {
-            ...habit,
-            ...updates,
-            updatedAt: new Date()
-          };
-          console.log('Updated habit:', updatedHabit);
-          return updatedHabit;
-        }
-        return habit;
-      });
-      
-      console.log('Updated habits state with', updatedHabits.length, 'habits');
-      return updatedHabits;
+    const updatedHabits = habits.map(habit => {
+      if (habit.id === id) {
+        const updatedHabit = {
+          ...habit,
+          ...updates,
+          updatedAt: new Date()
+        };
+        console.log('Updated habit:', updatedHabit);
+        return updatedHabit;
+      }
+      return habit;
     });
+    
+    console.log('Updated habits state with', updatedHabits.length, 'habits');
+    setHabits(updatedHabits);
+    
+    // Also force update localStorage
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem('habits', JSON.stringify(updatedHabits));
+        console.log('Manually forced saving updated habits to localStorage');
+      } catch (err) {
+        console.error('Error manually saving updated habits to localStorage:', err);
+      }
+    }
   };
 
   // Delete a habit and its associated logs
@@ -78,18 +98,25 @@ export const useHabitOperations = (
     console.log(`Deleting habit ${id}`);
     
     // Remove the habit
-    setHabits(prev => {
-      const updatedHabits = prev.filter(habit => habit.id !== id);
-      console.log('Habits after deletion:', updatedHabits.length);
-      return updatedHabits;
-    });
+    const updatedHabits = habits.filter(habit => habit.id !== id);
+    console.log('Habits after deletion:', updatedHabits.length);
+    setHabits(updatedHabits);
     
     // Remove all logs associated with this habit
-    setHabitLogs(prev => {
-      const updatedLogs = prev.filter(log => log.habitId !== id);
-      console.log('Logs after habit deletion:', updatedLogs.length);
-      return updatedLogs;
-    });
+    const updatedLogs = habitLogs.filter(log => log.habitId !== id);
+    console.log('Logs after habit deletion:', updatedLogs.length);
+    setHabitLogs(updatedLogs);
+    
+    // Force update localStorage
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem('habits', JSON.stringify(updatedHabits));
+        localStorage.setItem('habitLogs', JSON.stringify(updatedLogs));
+        console.log('Manually forced saving after habit deletion');
+      } catch (err) {
+        console.error('Error manually saving after habit deletion:', err);
+      }
+    }
   };
 
   // Log progress for a habit
@@ -102,24 +129,32 @@ export const useHabitOperations = (
     };
     
     // Add the new log
-    setHabitLogs(prev => {
-      const updatedLogs = [...prev, newLog];
-      console.log('Updated habit logs:', updatedLogs.length);
-      return updatedLogs;
-    });
+    const updatedLogs = [...habitLogs, newLog];
+    console.log('Updated habit logs:', updatedLogs.length);
+    setHabitLogs(updatedLogs);
     
     // Update the habit's updatedAt timestamp
-    setHabits(prev => {
-      return prev.map(habit => {
-        if (habit.id === logData.habitId) {
-          return {
-            ...habit,
-            updatedAt: new Date()
-          };
-        }
-        return habit;
-      });
+    const updatedHabits = habits.map(habit => {
+      if (habit.id === logData.habitId) {
+        return {
+          ...habit,
+          updatedAt: new Date()
+        };
+      }
+      return habit;
     });
+    setHabits(updatedHabits);
+    
+    // Force update localStorage
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem('habitLogs', JSON.stringify(updatedLogs));
+        localStorage.setItem('habits', JSON.stringify(updatedHabits));
+        console.log('Manually forced saving after logging progress');
+      } catch (err) {
+        console.error('Error manually saving after logging progress:', err);
+      }
+    }
     
     // Show success toast
     toast({
