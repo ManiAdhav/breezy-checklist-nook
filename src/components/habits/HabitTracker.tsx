@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
@@ -25,11 +26,14 @@ const HabitTracker: React.FC = () => {
         await loadHabits();
       } catch (err) {
         console.error('Error loading habits:', err);
-        toast({
-          title: "Error loading habits",
-          description: "Failed to load habits data. Please refresh the page.",
-          variant: "destructive"
-        });
+        // Only show error toast for serious errors, not just when there are no habits
+        if (err instanceof Error && err.message !== 'No habits found') {
+          toast({
+            title: "Error loading habits",
+            description: "Failed to load habits data. Please refresh the page.",
+            variant: "destructive"
+          });
+        }
       }
     };
     
@@ -38,7 +42,7 @@ const HabitTracker: React.FC = () => {
       loadData();
       isFirstRender.current = false;
     }
-  }, []);
+  }, [loadHabits]);
   
   // Prepare habits with streak data for display using useMemo
   const preparedHabits = useMemo(() => {

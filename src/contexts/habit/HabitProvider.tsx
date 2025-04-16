@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { HabitContext } from './HabitContext';
 import { useHabitStorage } from './useHabitStorage';
@@ -66,7 +67,7 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       
       console.log('HabitProvider: Habits reloaded successfully', loadedHabits?.length);
       
-      // Only show toast if habits were loaded successfully and there are habits
+      // Commented out success toast to avoid unnecessary notifications
       // if (loadedHabits && loadedHabits.length > 0) {
       //   toast({
       //     title: "Habits loaded",
@@ -75,15 +76,21 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       // }
     } catch (error) {
       console.error('Error loading habits in provider:', error);
-      toast({
-        title: "Error loading habits",
-        description: "There was a problem loading your habits. Please try refreshing the page.",
-        variant: "destructive"
-      });
+      // Show error toast only on serious errors, not just when no habits exist
+      if (habits.length === 0) {
+        // Initialize with empty array to prevent continuous error messages
+        setHabits([]);
+      } else {
+        toast({
+          title: "Error loading habits",
+          description: "There was a problem loading your habits. Please try refreshing the page.",
+          variant: "destructive"
+        });
+      }
     } finally {
       setLoadingState(false);
     }
-  }, [loadHabitsFromStorage, loadingState]); 
+  }, [loadHabitsFromStorage, loadingState, habits.length, setHabits]); 
 
   // Force save all habits
   const saveAllHabits = useCallback(() => {

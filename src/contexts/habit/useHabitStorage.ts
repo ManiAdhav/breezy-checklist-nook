@@ -46,11 +46,7 @@ export const useHabitStorage = () => {
           console.log('Formatted habits after date conversion:', parsedHabits);
         } catch (e) {
           console.error('Error parsing habits from storage:', e);
-          toast({
-            title: "Error",
-            description: "Failed to load habits data. The data might be corrupted.",
-            variant: "destructive"
-          });
+          // Don't show toast here, let the parent handle it
         }
       }
       
@@ -69,11 +65,7 @@ export const useHabitStorage = () => {
           console.log('Formatted logs after date conversion:', parsedLogs);
         } catch (e) {
           console.error('Error parsing habit logs from storage:', e);
-          toast({
-            title: "Error",
-            description: "Failed to load habit logs data. The data might be corrupted.",
-            variant: "destructive"
-          });
+          // Don't show toast here, let the parent handle it
         }
       }
       
@@ -85,11 +77,7 @@ export const useHabitStorage = () => {
       return { habits: parsedHabits, habitLogs: parsedLogs };
     } catch (error) {
       console.error('Error loading from storage:', error);
-      toast({
-        title: "Error loading data",
-        description: "Failed to load data from storage",
-        variant: "destructive"
-      });
+      // Return empty arrays instead of throwing, let parent component decide how to handle
       return { habits: [], habitLogs: [] };
     } finally {
       setIsLoading(false);
