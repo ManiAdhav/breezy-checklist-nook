@@ -7,8 +7,8 @@ interface HabitContextType {
   habitLogs: HabitLog[];
   isLoading: boolean;
   getHabitById: (id: string) => Habit | undefined;
-  addHabit: (habit: Omit<Habit, 'id' | 'createdAt' | 'updatedAt'>) => Habit;
-  updateHabit: (id: string, updates: Partial<Omit<Habit, 'id' | 'createdAt' | 'updatedAt'>>) => void;
+  addHabit: (habit: Omit<Habit, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Habit>;
+  updateHabit: (id: string, updates: Partial<Omit<Habit, 'id' | 'createdAt' | 'updatedAt'>>) => Promise<void>;
   deleteHabit: (id: string) => void;
   logProgress: (log: Omit<HabitLog, 'id'>) => void;
   getHabitLogs: (habitId: string) => HabitLog[];
