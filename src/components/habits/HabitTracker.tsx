@@ -15,36 +15,35 @@ const HabitTracker: React.FC = () => {
   const [isAddHabitOpen, setIsAddHabitOpen] = useState(false);
   const [selectedHabitId, setSelectedHabitId] = useState<string | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [hasAttemptedLoad, setHasAttemptedLoad] = useState(false);
   
-  // Create ref at component level
-  const isFirstRender = React.useRef(true);
-  
-  // Load habits when component mounts
+  // Load habits when component mounts or when loadHabits dependency changes
   useEffect(() => {
-    console.log('HabitTracker - Initial load of habits');
-    const loadData = async () => {
+    const loadHabitsData = async () => {
+      console.log('HabitTracker - Loading habits from context');
+      setHasAttemptedLoad(true);
+      
       try {
         await loadHabits();
-        console.log('HabitTracker - Habits loaded successfully, count:', habits.length);
+        console.log('HabitTracker - Habits loaded, count:', habits.length);
       } catch (err) {
-        console.error('Error loading habits:', err);
-        if (err instanceof Error) {
-          toast({
-            title: "Error loading habits",
-            description: "Failed to load habits data. Please refresh the page.",
-            variant: "destructive"
-          });
-        }
+        console.error('Error loading habits in HabitTracker:', err);
+        toast({
+          title: "Error loading habits",
+          description: "Failed to load habits data. Please refresh the page.",
+          variant: "destructive"
+        });
       }
     };
     
-    loadData();
-    
-    // Force refresh when returning to this page
-    return () => {
-      isFirstRender.current = true;
-    };
+    loadHabitsData();
   }, [loadHabits]);
+  
+  // Debug useEffect to monitor habits changes
+  useEffect(() => {
+    console.log('HabitTracker - Habits updated, new count:', habits.length);
+    console.log('Current habits in HabitTracker:', habits);
+  }, [habits]);
   
   // Prepare habits with streak data for display using useMemo
   const preparedHabits = useMemo(() => {
@@ -67,13 +66,13 @@ const HabitTracker: React.FC = () => {
     });
   }, [habits, getHabitStreak]);
   
-  // Find the selected habit object - use useMemo to prevent unnecessary recalculations
+  // Find the selected habit object
   const selectedHabit = useMemo(() => {
     if (!selectedHabitId) return null;
     return habits.find(h => h.id === selectedHabitId) || null;
   }, [selectedHabitId, habits]);
   
-  // Callbacks for habit actions - memoize all callbacks to prevent re-rendering
+  // Callbacks for habit actions
   const handleSelectHabit = useCallback((habitId: string) => {
     setSelectedHabitId(habitId);
     setIsDetailOpen(true);
@@ -86,7 +85,7 @@ const HabitTracker: React.FC = () => {
   const handleDetailOpenChange = useCallback((open: boolean) => {
     setIsDetailOpen(open);
     if (!open) {
-      // Clear selected habit on dialog close to prevent stale state
+      // Clear selected habit on dialog close
       setSelectedHabitId(null);
     }
   }, []);
@@ -98,7 +97,7 @@ const HabitTracker: React.FC = () => {
   const handleAddHabitSuccess = useCallback(async () => {
     setIsAddHabitOpen(false);
     
-    // After adding a habit, reload the habits to update the list
+    // After adding a habit, reload habits to ensure the list is up-to-date
     console.log("New habit added, refreshing habits list");
     await loadHabits();
     
@@ -108,7 +107,9 @@ const HabitTracker: React.FC = () => {
     });
   }, [loadHabits]);
 
-  console.log('HabitTracker - Rendering with', preparedHabits.length, 'habits');
+  const actualIsLoading = isLoading || (!hasAttemptedLoad);
+  
+  console.log('HabitTracker - Rendering with', preparedHabits.length, 'habits, loading:', actualIsLoading);
 
   return (
     <div className="h-full overflow-y-auto pb-6">
@@ -123,7 +124,7 @@ const HabitTracker: React.FC = () => {
         </Button>
       </div>
       
-      {isLoading ? (
+      {actualIsLoading ? (
         <div className="space-y-3">
           <Skeleton className="h-24 w-full" />
           <Skeleton className="h-24 w-full" />

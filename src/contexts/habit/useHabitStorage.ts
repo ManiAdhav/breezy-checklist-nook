@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Habit, HabitLog } from '@/types/habit';
 import { toast } from '@/hooks/use-toast';
 
@@ -11,6 +11,7 @@ export const useHabitStorage = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [habitLogs, setHabitLogs] = useState<HabitLog[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
   // Helper function to safely parse dates in objects
   const parseDatesInObject = (obj: any): any => {
@@ -24,6 +25,16 @@ export const useHabitStorage = () => {
     }
     return parsed;
   };
+
+  // Auto-load from storage on hook initialization
+  useEffect(() => {
+    if (!isInitialized) {
+      console.log('useHabitStorage: Auto-loading habits from storage on init');
+      loadHabitsFromStorage().then(() => {
+        setIsInitialized(true);
+      });
+    }
+  }, [isInitialized]);
 
   // Load habits and logs from storage
   const loadHabitsFromStorage = useCallback(async () => {

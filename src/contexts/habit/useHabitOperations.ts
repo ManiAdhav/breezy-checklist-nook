@@ -45,20 +45,18 @@ export const useHabitOperations = (
     const updatedHabits = [...habits, newHabit];
     console.log('Setting habits with new habit included, new count:', updatedHabits.length);
     
-    // Use setHabits to update and persist the habits
-    setHabits(updatedHabits);
-    
-    // Force the localStorage update (even though this should already happen via setHabits)
-    if (typeof localStorage !== 'undefined') {
-      try {
-        localStorage.setItem('habits', JSON.stringify(updatedHabits));
-        console.log('Manually forced saving habits to localStorage, count:', updatedHabits.length);
-      } catch (err) {
-        console.error('Error manually saving habits to localStorage:', err);
-      }
+    // Explicitly store to localStorage first to ensure persistence
+    try {
+      localStorage.setItem('habits', JSON.stringify(updatedHabits));
+      console.log('Directly saved updated habits to localStorage');
+    } catch (err) {
+      console.error('Error directly saving to localStorage:', err);
     }
     
-    // Return the newly created habit
+    // Then update React state via setter function
+    setHabits(updatedHabits);
+    
+    console.log('Habit added successfully, returning new habit object');
     return newHabit;
   };
 
@@ -80,17 +78,17 @@ export const useHabitOperations = (
     });
     
     console.log('Updated habits state with', updatedHabits.length, 'habits');
-    setHabits(updatedHabits);
     
-    // Also force update localStorage
-    if (typeof localStorage !== 'undefined') {
-      try {
-        localStorage.setItem('habits', JSON.stringify(updatedHabits));
-        console.log('Manually forced saving updated habits to localStorage');
-      } catch (err) {
-        console.error('Error manually saving updated habits to localStorage:', err);
-      }
+    // Explicitly store to localStorage first
+    try {
+      localStorage.setItem('habits', JSON.stringify(updatedHabits));
+      console.log('Directly saved updated habits to localStorage');
+    } catch (err) {
+      console.error('Error directly saving to localStorage:', err);
     }
+    
+    // Then update React state
+    setHabits(updatedHabits);
   };
 
   // Delete a habit and its associated logs
@@ -100,23 +98,23 @@ export const useHabitOperations = (
     // Remove the habit
     const updatedHabits = habits.filter(habit => habit.id !== id);
     console.log('Habits after deletion:', updatedHabits.length);
-    setHabits(updatedHabits);
     
     // Remove all logs associated with this habit
     const updatedLogs = habitLogs.filter(log => log.habitId !== id);
     console.log('Logs after habit deletion:', updatedLogs.length);
-    setHabitLogs(updatedLogs);
     
-    // Force update localStorage
-    if (typeof localStorage !== 'undefined') {
-      try {
-        localStorage.setItem('habits', JSON.stringify(updatedHabits));
-        localStorage.setItem('habitLogs', JSON.stringify(updatedLogs));
-        console.log('Manually forced saving after habit deletion');
-      } catch (err) {
-        console.error('Error manually saving after habit deletion:', err);
-      }
+    // Explicitly store to localStorage first
+    try {
+      localStorage.setItem('habits', JSON.stringify(updatedHabits));
+      localStorage.setItem('habitLogs', JSON.stringify(updatedLogs));
+      console.log('Directly saved updates after deletion to localStorage');
+    } catch (err) {
+      console.error('Error directly saving to localStorage:', err);
     }
+    
+    // Then update React state
+    setHabits(updatedHabits);
+    setHabitLogs(updatedLogs);
   };
 
   // Log progress for a habit
@@ -131,7 +129,6 @@ export const useHabitOperations = (
     // Add the new log
     const updatedLogs = [...habitLogs, newLog];
     console.log('Updated habit logs:', updatedLogs.length);
-    setHabitLogs(updatedLogs);
     
     // Update the habit's updatedAt timestamp
     const updatedHabits = habits.map(habit => {
@@ -143,18 +140,19 @@ export const useHabitOperations = (
       }
       return habit;
     });
-    setHabits(updatedHabits);
     
-    // Force update localStorage
-    if (typeof localStorage !== 'undefined') {
-      try {
-        localStorage.setItem('habitLogs', JSON.stringify(updatedLogs));
-        localStorage.setItem('habits', JSON.stringify(updatedHabits));
-        console.log('Manually forced saving after logging progress');
-      } catch (err) {
-        console.error('Error manually saving after logging progress:', err);
-      }
+    // Explicitly store to localStorage first
+    try {
+      localStorage.setItem('habitLogs', JSON.stringify(updatedLogs));
+      localStorage.setItem('habits', JSON.stringify(updatedHabits));
+      console.log('Directly saved progress updates to localStorage');
+    } catch (err) {
+      console.error('Error directly saving to localStorage:', err);
     }
+    
+    // Then update React state
+    setHabitLogs(updatedLogs);
+    setHabits(updatedHabits);
     
     // Show success toast
     toast({

@@ -30,7 +30,7 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     getHabitLogs 
   } = useHabitOperations(habits, setHabits, habitLogs, setHabitLogs);
 
-  // Load habits on component mount
+  // Load habits on component mount - CRITICAL for loading previous habits
   useEffect(() => {
     console.log('HabitProvider mounted, loading habits initially');
     loadHabits();
@@ -41,7 +41,7 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return calculateHabitStreak(habitLogs, habitId);
   }, [habitLogs, calculateHabitStreak]);
   
-  // Function to load habits data
+  // Function to load habits data - made more robust
   const loadHabits = useCallback(async () => {
     console.log('HabitProvider: Loading habits data');
     
@@ -54,22 +54,31 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setLoadingState(true);
     
     try {
-      const { habits: loadedHabits, habitLogs: loadedLogs } = await loadHabitsFromStorage();
+      // Wait for loadHabitsFromStorage to complete and get the result
+      const result = await loadHabitsFromStorage();
       
+      // Log what was retrieved for debugging
       console.log('HabitProvider: Habits loaded successfully', {
-        habitsLength: loadedHabits?.length || 0,
-        logsLength: loadedLogs?.length || 0
+        habitsLength: result.habits?.length || 0,
+        logsLength: result.habitLogs?.length || 0,
+        habitsData: result.habits
       });
       
-      // Explicitly set the data in state
-      if (loadedHabits) {
-        console.log('Setting habits state with loaded data:', loadedHabits);
-        setHabits(loadedHabits);
+      // Apply the loaded data to state if it exists
+      if (result.habits && result.habits.length > 0) {
+        console.log('Setting habits state with loaded data:', result.habits);
+        setHabits(result.habits);
+      } else {
+        console.log('No habits loaded from storage, setting empty array');
+        setHabits([]);
       }
       
-      if (loadedLogs) {
-        console.log('Setting habitLogs state with loaded data:', loadedLogs);
-        setHabitLogs(loadedLogs);
+      if (result.habitLogs && result.habitLogs.length > 0) {
+        console.log('Setting habitLogs state with loaded data:', result.habitLogs);
+        setHabitLogs(result.habitLogs);
+      } else {
+        console.log('No habit logs loaded from storage, setting empty array');
+        setHabitLogs([]);
       }
       
     } catch (error) {
@@ -129,7 +138,8 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Log when habits change for debugging
   useEffect(() => {
     console.log('HabitProvider rendered with', habits.length, 'habits');
-  }, [habits.length]);
+    console.log('Current habits state:', habits);
+  }, [habits]);
 
   return (
     <HabitContext.Provider value={value}>
