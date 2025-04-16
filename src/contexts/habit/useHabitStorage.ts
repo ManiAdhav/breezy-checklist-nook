@@ -39,15 +39,17 @@ export const useHabitStorage = () => {
       if (habitsJson) {
         try {
           parsedHabits = JSON.parse(habitsJson);
-          console.log('Parsed habits before date conversion:', parsedHabits);
+          console.log('Parsed habits before date conversion:', parsedHabits.length, 'habits found');
           
           // Parse dates in habits
           parsedHabits = parsedHabits.map(habit => parseDatesInObject(habit));
-          console.log('Formatted habits after date conversion:', parsedHabits);
+          console.log('Formatted habits after date conversion:', parsedHabits.length, 'habits processed');
         } catch (e) {
           console.error('Error parsing habits from storage:', e);
           // Just log the error, don't show toast
         }
+      } else {
+        console.log('No habits found in storage');
       }
       
       // Load habit logs
@@ -58,15 +60,17 @@ export const useHabitStorage = () => {
       if (logsJson) {
         try {
           parsedLogs = JSON.parse(logsJson);
-          console.log('Parsed logs before date conversion:', parsedLogs);
+          console.log('Parsed logs before date conversion:', parsedLogs.length, 'logs found');
           
           // Parse dates in logs
           parsedLogs = parsedLogs.map(log => parseDatesInObject(log));
-          console.log('Formatted logs after date conversion:', parsedLogs);
+          console.log('Formatted logs after date conversion:', parsedLogs.length, 'logs processed');
         } catch (e) {
           console.error('Error parsing habit logs from storage:', e);
           // Just log the error, don't show toast
         }
+      } else {
+        console.log('No habit logs found in storage');
       }
       
       // Always update state even if empty
@@ -86,7 +90,7 @@ export const useHabitStorage = () => {
 
   // Save habits to storage
   const saveHabitsToStorage = useCallback(async (habitsToSave: Habit[]) => {
-    console.log('Saving habits to storage:', habitsToSave);
+    console.log('Saving habits to storage:', habitsToSave.length, 'habits');
     try {
       localStorage.setItem(HABITS_STORAGE_KEY, JSON.stringify(habitsToSave));
       console.log(`Habits saved successfully to ${HABITS_STORAGE_KEY}`);
@@ -102,7 +106,7 @@ export const useHabitStorage = () => {
 
   // Save habit logs to storage
   const saveHabitLogsToStorage = useCallback(async (logsToSave: HabitLog[]) => {
-    console.log('Saving habit logs to storage:', logsToSave);
+    console.log('Saving habit logs to storage:', logsToSave.length, 'logs');
     try {
       localStorage.setItem(HABIT_LOGS_STORAGE_KEY, JSON.stringify(logsToSave));
       console.log(`Habit logs saved successfully to ${HABIT_LOGS_STORAGE_KEY}`);

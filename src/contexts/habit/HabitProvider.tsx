@@ -1,11 +1,10 @@
 
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { HabitContext } from './HabitContext';
 import { useHabitStorage } from './useHabitStorage';
 import { useHabitOperations } from './useHabitOperations';
 import { useStreakCalculation } from './useStreakCalculation';
 import { toast } from '@/hooks/use-toast';
-import { Habit } from '@/types/habit';
 
 export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { 
@@ -21,9 +20,6 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const { calculateHabitStreak } = useStreakCalculation();
   const [loadingState, setLoadingState] = useState(false);
   
-  // Create useRef at the component level, not inside useEffect
-  const initialLoadDone = useRef(false);
-  
   // Memoize the habit operations to prevent unnecessary re-renders
   const { 
     getHabitById, 
@@ -37,12 +33,7 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Load habits on component mount
   useEffect(() => {
     console.log('HabitProvider mounted, loading habits initially');
-    
-    // Use the ref defined at component level
-    if (!initialLoadDone.current) {
-      loadHabits();
-      initialLoadDone.current = true;
-    }
+    loadHabits();
   }, []); // Empty dependency array to run only once
 
   // Function to calculate streak for a habit
@@ -52,7 +43,7 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   
   // Function to load habits data
   const loadHabits = useCallback(async () => {
-    console.log('HabitProvider: Forcing reload of habits data');
+    console.log('HabitProvider: Loading habits data');
     
     // Prevent multiple simultaneous loading operations
     if (loadingState) {
@@ -65,12 +56,11 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       const { habits: loadedHabits, habitLogs: loadedLogs } = await loadHabitsFromStorage();
       
-      console.log('HabitProvider: Habits reloaded successfully', {
+      console.log('HabitProvider: Habits loaded successfully', {
         habitsLength: loadedHabits?.length,
         logsLength: loadedLogs?.length
       });
       
-      // No success toast to avoid unnecessary notifications
     } catch (error) {
       console.error('Error loading habits in provider:', error);
       
@@ -78,22 +68,19 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setHabits([]);
       setHabitLogs([]);
       
-      // Only show error toast if we're not in initial loading (to avoid showing on first load)
-      if (initialLoadDone.current && !storageLoading) {
-        toast({
-          title: "Error loading habits",
-          description: "There was a problem loading your habits. Please try refreshing the page.",
-          variant: "destructive"
-        });
-      }
+      toast({
+        title: "Error loading habits",
+        description: "There was a problem loading your habits. Please try refreshing the page.",
+        variant: "destructive"
+      });
     } finally {
       setLoadingState(false);
     }
-  }, [loadHabitsFromStorage, loadingState, setHabits, setHabitLogs, storageLoading]);
+  }, [loadHabitsFromStorage, loadingState, setHabits, setHabitLogs]);
 
   // Force save all habits
   const saveAllHabits = useCallback(() => {
-    console.log('HabitProvider: Force saving all habits');
+    console.log('HabitProvider: Force saving all habits', habits.length);
     saveHabitsToStorage(habits);
   }, [habits, saveHabitsToStorage]);
 

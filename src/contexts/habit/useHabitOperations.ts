@@ -41,8 +41,9 @@ export const useHabitOperations = (
 
     console.log('Created new habit object:', newHabit);
     
-    // Update state with new habit
+    // Update state with new habit - create a new array to ensure React detects the change
     const updatedHabits = [...habits, newHabit];
+    console.log('Setting habits with new habit included, new count:', updatedHabits.length);
     setHabits(updatedHabits);
     
     // Return the newly created habit
@@ -50,7 +51,7 @@ export const useHabitOperations = (
   };
 
   // Update an existing habit
-  const updateHabit = async (id: string, updates: Partial<Omit<Habit, 'id' | 'createdAt' | 'updatedAt'>>): Promise<void> => {
+  const updateHabit =  async (id: string, updates: Partial<Omit<Habit, 'id' | 'createdAt' | 'updatedAt'>>): Promise<void> => {
     console.log(`Updating habit ${id} with:`, updates);
     
     setHabits(prev => {

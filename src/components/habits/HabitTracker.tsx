@@ -21,11 +21,11 @@ const HabitTracker: React.FC = () => {
   
   // Load habits when component mounts
   useEffect(() => {
-    console.log('HabitTracker - Loading habits');
+    console.log('HabitTracker - Initial load of habits');
     const loadData = async () => {
       try {
         await loadHabits();
-        console.log('HabitTracker - Habits loaded successfully');
+        console.log('HabitTracker - Habits loaded successfully, count:', habits.length);
       } catch (err) {
         console.error('Error loading habits:', err);
         if (err instanceof Error) {
@@ -38,16 +38,17 @@ const HabitTracker: React.FC = () => {
       }
     };
     
-    // Using the ref to prevent the effect from running multiple times
-    if (isFirstRender.current) {
-      loadData();
-      isFirstRender.current = false;
-    }
+    loadData();
   }, [loadHabits]);
   
   // Prepare habits with streak data for display using useMemo
   const preparedHabits = useMemo(() => {
     console.log('HabitTracker - Preparing habits for display', habits.length);
+    if (habits.length === 0) {
+      console.log('No habits found to prepare');
+      return [];
+    }
+    
     return habits.map(habit => ({
       ...habit,
       streak: getHabitStreak(habit.id).current
