@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
@@ -39,7 +38,7 @@ const HabitTracker: React.FC = () => {
       loadData();
       isFirstRender.current = false;
     }
-  }, []); // Remove loadHabits from the dependency array to prevent re-runs
+  }, []);
   
   // Prepare habits with streak data for display using useMemo
   const preparedHabits = useMemo(() => {

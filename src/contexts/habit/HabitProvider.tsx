@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { HabitContext } from './HabitContext';
 import { useHabitStorage } from './useHabitStorage';
@@ -68,12 +67,12 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       console.log('HabitProvider: Habits reloaded successfully', loadedHabits?.length);
       
       // Only show toast if habits were loaded successfully and there are habits
-      if (loadedHabits && loadedHabits.length > 0) {
-        toast({
-          title: "Habits loaded",
-          description: `${loadedHabits.length} habits loaded successfully`,
-        });
-      }
+      // if (loadedHabits && loadedHabits.length > 0) {
+      //   toast({
+      //     title: "Habits loaded",
+      //     description: `${loadedHabits.length} habits loaded successfully`,
+      //   });
+      // }
     } catch (error) {
       console.error('Error loading habits in provider:', error);
       toast({
