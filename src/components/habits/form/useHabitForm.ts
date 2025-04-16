@@ -67,15 +67,19 @@ export const useHabitForm = (
     mode: "onChange",
   });
   
-  const toggleIconSelector = () => setShowIconSelector(!showIconSelector);
+  const toggleIconSelector = useCallback(() => {
+    setShowIconSelector(!showIconSelector);
+  }, [showIconSelector]);
   
-  const toggleDaySelection = (day: string) => {
-    if (selectedDays.includes(day)) {
-      setSelectedDays(selectedDays.filter(d => d !== day));
-    } else {
-      setSelectedDays([...selectedDays, day]);
-    }
-  };
+  const toggleDaySelection = useCallback((day: string) => {
+    setSelectedDays(prev => {
+      if (prev.includes(day)) {
+        return prev.filter(d => d !== day);
+      } else {
+        return [...prev, day];
+      }
+    });
+  }, []);
 
   // Function to handle form submission
   const handleSubmit = async (data: HabitFormData) => {
@@ -103,14 +107,14 @@ export const useHabitForm = (
       
       if (editHabit) {
         // Update existing habit
-        updateHabit(editHabit.id, habitData);
+        await updateHabit(editHabit.id, habitData);
         toast({
           title: "Success",
           description: "Habit updated successfully.",
         });
       } else {
         // Add new habit
-        const newHabit = addHabit(habitData);
+        const newHabit = await addHabit(habitData);
         console.log('New habit created:', newHabit);
         toast({
           title: "Success",
@@ -121,7 +125,10 @@ export const useHabitForm = (
       // Force reload habits to ensure UI is updated
       await loadHabits();
       
+      // Reset form
       form.reset();
+      
+      // Close dialog
       onOpenChange(false);
       
       // Call onSuccess if provided

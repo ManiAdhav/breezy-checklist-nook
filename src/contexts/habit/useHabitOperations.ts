@@ -16,7 +16,7 @@ export const useHabitOperations = (
   };
 
   // Add a new habit
-  const addHabit = (habitData: Omit<Habit, 'id' | 'createdAt' | 'updatedAt'>): Habit => {
+  const addHabit = async (habitData: Omit<Habit, 'id' | 'createdAt' | 'updatedAt'>): Promise<Habit> => {
     console.log('Adding new habit with data:', habitData);
     
     // Validate required fields
@@ -50,7 +50,7 @@ export const useHabitOperations = (
   };
 
   // Update an existing habit
-  const updateHabit = (id: string, updates: Partial<Omit<Habit, 'id' | 'createdAt' | 'updatedAt'>>): void => {
+  const updateHabit = async (id: string, updates: Partial<Omit<Habit, 'id' | 'createdAt' | 'updatedAt'>>): Promise<void> => {
     console.log(`Updating habit ${id} with:`, updates);
     
     setHabits(prev => {

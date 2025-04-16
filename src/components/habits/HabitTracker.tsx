@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
@@ -18,14 +19,15 @@ const HabitTracker: React.FC = () => {
   // Create ref at component level
   const isFirstRender = React.useRef(true);
   
-  // Load habits only once when component mounts
+  // Load habits when component mounts
   useEffect(() => {
+    console.log('HabitTracker - Loading habits');
     const loadData = async () => {
       try {
         await loadHabits();
+        console.log('HabitTracker - Habits loaded successfully');
       } catch (err) {
         console.error('Error loading habits:', err);
-        // Only show error toast for serious errors, not just when habits array is empty
         if (err instanceof Error) {
           toast({
             title: "Error loading habits",
@@ -45,6 +47,7 @@ const HabitTracker: React.FC = () => {
   
   // Prepare habits with streak data for display using useMemo
   const preparedHabits = useMemo(() => {
+    console.log('HabitTracker - Preparing habits for display', habits.length);
     return habits.map(habit => ({
       ...habit,
       streak: getHabitStreak(habit.id).current
@@ -86,16 +89,19 @@ const HabitTracker: React.FC = () => {
     setIsAddHabitOpen(open);
   }, []);
 
-  const handleAddHabitSuccess = useCallback(() => {
+  const handleAddHabitSuccess = useCallback(async () => {
     setIsAddHabitOpen(false);
     
-    // Don't call loadHabits directly to avoid triggering a new render cycle
-    // The HabitContext should manage this internally
+    // After adding a habit, reload the habits to update the list
+    await loadHabits();
+    
     toast({
       title: "Success",
       description: "Habit added successfully",
     });
-  }, []);
+  }, [loadHabits]);
+
+  console.log('HabitTracker - Rendering with', preparedHabits.length, 'habits');
 
   return (
     <div className="h-full overflow-y-auto pb-6">
