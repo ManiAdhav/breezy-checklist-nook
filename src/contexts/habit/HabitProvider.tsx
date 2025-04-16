@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { HabitContext } from './HabitContext';
 import { useHabitStorage } from './useHabitStorage';
 import { useHabitOperations } from './useHabitOperations';
@@ -21,6 +21,9 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const { calculateHabitStreak } = useStreakCalculation();
   const [loadingState, setLoadingState] = useState(false);
   
+  // Create useRef at the component level, not inside useEffect
+  const initialLoadDone = useRef(false);
+  
   // Memoize the habit operations to prevent unnecessary re-renders
   const { 
     getHabitById, 
@@ -34,9 +37,8 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Load habits on component mount
   useEffect(() => {
     console.log('HabitProvider mounted, loading habits initially');
-    // Use a ref to prevent loading habits multiple times
-    const initialLoadDone = React.useRef(false);
     
+    // Use the ref defined at component level
     if (!initialLoadDone.current) {
       loadHabits();
       initialLoadDone.current = true;
@@ -82,7 +84,7 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } finally {
       setLoadingState(false);
     }
-  }, [loadHabitsFromStorage]); // Removed dependencies that could cause re-renders
+  }, [loadHabitsFromStorage, loadingState]); 
 
   // Force save all habits
   const saveAllHabits = useCallback(() => {
