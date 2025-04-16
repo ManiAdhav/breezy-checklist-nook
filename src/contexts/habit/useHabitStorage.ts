@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { Habit, HabitLog } from '@/types/habit';
 import { toast } from '@/hooks/use-toast';
@@ -32,7 +33,7 @@ export const useHabitStorage = () => {
     try {
       // Load habits
       const habitsJson = localStorage.getItem(HABITS_STORAGE_KEY);
-      console.log('Raw habits from storage:', habitsJson);
+      console.log(`Raw habits from storage (${HABITS_STORAGE_KEY}):`, habitsJson);
       
       let parsedHabits: Habit[] = [];
       if (habitsJson) {
@@ -51,7 +52,7 @@ export const useHabitStorage = () => {
       
       // Load habit logs
       const logsJson = localStorage.getItem(HABIT_LOGS_STORAGE_KEY);
-      console.log('Raw habit logs from storage:', logsJson);
+      console.log(`Raw habit logs from storage (${HABIT_LOGS_STORAGE_KEY}):`, logsJson);
       
       let parsedLogs: HabitLog[] = [];
       if (logsJson) {
@@ -88,7 +89,7 @@ export const useHabitStorage = () => {
     console.log('Saving habits to storage:', habitsToSave);
     try {
       localStorage.setItem(HABITS_STORAGE_KEY, JSON.stringify(habitsToSave));
-      console.log('Habits saved successfully');
+      console.log(`Habits saved successfully to ${HABITS_STORAGE_KEY}`);
     } catch (error) {
       console.error('Error saving habits to storage:', error);
       toast({
@@ -104,7 +105,7 @@ export const useHabitStorage = () => {
     console.log('Saving habit logs to storage:', logsToSave);
     try {
       localStorage.setItem(HABIT_LOGS_STORAGE_KEY, JSON.stringify(logsToSave));
-      console.log('Habit logs saved successfully');
+      console.log(`Habit logs saved successfully to ${HABIT_LOGS_STORAGE_KEY}`);
     } catch (error) {
       console.error('Error saving habit logs to storage:', error);
       toast({
@@ -131,11 +132,12 @@ export const useHabitStorage = () => {
 
   return {
     habits,
-    setHabits,
+    setHabits: updateHabits, // Use updateHabits instead of setHabits to automatically save to storage
     habitLogs,
-    setHabitLogs,
+    setHabitLogs: updateHabitLogs, // Use updateHabitLogs instead of setHabitLogs to automatically save to storage
     isLoading,
     loadHabitsFromStorage,
-    saveHabitsToStorage
+    saveHabitsToStorage,
+    saveHabitLogsToStorage
   };
 };

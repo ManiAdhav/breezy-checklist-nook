@@ -65,16 +65,10 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       const { habits: loadedHabits, habitLogs: loadedLogs } = await loadHabitsFromStorage();
       
-      console.log('HabitProvider: Habits reloaded successfully', loadedHabits?.length);
-      
-      // Always initialize with arrays, empty ones if needed
-      if (!loadedHabits) {
-        setHabits([]);
-      }
-      
-      if (!loadedLogs) {
-        setHabitLogs([]);
-      }
+      console.log('HabitProvider: Habits reloaded successfully', {
+        habitsLength: loadedHabits?.length,
+        logsLength: loadedLogs?.length
+      });
       
       // No success toast to avoid unnecessary notifications
     } catch (error) {
