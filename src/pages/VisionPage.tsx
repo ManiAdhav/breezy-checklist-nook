@@ -9,6 +9,8 @@ import MobileSidebar from '@/components/layout/MobileSidebar';
 import VisionList from '@/components/vision/VisionList';
 import { useAuth } from '@/hooks/useAuth';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import { Toaster } from "@/components/ui/toaster";
 
 const VisionPage: React.FC = () => {
   const { user, loading, handleSignOut } = useAuth();
@@ -21,14 +23,19 @@ const VisionPage: React.FC = () => {
     <TaskProvider>
       <GoalProvider>
         <VisionProvider>
-          <div className="min-h-screen flex flex-col bg-background w-full">
-            <Header user={user} onSignOut={handleSignOut} />
-            <div className="flex flex-1 overflow-hidden">
-              <Sidebar />
-              <MobileSidebar />
-              <VisionList />
+          <SidebarProvider defaultOpen={true}>
+            <div className="min-h-screen flex flex-col bg-background w-full">
+              <Header user={user} onSignOut={handleSignOut} />
+              <div className="flex flex-1 overflow-hidden">
+                <Sidebar />
+                <MobileSidebar />
+                <main className="flex-1 overflow-y-auto">
+                  <VisionList />
+                </main>
+              </div>
+              <Toaster />
             </div>
-          </div>
+          </SidebarProvider>
         </VisionProvider>
       </GoalProvider>
     </TaskProvider>
