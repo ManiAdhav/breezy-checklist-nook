@@ -3,6 +3,7 @@ import React from 'react';
 import { TaskProvider } from '@/contexts/TaskContext';
 import { GoalProvider } from '@/contexts/GoalContext';
 import { VisionProvider } from '@/contexts/VisionContext';
+import { HabitProvider } from '@/contexts/habit/HabitProvider';
 import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
 import MobileSidebar from '@/components/layout/MobileSidebar';
@@ -23,19 +24,21 @@ const VisionPage: React.FC = () => {
     <TaskProvider>
       <GoalProvider>
         <VisionProvider>
-          <SidebarProvider defaultOpen={true}>
-            <div className="min-h-screen flex flex-col bg-background w-full">
-              <Header user={user} onSignOut={handleSignOut} />
-              <div className="flex flex-1 overflow-hidden">
-                <Sidebar />
-                <MobileSidebar />
-                <main className="flex-1 overflow-y-auto">
-                  <VisionList />
-                </main>
+          <HabitProvider>
+            <SidebarProvider defaultOpen={true}>
+              <div className="min-h-screen flex flex-col bg-background w-full">
+                <Header user={user} onSignOut={handleSignOut} />
+                <div className="flex flex-1 overflow-hidden">
+                  <Sidebar />
+                  <MobileSidebar />
+                  <main className="flex-1 overflow-y-auto">
+                    <VisionList />
+                  </main>
+                </div>
+                <Toaster />
               </div>
-              <Toaster />
-            </div>
-          </SidebarProvider>
+            </SidebarProvider>
+          </HabitProvider>
         </VisionProvider>
       </GoalProvider>
     </TaskProvider>
