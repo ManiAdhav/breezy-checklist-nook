@@ -16,6 +16,9 @@ const HabitTracker: React.FC = () => {
   const [selectedHabitId, setSelectedHabitId] = useState<string | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   
+  // Create ref at component level
+  const isFirstRender = React.useRef(true);
+  
   // Load habits only once when component mounts
   useEffect(() => {
     const loadData = async () => {
@@ -31,8 +34,7 @@ const HabitTracker: React.FC = () => {
       }
     };
     
-    // Using a ref to prevent the effect from running multiple times
-    const isFirstRender = React.useRef(true);
+    // Using the ref to prevent the effect from running multiple times
     if (isFirstRender.current) {
       loadData();
       isFirstRender.current = false;
