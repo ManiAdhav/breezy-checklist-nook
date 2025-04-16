@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { Habit, HabitLog } from '@/types/habit';
 import { toast } from '@/hooks/use-toast';
@@ -46,7 +45,7 @@ export const useHabitStorage = () => {
           console.log('Formatted habits after date conversion:', parsedHabits);
         } catch (e) {
           console.error('Error parsing habits from storage:', e);
-          // Don't show toast here, let the parent handle it
+          // Just log the error, don't show toast
         }
       }
       
@@ -65,11 +64,11 @@ export const useHabitStorage = () => {
           console.log('Formatted logs after date conversion:', parsedLogs);
         } catch (e) {
           console.error('Error parsing habit logs from storage:', e);
-          // Don't show toast here, let the parent handle it
+          // Just log the error, don't show toast
         }
       }
       
-      // Update state with parsed data
+      // Always update state even if empty
       setHabits(parsedHabits);
       setHabitLogs(parsedLogs);
       console.log('Finished loading habits and logs from storage');
@@ -77,7 +76,7 @@ export const useHabitStorage = () => {
       return { habits: parsedHabits, habitLogs: parsedLogs };
     } catch (error) {
       console.error('Error loading from storage:', error);
-      // Return empty arrays instead of throwing, let parent component decide how to handle
+      // Return empty arrays without showing toast
       return { habits: [], habitLogs: [] };
     } finally {
       setIsLoading(false);
@@ -132,12 +131,11 @@ export const useHabitStorage = () => {
 
   return {
     habits,
-    setHabits: updateHabits,
+    setHabits,
     habitLogs,
-    setHabitLogs: updateHabitLogs,
+    setHabitLogs,
     isLoading,
     loadHabitsFromStorage,
-    saveHabitsToStorage,
-    saveHabitLogsToStorage
+    saveHabitsToStorage
   };
 };

@@ -63,24 +63,29 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setLoadingState(true);
     
     try {
-      const { habits: loadedHabits } = await loadHabitsFromStorage();
+      const { habits: loadedHabits, habitLogs: loadedLogs } = await loadHabitsFromStorage();
       
       console.log('HabitProvider: Habits reloaded successfully', loadedHabits?.length);
       
-      // Commented out success toast to avoid unnecessary notifications
-      // if (loadedHabits && loadedHabits.length > 0) {
-      //   toast({
-      //     title: "Habits loaded",
-      //     description: `${loadedHabits.length} habits loaded successfully`,
-      //   });
-      // }
+      // Always initialize with arrays, empty ones if needed
+      if (!loadedHabits) {
+        setHabits([]);
+      }
+      
+      if (!loadedLogs) {
+        setHabitLogs([]);
+      }
+      
+      // No success toast to avoid unnecessary notifications
     } catch (error) {
       console.error('Error loading habits in provider:', error);
-      // Show error toast only on serious errors, not just when no habits exist
-      if (habits.length === 0) {
-        // Initialize with empty array to prevent continuous error messages
-        setHabits([]);
-      } else {
+      
+      // Initialize with empty arrays to prevent errors
+      setHabits([]);
+      setHabitLogs([]);
+      
+      // Only show error toast if we're not in initial loading (to avoid showing on first load)
+      if (initialLoadDone.current && !storageLoading) {
         toast({
           title: "Error loading habits",
           description: "There was a problem loading your habits. Please try refreshing the page.",
@@ -90,7 +95,7 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } finally {
       setLoadingState(false);
     }
-  }, [loadHabitsFromStorage, loadingState, habits.length, setHabits]); 
+  }, [loadHabitsFromStorage, loadingState, setHabits, setHabitLogs, storageLoading]);
 
   // Force save all habits
   const saveAllHabits = useCallback(() => {
