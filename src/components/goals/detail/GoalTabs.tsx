@@ -35,7 +35,7 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
 }) => {
   return (
     <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
-      <TabsList className="sticky top-[72px] z-10 grid grid-cols-5 mb-6 w-full bg-background">
+      <TabsList className="sticky top-0 z-10 grid grid-cols-5 mb-6 w-full bg-background">
         <TabsTrigger value="overview" className="flex items-center space-x-2">
           <Shapes className="h-4 w-4" />
           <span>Overview</span>

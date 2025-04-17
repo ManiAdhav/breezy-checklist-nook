@@ -7,6 +7,7 @@ import GoalTabs from './detail/GoalTabs';
 import GoalNotFound from './detail/GoalNotFound';
 import GoalActionButton from './detail/GoalActionButton';
 import EditGoalDialog from './dialogs/EditGoalDialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface GoalDetailViewProps {
   goalId: string;
@@ -45,7 +46,7 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
         habitCount={habitCount}
       />
       
-      <div className="flex-1 overflow-y-auto">
+      <ScrollArea className="flex-1">
         {/* Goal Description and Progress */}
         <GoalProgress goal={goal} />
         
@@ -61,7 +62,7 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
             habitCount={habitCount}
           />
         </div>
-      </div>
+      </ScrollArea>
       
       {/* Edit Goal Dialog */}
       {goal && <EditGoalDialog 
