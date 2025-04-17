@@ -1,7 +1,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useTask } from '@/contexts/TaskContext';
-import { generateRandomColor } from '@/contexts/task/useTagOperations';
+import { generateRandomColor } from '@/utils/colorUtils'; // Updated import
 import { filterTags, getRecentTags } from '../utils/tagUtils';
 
 export const useTagSelection = (

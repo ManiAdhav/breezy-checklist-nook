@@ -2,32 +2,44 @@
 import { useEffect } from 'react';
 import { fetchData } from '@/utils/dataSync';
 import { toast } from '@/hooks/use-toast';
+import { Task, List } from '@/types/task';
 
 export const useTaskData = (
-  setTasks: React.Dispatch<React.SetStateAction<any[]>>,
-  setCustomLists: React.Dispatch<React.SetStateAction<any[]>>,
+  setTasks: React.Dispatch<React.SetStateAction<Task[]>>,
+  setCustomLists: React.Dispatch<React.SetStateAction<List[]>>,
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  // Load data when component mounts
   useEffect(() => {
     const fetchTaskData = async () => {
       setIsLoading(true);
       console.log('Fetching tasks and lists data...');
       
       try {
-        // Get data using our consistent sync utilities
+        // Type assertion to ensure type safety
         const [tasksData, listsData] = await Promise.all([
-          fetchData('tasks', 'tasks'),
-          fetchData('lists', 'customLists')
+          fetchData('tasks', 'tasks') as Promise<Task[]>,
+          fetchData('lists', 'customLists') as Promise<List[]>
         ]);
         
         // Process tasks date fields
         const processedTasks = tasksData.map(task => ({
-          ...task,
-          createdAt: new Date(task.createdAt),
-          updatedAt: new Date(task.updatedAt),
-          dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
-          startDate: task.startDate ? new Date(task.startDate) : undefined
+          ...(task as Task),
+          createdAt: task.createdAt instanceof Date 
+            ? task.createdAt 
+            : new Date(task.createdAt || Date.now()),
+          updatedAt: task.updatedAt instanceof Date 
+            ? task.updatedAt 
+            : new Date(task.updatedAt || Date.now()),
+          dueDate: task.dueDate 
+            ? (task.dueDate instanceof Date 
+              ? task.dueDate 
+              : new Date(task.dueDate)) 
+            : undefined,
+          startDate: task.startDate 
+            ? (task.startDate instanceof Date 
+              ? task.startDate 
+              : new Date(task.startDate)) 
+            : undefined
         }));
         
         console.log(`Loaded ${processedTasks.length} tasks successfully:`, processedTasks);

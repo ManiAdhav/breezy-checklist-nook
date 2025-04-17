@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Edit2, Trash2, ChevronRight, ChevronDown, Plus, Tag as TagIcon } from 'lucide-react';
 import { useTask } from '@/contexts/TaskContext';
@@ -12,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { generateRandomColor } from '@/contexts/task/useTagOperations';
+import { generateRandomColor } from '@/utils/colorUtils'; // Updated import
 
 const TagsSection: React.FC = () => {
   const { tags, addTag, updateTag, deleteTag } = useTask();
