@@ -1,6 +1,7 @@
 
 import { List } from '@/types/task';
-import * as TaskService from '@/api/taskService';
+import { v4 as uuidv4 } from 'uuid';
+import { saveData } from '@/utils/dataSync';
 import { toast } from '@/hooks/use-toast';
 
 export const useListOperations = (
@@ -11,37 +12,36 @@ export const useListOperations = (
   customLists: List[],
   selectedListId: string
 ) => {
-  // List operations
-  const addList = async (list: Omit<List, 'id'>) => {
+  const addList = async (name: string, color?: string, icon?: string) => {
     setIsLoading(true);
     try {
-      const response = await TaskService.createList(list);
+      const newList: List = {
+        id: uuidv4(),
+        name,
+        color,
+        icon,
+      };
+
+      const updatedLists = [...customLists, newList];
+      setCustomLists(updatedLists);
+      setSelectedListId(newList.id);
       
-      if (response.success && response.data) {
-        // Ensure we're adding a valid list object to the state
-        setCustomLists(prevLists => [...prevLists, response.data!]);
-        setSelectedListId(response.data!.id);
-        
-        // Log the list creation for debugging
-        console.log('List created:', response.data);
-        
-        toast({
-          title: "List added",
-          description: `"${list.name}" was added successfully.`,
-        });
-        
-        return response.data;
-      } else {
-        throw new Error(response.error || 'Failed to add list');
-      }
+      // Save to storage
+      await saveData('lists', 'customLists', updatedLists);
+      
+      toast({
+        title: "Success",
+        description: `List "${name}" created successfully`,
+      });
+      
+      return newList;
     } catch (error) {
       console.error('Error adding list:', error);
       toast({
         title: "Error",
-        description: "Failed to add list",
+        description: "Failed to create list",
         variant: "destructive",
       });
-      return null; // Return null instead of throwing to prevent app freeze
     } finally {
       setIsLoading(false);
     }
@@ -50,22 +50,25 @@ export const useListOperations = (
   const updateList = async (id: string, updates: Partial<List>) => {
     setIsLoading(true);
     try {
-      const response = await TaskService.updateList(id, updates);
+      const listToUpdate = customLists.find(list => list.id === id);
+      if (!listToUpdate) throw new Error('List not found');
+
+      const updatedList = { ...listToUpdate, ...updates };
+      const updatedLists = customLists.map(list => 
+        list.id === id ? updatedList : list
+      );
+
+      setCustomLists(updatedLists);
       
-      if (response.success && response.data) {
-        setCustomLists(prevLists => 
-          prevLists.map(list => 
-            list.id === id ? response.data! : list
-          )
-        );
-        toast({
-          title: "List updated",
-          description: "Your list was updated successfully.",
-        });
-        return response.data;
-      } else {
-        throw new Error(response.error || 'Failed to update list');
-      }
+      // Save to storage
+      await saveData('lists', 'customLists', updatedLists);
+      
+      toast({
+        title: "Success",
+        description: `List "${updatedList.name}" updated successfully`,
+      });
+      
+      return updatedList;
     } catch (error) {
       console.error('Error updating list:', error);
       toast({
@@ -73,47 +76,47 @@ export const useListOperations = (
         description: "Failed to update list",
         variant: "destructive",
       });
-      return null; // Return null instead of throwing to prevent app freeze
     } finally {
       setIsLoading(false);
     }
   };
 
   const deleteList = async (id: string) => {
-    // Find the list name before deletion for the toast
-    const listToDelete = customLists.find(list => list.id === id);
-    
     setIsLoading(true);
     try {
-      const response = await TaskService.deleteList(id);
-      
-      if (response.success) {
-        setCustomLists(prevLists => prevLists.filter(list => list.id !== id));
-        
-        // If the deleted list was selected, switch to inbox
-        if (selectedListId === id) {
-          setSelectedListId('inbox');
-        }
-        
-        // Update task references in the state
-        setTasks(prevTasks => 
-          prevTasks.map(task => 
-            task.listId === id 
-              ? { ...task, listId: 'inbox' } 
-              : task
-          )
+      const listToDelete = customLists.find(list => list.id === id);
+      if (!listToDelete) throw new Error('List not found');
+
+      // Update lists
+      const updatedLists = customLists.filter(list => list.id !== id);
+      setCustomLists(updatedLists);
+
+      // If the deleted list was selected, select the first custom list or the inbox
+      if (selectedListId === id) {
+        setSelectedListId(updatedLists.length > 0 ? updatedLists[0].id : 'inbox');
+      }
+
+      // Update tasks that were in the deleted list
+      setTasks(prevTasks => {
+        const updatedTasks = prevTasks.map(task => 
+          task.listId === id ? { ...task, listId: 'inbox' } : task
         );
         
-        toast({
-          title: "List deleted",
-          description: `"${listToDelete?.name}" was deleted and its tasks moved to Inbox.`,
-          variant: "destructive",
-        });
+        // Save updated tasks to storage
+        saveData('tasks', 'tasks', updatedTasks);
         
-        return true;
-      } else {
-        throw new Error(response.error || 'Failed to delete list');
-      }
+        return updatedTasks;
+      });
+      
+      // Save updated lists to storage
+      await saveData('lists', 'customLists', updatedLists);
+      
+      toast({
+        title: "Success",
+        description: `List "${listToDelete.name}" deleted successfully`,
+      });
+      
+      return true;
     } catch (error) {
       console.error('Error deleting list:', error);
       toast({
@@ -121,7 +124,7 @@ export const useListOperations = (
         description: "Failed to delete list",
         variant: "destructive",
       });
-      return false; // Return false instead of throwing to prevent app freeze
+      return false;
     } finally {
       setIsLoading(false);
     }

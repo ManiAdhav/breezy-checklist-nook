@@ -1,24 +1,18 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { HabitContext } from './HabitContext';
-import { useHabitStorage } from './useHabitStorage';
 import { useHabitOperations } from './useHabitOperations';
 import { useStreakCalculation } from './useStreakCalculation';
 import { toast } from '@/hooks/use-toast';
+import { fetchData, saveData } from '@/utils/dataSync';
+import { Habit, HabitLog } from '@/types/habit';
 
 export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { 
-    habits, 
-    setHabits, 
-    habitLogs, 
-    setHabitLogs, 
-    isLoading: storageLoading, 
-    loadHabitsFromStorage,
-    saveHabitsToStorage 
-  } = useHabitStorage();
+  const [habits, setHabits] = useState<Habit[]>([]);
+  const [habitLogs, setHabitLogs] = useState<HabitLog[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
   const { calculateHabitStreak } = useStreakCalculation();
-  const [loadingState, setLoadingState] = useState(true); // Start as loading
   
   // Memoize the habit operations to prevent unnecessary re-renders
   const { 
@@ -30,41 +24,52 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     getHabitLogs 
   } = useHabitOperations(habits, setHabits, habitLogs, setHabitLogs);
 
-  // Load habits on component mount - CRITICAL for loading previous habits
+  // Load habits on component mount
   useEffect(() => {
-    console.log('HabitProvider mounted, loading habits initially');
+    console.log('HabitProvider mounted, loading habits...');
     loadHabits();
-  }, []); // Empty dependency array to run only once
+  }, []); 
 
   // Function to calculate streak for a habit
   const getHabitStreak = useCallback((habitId: string) => {
     return calculateHabitStreak(habitLogs, habitId);
   }, [habitLogs, calculateHabitStreak]);
   
-  // Function to load habits data - made more robust
+  // Function to load habits data
   const loadHabits = useCallback(async () => {
     console.log('HabitProvider: Loading habits data');
     
     // Set loading state immediately
-    setLoadingState(true);
+    setIsLoading(true);
     
     try {
-      console.log('Calling loadHabitsFromStorage');
-      // Wait for loadHabitsFromStorage to complete and get the result
-      const result = await loadHabitsFromStorage();
+      // Use our sync utilities to load habits and logs consistently
+      const [habitsData, logsData] = await Promise.all([
+        fetchData<Habit>('habits', 'habits'),
+        fetchData<HabitLog>('habit_logs', 'habitLogs')
+      ]);
       
-      // Log what was retrieved for debugging
+      // Convert string dates back to Date objects
+      const processedHabits = habitsData.map(habit => ({
+        ...habit,
+        createdAt: new Date(habit.createdAt),
+        updatedAt: new Date(habit.updatedAt),
+        startDate: new Date(habit.startDate),
+        endDate: habit.endDate ? new Date(habit.endDate) : undefined
+      }));
+      
+      const processedLogs = logsData.map(log => ({
+        ...log,
+        date: new Date(log.date)
+      }));
+      
       console.log('HabitProvider: Habits loaded successfully', {
-        habitsLength: result.habits?.length || 0,
-        logsLength: result.habitLogs?.length || 0,
-        habitsData: result.habits
+        habitsLength: processedHabits.length,
+        logsLength: processedLogs.length
       });
       
-      // Always set state regardless of empty or not to ensure state updates
-      console.log('Setting habits and habitLogs state with loaded data');
-      setHabits(result.habits || []);
-      setHabitLogs(result.habitLogs || []);
-      
+      setHabits(processedHabits);
+      setHabitLogs(processedLogs);
     } catch (error) {
       console.error('Error loading habits in provider:', error);
       
@@ -78,23 +83,38 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         variant: "destructive"
       });
     } finally {
-      setLoadingState(false);
+      setIsLoading(false);
     }
-  }, [loadHabitsFromStorage, setHabits, setHabitLogs]);
+  }, []);
 
   // Force save all habits
-  const saveAllHabits = useCallback(() => {
+  const saveAllHabits = useCallback(async () => {
     console.log('HabitProvider: Force saving all habits', habits.length);
-    saveHabitsToStorage(habits, habitLogs);
-  }, [habits, habitLogs, saveHabitsToStorage]);
-
-  const combinedIsLoading = storageLoading || loadingState;
+    try {
+      await Promise.all([
+        saveData('habits', 'habits', habits),
+        saveData('habit_logs', 'habitLogs', habitLogs)
+      ]);
+      
+      toast({
+        title: "Success",
+        description: "All habits and logs saved successfully",
+      });
+    } catch (error) {
+      console.error('Error saving all habits:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save habits data",
+        variant: "destructive"
+      });
+    }
+  }, [habits, habitLogs]);
 
   // Memoize the context value to prevent unnecessary re-renders
   const value = useMemo(() => ({
     habits,
     habitLogs,
-    isLoading: combinedIsLoading,
+    isLoading,
     getHabitById,
     addHabit,
     updateHabit,
@@ -107,7 +127,7 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }), [
     habits,
     habitLogs,
-    combinedIsLoading,
+    isLoading,
     getHabitById,
     addHabit,
     updateHabit,
@@ -122,7 +142,6 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Log when habits change for debugging
   useEffect(() => {
     console.log('HabitProvider rendered with', habits.length, 'habits');
-    console.log('Current habits state:', habits);
   }, [habits]);
 
   return (

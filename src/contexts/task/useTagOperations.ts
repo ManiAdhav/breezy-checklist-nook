@@ -1,93 +1,104 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Tag } from '@/types/task';
+import { v4 as uuidv4 } from 'uuid';
+import { fetchData, saveData } from '@/utils/dataSync';
 import { toast } from '@/hooks/use-toast';
-import { generateId } from '@/utils/taskUtils';
-
-// Generate a random color
-export const generateRandomColor = (): string => {
-  const colors = [
-    '#9b87f5', '#7E69AB', '#6E59A5', '#D6BCFA', 
-    '#F2FCE2', '#FEF7CD', '#FEC6A1', '#E5DEFF', 
-    '#FFDEE2', '#FDE1D3', '#D3E4FD', '#F1F0FB', 
-    '#8B5CF6', '#D946EF', '#F97316', '#0EA5E9',
-    '#33C3F0', '#0FA0CE', '#ea384c'
-  ];
-  return colors[Math.floor(Math.random() * colors.length)];
-};
 
 export const useTagOperations = () => {
   const [tags, setTags] = useState<Tag[]>([]);
-
-  const loadTags = () => {
+  
+  const loadTags = useCallback(async () => {
     try {
-      const storedTags = localStorage.getItem('tags');
-      if (storedTags) {
-        setTags(JSON.parse(storedTags));
-      }
+      // Use our sync utility for consistent loading
+      const tagsData = await fetchData<Tag>('tags', 'tags');
+      console.log(`Loaded ${tagsData.length} tags from storage`);
+      setTags(tagsData);
+      return tagsData;
     } catch (error) {
       console.error('Error loading tags:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load tags",
+        variant: "destructive",
+      });
+      return [];
     }
-  };
-
-  const saveTags = (updatedTags: Tag[]) => {
+  }, []);
+  
+  const addTag = async (name: string, color: string): Promise<Tag | undefined> => {
     try {
-      localStorage.setItem('tags', JSON.stringify(updatedTags));
+      const newTag: Tag = {
+        id: uuidv4(),
+        name,
+        color
+      };
+      
+      const updatedTags = [...tags, newTag];
+      setTags(updatedTags);
+      
+      // Save tags to storage
+      await saveData('tags', 'tags', updatedTags);
+      
+      return newTag;
     } catch (error) {
-      console.error('Error saving tags:', error);
+      console.error('Error adding tag:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create tag",
+        variant: "destructive",
+      });
     }
   };
-
-  const addTag = (tag: Omit<Tag, 'id'>): Tag => {
-    const newTag: Tag = {
-      ...tag,
-      id: generateId(),
-    };
-
-    const updatedTags = [...tags, newTag];
-    setTags(updatedTags);
-    saveTags(updatedTags);
-    
-    toast({
-      title: "Tag added",
-      description: "Your tag was added successfully.",
-    });
-    
-    return newTag;
+  
+  const updateTag = async (id: string, updates: Partial<Tag>): Promise<Tag | undefined> => {
+    try {
+      const updatedTags = tags.map(tag => 
+        tag.id === id ? { ...tag, ...updates } : tag
+      );
+      
+      setTags(updatedTags);
+      
+      // Save tags to storage
+      await saveData('tags', 'tags', updatedTags);
+      
+      return updatedTags.find(tag => tag.id === id);
+    } catch (error) {
+      console.error('Error updating tag:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update tag",
+        variant: "destructive",
+      });
+    }
   };
-
-  const updateTag = (id: string, updates: Partial<Tag>) => {
-    const updatedTags = tags.map(tag => 
-      tag.id === id ? { ...tag, ...updates } : tag
-    );
-    
-    setTags(updatedTags);
-    saveTags(updatedTags);
-    
-    toast({
-      title: "Tag updated",
-      description: "Your tag was updated successfully.",
-    });
+  
+  const deleteTag = async (id: string): Promise<boolean> => {
+    try {
+      const updatedTags = tags.filter(tag => tag.id !== id);
+      setTags(updatedTags);
+      
+      // Save tags to storage
+      await saveData('tags', 'tags', updatedTags);
+      
+      return true;
+    } catch (error) {
+      console.error('Error deleting tag:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete tag",
+        variant: "destructive",
+      });
+      return false;
+    }
   };
-
-  const deleteTag = (id: string) => {
-    const updatedTags = tags.filter(tag => tag.id !== id);
-    setTags(updatedTags);
-    saveTags(updatedTags);
-    
-    toast({
-      title: "Tag deleted",
-      description: "Your tag was deleted successfully.",
-      variant: "destructive",
-    });
-  };
-
+  
   return {
     tags,
     setTags,
     loadTags,
     addTag,
     updateTag,
-    deleteTag,
+    deleteTag
   };
 };

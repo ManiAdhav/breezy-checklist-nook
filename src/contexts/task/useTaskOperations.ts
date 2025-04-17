@@ -1,9 +1,9 @@
 
 import { useState } from 'react';
 import { Task, List } from '@/types/task';
-import * as TaskService from '@/api/taskService';
+import { saveData } from '@/utils/dataSync';
 import { toast } from '@/hooks/use-toast';
-import { storeTasks } from '@/api/services/storage/supabase/tasks';
+import { v4 as uuidv4 } from 'uuid';
 
 export const useTaskOperations = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -14,19 +14,20 @@ export const useTaskOperations = () => {
   const addTask = async (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
     setIsLoading(true);
     try {
-      const response = await TaskService.createTask(task);
+      const newTask: Task = {
+        ...task,
+        id: uuidv4(),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
       
-      if (response.success && response.data) {
-        const newTasks = [...tasks, response.data];
-        setTasks(newTasks);
-        
-        // Also ensure tasks are saved to storage directly
-        await storeTasks(newTasks);
-        
-        return response.data;
-      } else {
-        throw new Error(response.error || 'Failed to add task');
-      }
+      const newTasks = [...tasks, newTask];
+      setTasks(newTasks);
+      
+      // Save tasks to storage
+      await saveData('tasks', 'tasks', newTasks);
+      
+      return newTask;
     } catch (error) {
       console.error('Error adding task:', error);
       toast({
@@ -43,21 +44,16 @@ export const useTaskOperations = () => {
   const updateTask = async (id: string, updates: Partial<Task>) => {
     setIsLoading(true);
     try {
-      const response = await TaskService.updateTask(id, updates);
+      const updatedTasks = tasks.map(task => 
+        task.id === id ? { ...task, ...updates, updatedAt: new Date() } : task
+      );
       
-      if (response.success && response.data) {
-        const updatedTasks = tasks.map(task => 
-          task.id === id ? response.data! : task
-        );
-        setTasks(updatedTasks);
-        
-        // Also ensure tasks are saved to storage directly
-        await storeTasks(updatedTasks);
-        
-        return response.data;
-      } else {
-        throw new Error(response.error || 'Failed to update task');
-      }
+      setTasks(updatedTasks);
+      
+      // Save tasks to storage
+      await saveData('tasks', 'tasks', updatedTasks);
+      
+      return updatedTasks.find(task => task.id === id);
     } catch (error) {
       console.error('Error updating task:', error);
       toast({
@@ -74,19 +70,13 @@ export const useTaskOperations = () => {
   const deleteTask = async (id: string) => {
     setIsLoading(true);
     try {
-      const response = await TaskService.deleteTask(id);
+      const updatedTasks = tasks.filter(task => task.id !== id);
+      setTasks(updatedTasks);
       
-      if (response.success) {
-        const updatedTasks = tasks.filter(task => task.id !== id);
-        setTasks(updatedTasks);
-        
-        // Also ensure tasks are saved to storage directly
-        await storeTasks(updatedTasks);
-        
-        return true;
-      } else {
-        throw new Error(response.error || 'Failed to delete task');
-      }
+      // Save tasks to storage
+      await saveData('tasks', 'tasks', updatedTasks);
+      
+      return true;
     } catch (error) {
       console.error('Error deleting task:', error);
       toast({
@@ -102,21 +92,20 @@ export const useTaskOperations = () => {
 
   const toggleTaskCompletion = async (id: string) => {
     try {
-      const response = await TaskService.toggleTaskCompletion(id);
-      
-      if (response.success && response.data) {
-        const updatedTasks = tasks.map(task => 
-          task.id === id ? response.data! : task
-        );
-        setTasks(updatedTasks);
-        
-        // Also ensure tasks are saved to storage directly
-        await storeTasks(updatedTasks);
-        
-        return response.data;
-      } else {
-        throw new Error(response.error || 'Failed to toggle task completion');
+      const task = tasks.find(t => t.id === id);
+      if (!task) {
+        throw new Error('Task not found');
       }
+      
+      const updatedTask = { ...task, completed: !task.completed, updatedAt: new Date() };
+      const updatedTasks = tasks.map(t => t.id === id ? updatedTask : t);
+      
+      setTasks(updatedTasks);
+      
+      // Save tasks to storage
+      await saveData('tasks', 'tasks', updatedTasks);
+      
+      return updatedTask;
     } catch (error) {
       console.error('Error toggling task completion:', error);
       toast({
