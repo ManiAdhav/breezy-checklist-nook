@@ -76,26 +76,21 @@ const HabitSection: React.FC<HabitSectionProps> = ({ goalId, limit }) => {
     // or a percentage based on completion rate
     let progress = 0;
     
-    if (habit.targetStreak && habit.targetStreak > 0) {
-      // Calculate based on target streak
-      progress = Math.min(100, (streak.current / habit.targetStreak) * 100);
-    } else {
-      // Calculate based on consistency - last 7 days
-      const last7Days = Array.from({ length: 7 }, (_, i) => {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        return date.setHours(0, 0, 0, 0);
-      });
-      
-      const completedDays = last7Days.filter(day => 
-        habitLogs.some(log => 
-          log.habitId === habit.id && 
-          new Date(log.date).setHours(0, 0, 0, 0) === day
-        )
-      ).length;
-      
-      progress = Math.round((completedDays / 7) * 100);
-    }
+    // Calculate based on consistency - last 7 days
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      return date.setHours(0, 0, 0, 0);
+    });
+    
+    const completedDays = last7Days.filter(day => 
+      habitLogs.some(log => 
+        log.habitId === habit.id && 
+        new Date(log.date).setHours(0, 0, 0, 0) === day
+      )
+    ).length;
+    
+    progress = Math.round((completedDays / 7) * 100);
     
     return progress;
   };
@@ -117,7 +112,7 @@ const HabitSection: React.FC<HabitSectionProps> = ({ goalId, limit }) => {
     logProgress({
       habitId: habit.id,
       date: new Date(),
-      value: habit.metric === 'boolean' ? true : 1, // Default values
+      value: habit.metric === 'boolean' ? 1 : 1, // Convert boolean to number for consistency
       notes: ''
     });
     
@@ -142,11 +137,16 @@ const HabitSection: React.FC<HabitSectionProps> = ({ goalId, limit }) => {
     const newHabit = {
       name: "New Habit",
       description: "Track your new daily habit",
-      frequency: "daily",
+      frequency: "daily" as 'daily' | 'weekly' | 'monthly',
       metric: "boolean",
+      target: 1, // Add target property
       goalId: goalId,
       startDate: new Date(),
-      icon: "activity"
+      icon: "activity",
+      tags: [], // Add required tags property
+      selectedDays: [], // Add required selectedDays property
+      timeOfDay: "", // Add required timeOfDay property
+      reminders: [] // Add required reminders property
     };
     
     addHabit(newHabit)
@@ -355,12 +355,12 @@ const HabitSection: React.FC<HabitSectionProps> = ({ goalId, limit }) => {
                       >
                         {isCompletedToday(selectedHabit) ? (
                           <>
-                            <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                            <CheckCircle2 className="mr-2 h-4 w-4 text-green-500" />
                             Completed Today
                           </>
                         ) : (
                           <>
-                            <Circle className="h-4 w-4 mr-2" />
+                            <Circle className="mr-2 h-4 w-4" />
                             Mark Complete for Today
                           </>
                         )}
