@@ -90,7 +90,7 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
   }
   
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-background">
+    <div className="flex flex-col h-full bg-background">
       {/* Header */}
       {goal && <GoalHeader 
         goal={goal} 
@@ -103,14 +103,14 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
         habitCount={habitCount}
       />}
       
-      <div className="flex-1 overflow-y-auto pb-20">
+      <div className="flex-1 overflow-y-auto">
         {/* Goal Description and Progress */}
         <GoalProgress goal={goal} />
         
         {/* Tabs for different sections */}
-        <div className="px-6 py-4">
+        <div className="px-6 py-4 pb-20">
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="grid grid-cols-5 mb-6 w-full">
+            <TabsList className="sticky top-[72px] z-10 grid grid-cols-5 mb-6 w-full bg-background">
               <TabsTrigger value="overview" className="flex items-center space-x-2">
                 <Shapes className="h-4 w-4" />
                 <span>Overview</span>
