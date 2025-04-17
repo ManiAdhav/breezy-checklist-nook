@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect } from 'react';
 import { TaskContextType, defaultLists } from './task/types';
 import { useTaskOperations } from './task/useTaskOperations';
@@ -75,9 +76,20 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return addList(list.name, list.color, list.icon);
   };
 
-  const wrappedAddTag = (tag: Omit<Tag, 'id'>) => {
-    const newTag = addTag(tag.name, tag.color);
-    return newTag ? newTag : {} as Tag;
+  // Fix this function to ensure it returns a Tag type and not a Promise<Tag>
+  const wrappedAddTag = (tag: Omit<Tag, 'id'>): Tag => {
+    // Call addTag which returns a Promise<Tag> | undefined
+    const result = addTag(tag.name, tag.color);
+    
+    // Create a default tag with empty values to satisfy TypeScript
+    const defaultTag: Tag = {
+      id: '',
+      name: tag.name,
+      color: tag.color
+    };
+    
+    // Return the result if it's available, otherwise return the default tag
+    return result || defaultTag;
   };
 
   return (

@@ -26,7 +26,7 @@ export const useTagOperations = () => {
     }
   }, []);
   
-  const addTag = async (name: string, color: string): Promise<Tag | undefined> => {
+  const addTag = (name: string, color: string): Tag => {
     try {
       const newTag: Tag = {
         id: uuidv4(),
@@ -37,8 +37,15 @@ export const useTagOperations = () => {
       const updatedTags = [...tags, newTag];
       setTags(updatedTags);
       
-      // Save tags to storage
-      await saveData('tags', 'tags', updatedTags);
+      // Save tags to storage (as a side effect)
+      saveData('tags', 'tags', updatedTags).catch(error => {
+        console.error('Error saving tags:', error);
+        toast({
+          title: "Error",
+          description: "Failed to save tag to storage",
+          variant: "destructive",
+        });
+      });
       
       return newTag;
     } catch (error) {
@@ -48,6 +55,13 @@ export const useTagOperations = () => {
         description: "Failed to create tag",
         variant: "destructive",
       });
+      
+      // Return a default tag in case of error
+      return {
+        id: uuidv4(),
+        name,
+        color
+      };
     }
   };
   
