@@ -78,18 +78,11 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Fix this function to ensure it returns a Tag type and not a Promise<Tag>
   const wrappedAddTag = (tag: Omit<Tag, 'id'>): Tag => {
-    // Call addTag which returns a Promise<Tag> | undefined
+    // Call addTag which returns a Tag
     const result = addTag(tag.name, tag.color);
     
-    // Create a default tag with empty values to satisfy TypeScript
-    const defaultTag: Tag = {
-      id: '',
-      name: tag.name,
-      color: tag.color
-    };
-    
-    // Return the result if it's available, otherwise return the default tag
-    return result || defaultTag;
+    // Return the result (which is guaranteed to be a Tag)
+    return result;
   };
 
   return (

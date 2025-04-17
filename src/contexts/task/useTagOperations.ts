@@ -26,6 +26,7 @@ export const useTagOperations = () => {
     }
   }, []);
   
+  // Updated the return type annotation to be explicitly Tag
   const addTag = (name: string, color: string): Tag => {
     try {
       const newTag: Tag = {
