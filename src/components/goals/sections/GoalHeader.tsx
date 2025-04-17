@@ -5,33 +5,32 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Calendar, Edit } from 'lucide-react';
 import { Goals, GoalStatus } from '@/types/task';
 import { useGoal } from '@/hooks/useGoalContext';
-import { useTask } from '@/contexts/TaskContext';
 import { toast } from '@/hooks/use-toast';
 
 interface GoalHeaderProps {
   goal: Goals;
   onBack: () => void;
   onEdit: () => void;
+  milestoneCount?: number;
+  planCount?: number;
+  taskCount?: number;
+  actionCount?: number;
+  habitCount?: number;
 }
 
-const GoalHeader: React.FC<GoalHeaderProps> = ({ goal, onBack, onEdit }) => {
-  const { updateThreeYearGoal, ninetyDayTargets, plans } = useGoal();
-  const { tasks } = useTask();
+const GoalHeader: React.FC<GoalHeaderProps> = ({ 
+  goal, 
+  onBack, 
+  onEdit,
+  milestoneCount = 0,
+  planCount = 0,
+  taskCount = 0,
+  actionCount = 0,
+  habitCount = 0
+}) => {
+  const { updateThreeYearGoal } = useGoal();
   
-  // Count associated items
-  const milestoneCount = ninetyDayTargets.filter(
-    target => target.threeYearGoalId === goal.id
-  ).length;
-  
-  const planCount = plans.filter(plan => 
-    ninetyDayTargets.some(
-      target => target.threeYearGoalId === goal.id && target.id === plan.ninetyDayTargetId
-    )
-  ).length;
-  
-  const taskCount = tasks.filter(task => task.goalId === goal.id).length;
-  
-  // Get the icon component based on the goal's icon value
+  // Get the status label based on the goal's status value
   const getStatusLabel = (status: GoalStatus): string => {
     const labels = {
       not_started: 'Not Started',
@@ -64,15 +63,21 @@ const GoalHeader: React.FC<GoalHeaderProps> = ({ goal, onBack, onEdit }) => {
       <div className="flex-1">
         <h2 className="text-xl font-semibold tracking-tight flex items-center">
           {goal.title}
-          <div className="flex ml-3 space-x-1.5">
-            <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100 rounded-full">
-              {milestoneCount} Milestones
+          <div className="flex ml-3 space-x-1.5 flex-wrap">
+            <span className="text-xs px-2 py-0.5 bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100 rounded-full whitespace-nowrap">
+              {milestoneCount} {milestoneCount === 1 ? 'Milestone' : 'Milestones'}
             </span>
-            <span className="text-xs px-2 py-0.5 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 rounded-full">
-              {planCount} Plans
+            <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100 rounded-full whitespace-nowrap">
+              {planCount} {planCount === 1 ? 'Plan' : 'Plans'}
             </span>
-            <span className="text-xs px-2 py-0.5 bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100 rounded-full">
-              {taskCount} Tasks
+            <span className="text-xs px-2 py-0.5 bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100 rounded-full whitespace-nowrap">
+              {taskCount} {taskCount === 1 ? 'Task' : 'Tasks'}
+            </span>
+            <span className="text-xs px-2 py-0.5 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100 rounded-full whitespace-nowrap">
+              {actionCount} {actionCount === 1 ? 'Action' : 'Actions'}
+            </span>
+            <span className="text-xs px-2 py-0.5 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 rounded-full whitespace-nowrap">
+              {habitCount} {habitCount === 1 ? 'Habit' : 'Habits'}
             </span>
           </div>
         </h2>

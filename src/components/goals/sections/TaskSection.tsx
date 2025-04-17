@@ -11,9 +11,10 @@ import TaskDialog from './tasks/TaskDialog';
 
 interface TaskSectionProps {
   goalId: string;
+  limit?: number;
 }
 
-const TaskSection: React.FC<TaskSectionProps> = ({ goalId }) => {
+const TaskSection: React.FC<TaskSectionProps> = ({ goalId, limit }) => {
   const {
     tasks,
     isTaskDialogOpen,
@@ -34,6 +35,10 @@ const TaskSection: React.FC<TaskSectionProps> = ({ goalId }) => {
     handleDeleteTask
   } = useTaskSection(goalId);
   
+  // Apply limit if specified
+  const displayTasks = limit ? tasks.slice(0, limit) : tasks;
+  const hasMoreTasks = limit && tasks.length > limit;
+  
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -53,12 +58,12 @@ const TaskSection: React.FC<TaskSectionProps> = ({ goalId }) => {
         <EmptyTaskState onAddTask={openCreateTaskDialog} />
       ) : (
         <div className="space-y-2">
-          {tasks.map((task, index) => (
+          {displayTasks.map((task, index) => (
             <TaskItem 
               key={task.id}
               task={task}
               index={index}
-              totalTasks={tasks.length}
+              totalTasks={displayTasks.length}
               toggleTaskStatus={toggleTaskStatus}
               moveTask={moveTask}
               onEdit={openEditTaskDialog}
@@ -66,6 +71,11 @@ const TaskSection: React.FC<TaskSectionProps> = ({ goalId }) => {
               getPriorityClasses={getPriorityClasses}
             />
           ))}
+          {hasMoreTasks && (
+            <Button variant="ghost" className="w-full text-sm text-muted-foreground">
+              +{tasks.length - limit} more tasks
+            </Button>
+          )}
         </div>
       )}
 

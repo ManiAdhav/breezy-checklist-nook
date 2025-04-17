@@ -8,9 +8,10 @@ import ActionCard from './actions/ActionCard';
 
 interface ActionsSectionProps {
   goalId: string;
+  limit?: number;
 }
 
-const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
+const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId, limit }) => {
   const { tasks, toggleTaskCompletion } = useTask();
   
   const [isAddActionOpen, setIsAddActionOpen] = useState(false);
@@ -20,6 +21,10 @@ const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
     // Check if the task is an action and has the correct goalId
     return task.isAction && task.goalId === goalId;
   });
+  
+  // Apply limit if specified
+  const displayActions = limit ? goalActions.slice(0, limit) : goalActions;
+  const hasMoreActions = limit && goalActions.length > limit;
   
   return (
     <div>
@@ -42,14 +47,21 @@ const ActionsSection: React.FC<ActionsSectionProps> = ({ goalId }) => {
       </div>
       
       <div className="grid gap-3">
-        {goalActions.length > 0 ? (
-          goalActions.map(action => (
-            <ActionCard
-              key={action.id}
-              action={action}
-              onToggleTaskCompletion={toggleTaskCompletion}
-            />
-          ))
+        {displayActions.length > 0 ? (
+          <>
+            {displayActions.map(action => (
+              <ActionCard
+                key={action.id}
+                action={action}
+                onToggleTaskCompletion={toggleTaskCompletion}
+              />
+            ))}
+            {hasMoreActions && (
+              <Button variant="ghost" className="w-full text-sm text-muted-foreground">
+                +{goalActions.length - limit} more actions
+              </Button>
+            )}
+          </>
         ) : (
           <div className="text-center p-4 text-muted-foreground text-sm">
             No actions created yet. Add one to get started.

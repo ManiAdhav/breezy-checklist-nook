@@ -1,28 +1,38 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useGoal } from '@/hooks/useGoalContext';
-import { Goals } from '@/types/task';
+import { useTask } from '@/contexts/TaskContext';
+import { useHabit } from '@/contexts/HabitContext';
+import { Goals, GoalStatus } from '@/types/task';
 import { 
   Target, 
   Flag,
   ListChecks,
   Repeat,
-  Plus
+  Calendar,
+  Plus,
+  Shapes
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { 
-  Collapsible,
-  CollapsibleContent,
-} from "@/components/ui/collapsible";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+} from "@/components/ui/card";
 
 import GoalHeader from './sections/GoalHeader';
 import GoalProgress from './sections/GoalProgress';
-import SectionHeader from './sections/SectionHeader';
-import EditGoalDialog from './dialogs/EditGoalDialog';
 import MilestoneSection from './sections/MilestoneSection';
 import PlanSection from './sections/PlanSection';
 import TaskSection from './sections/TaskSection';
 import HabitSection from './sections/HabitSection';
 import ActionsSection from './sections/ActionsSection';
+import EditGoalDialog from './dialogs/EditGoalDialog';
 
 interface GoalDetailViewProps {
   goalId: string;
@@ -30,26 +40,42 @@ interface GoalDetailViewProps {
 }
 
 const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
-  const { threeYearGoals } = useGoal();
+  const { threeYearGoals, ninetyDayTargets, plans } = useGoal();
+  const { tasks } = useTask();
+  const { habits } = useHabit();
   
   const goal = threeYearGoals.find(g => g.id === goalId);
   
-  const [openSections, setOpenSections] = useState({
-    milestones: true,
-    plans: true,
-    tasks: true,
-    habits: false,
-    actions: true,
-  });
-
-  // Edit goal state
+  // State for tabs and dialogs
+  const [activeTab, setActiveTab] = useState("overview");
   const [isEditGoalDialogOpen, setIsEditGoalDialogOpen] = useState(false);
   
-  const toggleSection = (section: keyof typeof openSections) => {
-    setOpenSections(prev => ({
-      ...prev,
-      [section]: !prev[section]
-    }));
+  // Count associated items
+  const goalMilestones = ninetyDayTargets.filter(target => target.threeYearGoalId === goalId);
+  const milestoneCount = goalMilestones.length;
+  
+  const goalPlans = plans.filter(plan => 
+    goalMilestones.some(milestone => milestone.id === plan.ninetyDayTargetId)
+  );
+  const planCount = goalPlans.length;
+  
+  const goalTasks = tasks.filter(task => task.goalId === goalId);
+  const taskCount = goalTasks.length;
+  
+  const goalActions = tasks.filter(task => task.isAction && task.goalId === goalId);
+  const actionCount = goalActions.length;
+  
+  // Filter habits associated with this goal
+  const goalHabits = habits.filter(habit => habit.goalId === goalId);
+  const habitCount = goalHabits.length;
+  
+  // When active tab is clicked again, default to overview
+  const handleTabChange = (value: string) => {
+    if (value === activeTab) {
+      setActiveTab("overview");
+    } else {
+      setActiveTab(value);
+    }
   };
   
   if (!goal) {
@@ -69,105 +95,161 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
       {goal && <GoalHeader 
         goal={goal} 
         onBack={onBack} 
-        onEdit={() => setIsEditGoalDialogOpen(true)} 
+        onEdit={() => setIsEditGoalDialogOpen(true)}
+        milestoneCount={milestoneCount}
+        planCount={planCount}
+        taskCount={taskCount}
+        actionCount={actionCount}
+        habitCount={habitCount}
       />}
       
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto pb-20">
         {/* Goal Description and Progress */}
         <GoalProgress goal={goal} />
         
-        {/* Sections */}
-        <div className="divide-y divide-border">
-          {/* Actions Section */}
-          <Collapsible 
-            open={openSections.actions}
-            className="px-6 py-4 bg-background"
-          >
-            <SectionHeader 
-              icon={ListChecks} 
-              title="Actions" 
-              isOpen={openSections.actions} 
-              onToggle={() => toggleSection('actions')}
-              iconColor="text-blue-500" 
-            />
-            <CollapsibleContent>
-              <div className="pt-4">
-                <ActionsSection goalId={goal.id} />
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
-          
-          {/* Milestones Section */}
-          <Collapsible 
-            open={openSections.milestones}
-            className="px-6 py-4 bg-background"
-          >
-            <SectionHeader 
-              icon={Flag} 
-              title="Milestones" 
-              isOpen={openSections.milestones} 
-              onToggle={() => toggleSection('milestones')} 
-            />
-            <CollapsibleContent>
-              <div className="pt-4">
-                <MilestoneSection goalId={goal.id} />
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
-          
-          {/* Plans Section */}
-          <Collapsible 
-            open={openSections.plans}
-            className="px-6 py-4 bg-background"
-          >
-            <SectionHeader 
-              icon={Target} 
-              title="Plans" 
-              isOpen={openSections.plans} 
-              onToggle={() => toggleSection('plans')} 
-            />
-            <CollapsibleContent>
-              <div className="pt-4">
-                <PlanSection goalId={goal.id} />
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
-          
-          {/* Tasks Section */}
-          <Collapsible 
-            open={openSections.tasks}
-            className="px-6 py-4 bg-background"
-          >
-            <SectionHeader 
-              icon={ListChecks} 
-              title="Tasks" 
-              isOpen={openSections.tasks} 
-              onToggle={() => toggleSection('tasks')} 
-            />
-            <CollapsibleContent>
-              <div className="pt-4">
-                <TaskSection goalId={goal.id} />
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
-          
-          {/* Habits Section */}
-          <Collapsible 
-            open={openSections.habits}
-            className="px-6 py-4 bg-background"
-          >
-            <SectionHeader 
-              icon={Repeat} 
-              title="Habits" 
-              isOpen={openSections.habits} 
-              onToggle={() => toggleSection('habits')} 
-            />
-            <CollapsibleContent>
-              <div className="pt-4">
-                <HabitSection goalId={goal.id} />
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
+        {/* Tabs for different sections */}
+        <div className="px-6 py-4">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+            <TabsList className="grid grid-cols-5 mb-6 w-full">
+              <TabsTrigger value="overview" className="flex items-center space-x-2">
+                <Shapes className="h-4 w-4" />
+                <span>Overview</span>
+              </TabsTrigger>
+              <TabsTrigger value="milestones" className="flex items-center space-x-2">
+                <Flag className="h-4 w-4" />
+                <span>Milestones</span>
+                {milestoneCount > 0 && <span className="ml-1 text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded-full">{milestoneCount}</span>}
+              </TabsTrigger>
+              <TabsTrigger value="plans" className="flex items-center space-x-2">
+                <Target className="h-4 w-4" />
+                <span>Plans</span>
+                {planCount > 0 && <span className="ml-1 text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100 px-1.5 py-0.5 rounded-full">{planCount}</span>}
+              </TabsTrigger>
+              <TabsTrigger value="tasks" className="flex items-center space-x-2">
+                <ListChecks className="h-4 w-4" />
+                <span>Tasks</span>
+                {taskCount > 0 && <span className="ml-1 text-xs bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100 px-1.5 py-0.5 rounded-full">{taskCount}</span>}
+              </TabsTrigger>
+              <TabsTrigger value="habits" className="flex items-center space-x-2">
+                <Repeat className="h-4 w-4" />
+                <span>Habits</span>
+                {habitCount > 0 && <span className="ml-1 text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 px-1.5 py-0.5 rounded-full">{habitCount}</span>}
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="overview" className="mt-0 space-y-6">
+              <Card>
+                <CardContent className="p-6 space-y-6">
+                  {/* Quick Overview of all sections */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Actions Section Summary */}
+                    <div className="border rounded-lg p-4 bg-card/50">
+                      <div className="flex justify-between items-center mb-3">
+                        <h3 className="text-lg font-medium flex items-center">
+                          <ListChecks className="h-5 w-5 mr-2 text-blue-500" />
+                          Actions
+                        </h3>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setActiveTab("tasks")}
+                        >
+                          View All
+                        </Button>
+                      </div>
+                      <ActionsSection goalId={goal.id} limit={3} />
+                    </div>
+                    
+                    {/* Habits Section Summary */}
+                    <div className="border rounded-lg p-4 bg-card/50">
+                      <div className="flex justify-between items-center mb-3">
+                        <h3 className="text-lg font-medium flex items-center">
+                          <Repeat className="h-5 w-5 mr-2 text-green-500" />
+                          Habits
+                        </h3>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => setActiveTab("habits")}
+                        >
+                          View All
+                        </Button>
+                      </div>
+                      <HabitSection goalId={goal.id} limit={3} />
+                    </div>
+                    
+                    {/* Milestones Section Summary */}
+                    <div className="border rounded-lg p-4 bg-card/50">
+                      <div className="flex justify-between items-center mb-3">
+                        <h3 className="text-lg font-medium flex items-center">
+                          <Flag className="h-5 w-5 mr-2 text-purple-500" />
+                          Milestones
+                        </h3>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setActiveTab("milestones")}
+                        >
+                          View All
+                        </Button>
+                      </div>
+                      <MilestoneSection goalId={goal.id} limit={3} />
+                    </div>
+                    
+                    {/* Tasks Section Summary */}
+                    <div className="border rounded-lg p-4 bg-card/50">
+                      <div className="flex justify-between items-center mb-3">
+                        <h3 className="text-lg font-medium flex items-center">
+                          <ListChecks className="h-5 w-5 mr-2 text-yellow-500" />
+                          Tasks
+                        </h3>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setActiveTab("tasks")}
+                        >
+                          View All
+                        </Button>
+                      </div>
+                      <TaskSection goalId={goal.id} limit={3} />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="milestones" className="mt-0">
+              <Card>
+                <CardContent className="p-6">
+                  <MilestoneSection goalId={goal.id} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="plans" className="mt-0">
+              <Card>
+                <CardContent className="p-6">
+                  <PlanSection goalId={goal.id} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="tasks" className="mt-0">
+              <Card>
+                <CardContent className="p-6">
+                  <TaskSection goalId={goal.id} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="habits" className="mt-0">
+              <Card>
+                <CardContent className="p-6">
+                  <HabitSection goalId={goal.id} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
       

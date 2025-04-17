@@ -9,9 +9,10 @@ import EmptyMilestones from './milestones/EmptyMilestones';
 
 interface MilestoneSectionProps {
   goalId: string;
+  limit?: number;
 }
 
-const MilestoneSection: React.FC<MilestoneSectionProps> = ({ goalId }) => {
+const MilestoneSection: React.FC<MilestoneSectionProps> = ({ goalId, limit }) => {
   const {
     goalMilestones,
     isMilestoneDialogOpen,
@@ -35,6 +36,10 @@ const MilestoneSection: React.FC<MilestoneSectionProps> = ({ goalId }) => {
     handleDeleteMilestone
   } = useMilestones(goalId);
   
+  // Apply limit if specified
+  const displayMilestones = limit ? goalMilestones.slice(0, limit) : goalMilestones;
+  const hasMoreMilestones = limit && goalMilestones.length > limit;
+  
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -54,7 +59,7 @@ const MilestoneSection: React.FC<MilestoneSectionProps> = ({ goalId }) => {
         <EmptyMilestones onAddMilestone={openCreateMilestoneDialog} />
       ) : (
         <div className="space-y-2">
-          {goalMilestones.map(milestone => (
+          {displayMilestones.map(milestone => (
             <MilestoneItem 
               key={milestone.id}
               milestone={milestone}
@@ -64,6 +69,11 @@ const MilestoneSection: React.FC<MilestoneSectionProps> = ({ goalId }) => {
               getStatusClasses={getStatusClasses}
             />
           ))}
+          {hasMoreMilestones && (
+            <Button variant="ghost" className="w-full text-sm text-muted-foreground">
+              +{goalMilestones.length - limit} more milestones
+            </Button>
+          )}
         </div>
       )}
 
