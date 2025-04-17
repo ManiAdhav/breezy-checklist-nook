@@ -1,164 +1,220 @@
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { Habit, HabitLog } from '@/types/habit';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
-// Local storage keys
+// Constants for localStorage keys
 const HABITS_STORAGE_KEY = 'habits';
 const HABIT_LOGS_STORAGE_KEY = 'habitLogs';
 
 export const useHabitStorage = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [habitLogs, setHabitLogs] = useState<HabitLog[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isInitialized, setIsInitialized] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Helper function to safely parse dates in objects
-  const parseDatesInObject = (obj: any): any => {
-    const dateProperties = ['createdAt', 'updatedAt', 'startDate', 'endDate', 'date'];
-    
-    const parsed = { ...obj };
-    for (const key of dateProperties) {
-      if (parsed[key] && typeof parsed[key] === 'string') {
-        parsed[key] = new Date(parsed[key]);
-      }
-    }
-    return parsed;
-  };
-
-  // Auto-load from storage on hook initialization
-  useEffect(() => {
-    if (!isInitialized) {
-      console.log('useHabitStorage: Auto-loading habits from storage on init');
-      loadHabitsFromStorage().then(() => {
-        setIsInitialized(true);
-      });
-    }
-  }, [isInitialized]);
-
-  // Load habits and logs from storage
+  // Load habits from storage (localStorage and then Supabase if available)
   const loadHabitsFromStorage = useCallback(async () => {
-    console.log('Loading habits and logs from storage');
+    console.log('useHabitStorage: Loading habits from storage');
     setIsLoading(true);
-    
+
     try {
-      // Load habits
-      const habitsJson = localStorage.getItem(HABITS_STORAGE_KEY);
-      console.log(`Raw habits from storage (${HABITS_STORAGE_KEY}):`, habitsJson);
+      // Try to load from Supabase first if user is authenticated
+      const { data: session } = await supabase.auth.getSession();
+      let loadedHabits: Habit[] = [];
+      let loadedLogs: HabitLog[] = [];
       
-      let parsedHabits: Habit[] = [];
-      if (habitsJson) {
-        try {
-          parsedHabits = JSON.parse(habitsJson);
-          console.log('Parsed habits before date conversion:', parsedHabits.length, 'habits found');
+      if (session?.session) {
+        console.log('User is authenticated, trying to load from Supabase');
+        const { data: habitsData, error: habitsError } = await supabase
+          .from('user_entries')
+          .select('*')
+          .eq('entry_type', HABITS_STORAGE_KEY);
           
-          // Parse dates in habits
-          parsedHabits = parsedHabits.map(habit => parseDatesInObject(habit));
-          console.log('Formatted habits after date conversion:', parsedHabits.length, 'habits processed');
-        } catch (e) {
-          console.error('Error parsing habits from storage:', e);
-          // Just log the error, don't show toast
+        const { data: logsData, error: logsError } = await supabase
+          .from('user_entries')
+          .select('*')
+          .eq('entry_type', HABIT_LOGS_STORAGE_KEY);
+          
+        if (habitsError) {
+          console.error('Error loading habits from Supabase:', habitsError);
+        } else if (habitsData && habitsData.length > 0) {
+          // Parse the habits data
+          loadedHabits = habitsData.map(entry => {
+            try {
+              return JSON.parse(entry.content);
+            } catch (e) {
+              console.error('Error parsing habit data:', e);
+              return null;
+            }
+          }).filter(Boolean) as Habit[];
+          console.log('Loaded habits from Supabase:', loadedHabits.length);
         }
-      } else {
-        console.log('No habits found in storage');
+        
+        if (logsError) {
+          console.error('Error loading habit logs from Supabase:', logsError);
+        } else if (logsData && logsData.length > 0) {
+          // Parse the logs data
+          loadedLogs = logsData.map(entry => {
+            try {
+              return JSON.parse(entry.content);
+            } catch (e) {
+              console.error('Error parsing habit log data:', e);
+              return null;
+            }
+          }).filter(Boolean) as HabitLog[];
+          console.log('Loaded habit logs from Supabase:', loadedLogs.length);
+        }
       }
       
-      // Load habit logs
-      const logsJson = localStorage.getItem(HABIT_LOGS_STORAGE_KEY);
-      console.log(`Raw habit logs from storage (${HABIT_LOGS_STORAGE_KEY}):`, logsJson);
-      
-      let parsedLogs: HabitLog[] = [];
-      if (logsJson) {
-        try {
-          parsedLogs = JSON.parse(logsJson);
-          console.log('Parsed logs before date conversion:', parsedLogs.length, 'logs found');
-          
-          // Parse dates in logs
-          parsedLogs = parsedLogs.map(log => parseDatesInObject(log));
-          console.log('Formatted logs after date conversion:', parsedLogs.length, 'logs processed');
-        } catch (e) {
-          console.error('Error parsing habit logs from storage:', e);
-          // Just log the error, don't show toast
+      // If no data from Supabase or not authenticated, try localStorage
+      if (loadedHabits.length === 0) {
+        console.log('No habits from Supabase, trying localStorage');
+        const localHabits = localStorage.getItem(HABITS_STORAGE_KEY);
+        if (localHabits) {
+          try {
+            loadedHabits = JSON.parse(localHabits);
+            console.log('Loaded habits from localStorage:', loadedHabits.length);
+          } catch (e) {
+            console.error('Error parsing localStorage habits:', e);
+          }
+        } else {
+          console.log('No habits found in localStorage');
         }
-      } else {
-        console.log('No habit logs found in storage');
       }
       
-      // Always update state even if empty
-      setHabits(parsedHabits);
-      setHabitLogs(parsedLogs);
-      console.log('Finished loading habits and logs from storage');
+      if (loadedLogs.length === 0) {
+        console.log('No habit logs from Supabase, trying localStorage');
+        const localLogs = localStorage.getItem(HABIT_LOGS_STORAGE_KEY);
+        if (localLogs) {
+          try {
+            loadedLogs = JSON.parse(localLogs);
+            console.log('Loaded habit logs from localStorage:', loadedLogs.length);
+          } catch (e) {
+            console.error('Error parsing localStorage habit logs:', e);
+          }
+        } else {
+          console.log('No habit logs found in localStorage');
+        }
+      }
       
-      return { habits: parsedHabits, habitLogs: parsedLogs };
+      // Convert dates back to Date objects
+      loadedHabits = loadedHabits.map(habit => ({
+        ...habit,
+        createdAt: new Date(habit.createdAt),
+        updatedAt: new Date(habit.updatedAt),
+        startDate: new Date(habit.startDate),
+        endDate: habit.endDate ? new Date(habit.endDate) : undefined
+      }));
+      
+      loadedLogs = loadedLogs.map(log => ({
+        ...log,
+        date: new Date(log.date)
+      }));
+      
+      return { habits: loadedHabits, habitLogs: loadedLogs };
     } catch (error) {
-      console.error('Error loading from storage:', error);
-      // Return empty arrays without showing toast
+      console.error('Error in loadHabitsFromStorage:', error);
+      toast({
+        title: "Error loading data",
+        description: "There was an error loading your habits data.",
+        variant: "destructive"
+      });
       return { habits: [], habitLogs: [] };
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // Save habits to storage
-  const saveHabitsToStorage = useCallback(async (habitsToSave: Habit[], logsToSave?: HabitLog[]) => {
-    console.log('Saving habits to storage:', habitsToSave.length, 'habits');
+  // Save habits to storage (localStorage and Supabase if available)
+  const saveHabitsToStorage = useCallback(async (habitsToSave: Habit[], logsToSave: HabitLog[]) => {
+    console.log('useHabitStorage: Saving habits to storage');
+    setIsLoading(true);
+
     try {
+      // Always save to localStorage first for immediate availability
       localStorage.setItem(HABITS_STORAGE_KEY, JSON.stringify(habitsToSave));
-      console.log(`Habits saved successfully to ${HABITS_STORAGE_KEY}`);
+      localStorage.setItem(HABIT_LOGS_STORAGE_KEY, JSON.stringify(logsToSave));
+      console.log('Habits and logs saved to localStorage');
       
-      // If logs are also provided, save them too
-      if (logsToSave) {
-        localStorage.setItem(HABIT_LOGS_STORAGE_KEY, JSON.stringify(logsToSave));
-        console.log(`Habit logs saved successfully to ${HABIT_LOGS_STORAGE_KEY}`);
+      // Try to save to Supabase if user is authenticated
+      const { data: session } = await supabase.auth.getSession();
+      if (session?.session) {
+        console.log('User is authenticated, saving to Supabase');
+        
+        // For habits, delete existing entries and insert new ones
+        if (habitsToSave.length > 0) {
+          const { error: deleteError } = await supabase
+            .from('user_entries')
+            .delete()
+            .eq('entry_type', HABITS_STORAGE_KEY);
+            
+          if (deleteError) {
+            console.error('Error deleting existing habits in Supabase:', deleteError);
+          }
+          
+          const { error: insertError } = await supabase
+            .from('user_entries')
+            .insert(
+              habitsToSave.map(habit => ({
+                entry_type: HABITS_STORAGE_KEY,
+                content: JSON.stringify(habit)
+              }))
+            );
+            
+          if (insertError) {
+            console.error('Error saving habits to Supabase:', insertError);
+          } else {
+            console.log('Habits saved to Supabase successfully');
+          }
+        }
+        
+        // For logs, delete existing entries and insert new ones
+        if (logsToSave.length > 0) {
+          const { error: deleteError } = await supabase
+            .from('user_entries')
+            .delete()
+            .eq('entry_type', HABIT_LOGS_STORAGE_KEY);
+            
+          if (deleteError) {
+            console.error('Error deleting existing habit logs in Supabase:', deleteError);
+          }
+          
+          const { error: insertError } = await supabase
+            .from('user_entries')
+            .insert(
+              logsToSave.map(log => ({
+                entry_type: HABIT_LOGS_STORAGE_KEY,
+                content: JSON.stringify(log)
+              }))
+            );
+            
+          if (insertError) {
+            console.error('Error saving habit logs to Supabase:', insertError);
+          } else {
+            console.log('Habit logs saved to Supabase successfully');
+          }
+        }
       }
     } catch (error) {
-      console.error('Error saving habits to storage:', error);
+      console.error('Error in saveHabitsToStorage:', error);
       toast({
         title: "Error saving data",
-        description: "Failed to save habits data to storage",
+        description: "There was an error saving your habits data.",
         variant: "destructive"
       });
+    } finally {
+      setIsLoading(false);
     }
   }, []);
-
-  // Save habit logs to storage
-  const saveHabitLogsToStorage = useCallback(async (logsToSave: HabitLog[]) => {
-    console.log('Saving habit logs to storage:', logsToSave.length, 'logs');
-    try {
-      localStorage.setItem(HABIT_LOGS_STORAGE_KEY, JSON.stringify(logsToSave));
-      console.log(`Habit logs saved successfully to ${HABIT_LOGS_STORAGE_KEY}`);
-    } catch (error) {
-      console.error('Error saving habit logs to storage:', error);
-      toast({
-        title: "Error saving data",
-        description: "Failed to save habit logs data to storage",
-        variant: "destructive"
-      });
-    }
-  }, []);
-
-  // Update habits state and save to storage
-  const updateHabits = useCallback((newHabits: Habit[]) => {
-    console.log('Updating habits state and storage:', newHabits.length, 'habits');
-    setHabits(newHabits);
-    saveHabitsToStorage(newHabits);
-  }, [saveHabitsToStorage]);
-
-  // Update habit logs state and save to storage
-  const updateHabitLogs = useCallback((newLogs: HabitLog[]) => {
-    console.log('Updating habit logs state and storage:', newLogs.length, 'logs');
-    setHabitLogs(newLogs);
-    saveHabitLogsToStorage(newLogs);
-  }, [saveHabitLogsToStorage]);
 
   return {
     habits,
-    setHabits: updateHabits, // Use updateHabits instead of setHabits to automatically save to storage
+    setHabits,
     habitLogs,
-    setHabitLogs: updateHabitLogs, // Use updateHabitLogs instead of setHabitLogs to automatically save to storage
+    setHabitLogs,
     isLoading,
     loadHabitsFromStorage,
-    saveHabitsToStorage,
-    saveHabitLogsToStorage
+    saveHabitsToStorage
   };
 };

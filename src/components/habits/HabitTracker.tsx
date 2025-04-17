@@ -17,15 +17,22 @@ const HabitTracker: React.FC = () => {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [hasAttemptedLoad, setHasAttemptedLoad] = useState(false);
   
-  // Load habits when component mounts or when loadHabits dependency changes
+  // Load habits when component mounts
   useEffect(() => {
     const loadHabitsData = async () => {
-      console.log('HabitTracker - Loading habits from context');
+      console.log('HabitTracker - Initial load');
+      
+      if (hasAttemptedLoad) {
+        console.log('Already attempted to load habits, skipping');
+        return;
+      }
+      
       setHasAttemptedLoad(true);
       
       try {
+        console.log('HabitTracker - Calling loadHabits()');
         await loadHabits();
-        console.log('HabitTracker - Habits loaded, count:', habits.length);
+        console.log('HabitTracker - Habits loaded successfully, count:', habits.length);
       } catch (err) {
         console.error('Error loading habits in HabitTracker:', err);
         toast({
@@ -37,12 +44,11 @@ const HabitTracker: React.FC = () => {
     };
     
     loadHabitsData();
-  }, [loadHabits]);
+  }, [loadHabits, hasAttemptedLoad]);
   
-  // Debug useEffect to monitor habits changes
+  // Log whenever habits change
   useEffect(() => {
-    console.log('HabitTracker - Habits updated, new count:', habits.length);
-    console.log('Current habits in HabitTracker:', habits);
+    console.log('HabitTracker - Habits changed, new count:', habits.length);
   }, [habits]);
   
   // Prepare habits with streak data for display using useMemo

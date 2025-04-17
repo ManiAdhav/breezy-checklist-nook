@@ -18,7 +18,7 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   } = useHabitStorage();
   
   const { calculateHabitStreak } = useStreakCalculation();
-  const [loadingState, setLoadingState] = useState(false);
+  const [loadingState, setLoadingState] = useState(true); // Start as loading
   
   // Memoize the habit operations to prevent unnecessary re-renders
   const { 
@@ -45,15 +45,11 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const loadHabits = useCallback(async () => {
     console.log('HabitProvider: Loading habits data');
     
-    // Prevent multiple simultaneous loading operations
-    if (loadingState) {
-      console.log('Already loading habits, skipping duplicate call');
-      return;
-    }
-    
+    // Set loading state immediately
     setLoadingState(true);
     
     try {
+      console.log('Calling loadHabitsFromStorage');
       // Wait for loadHabitsFromStorage to complete and get the result
       const result = await loadHabitsFromStorage();
       
@@ -64,22 +60,10 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         habitsData: result.habits
       });
       
-      // Apply the loaded data to state if it exists
-      if (result.habits && result.habits.length > 0) {
-        console.log('Setting habits state with loaded data:', result.habits);
-        setHabits(result.habits);
-      } else {
-        console.log('No habits loaded from storage, setting empty array');
-        setHabits([]);
-      }
-      
-      if (result.habitLogs && result.habitLogs.length > 0) {
-        console.log('Setting habitLogs state with loaded data:', result.habitLogs);
-        setHabitLogs(result.habitLogs);
-      } else {
-        console.log('No habit logs loaded from storage, setting empty array');
-        setHabitLogs([]);
-      }
+      // Always set state regardless of empty or not to ensure state updates
+      console.log('Setting habits and habitLogs state with loaded data');
+      setHabits(result.habits || []);
+      setHabitLogs(result.habitLogs || []);
       
     } catch (error) {
       console.error('Error loading habits in provider:', error);
@@ -96,7 +80,7 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } finally {
       setLoadingState(false);
     }
-  }, [loadHabitsFromStorage, loadingState, setHabits, setHabitLogs]);
+  }, [loadHabitsFromStorage, setHabits, setHabitLogs]);
 
   // Force save all habits
   const saveAllHabits = useCallback(() => {
