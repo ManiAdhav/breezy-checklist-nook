@@ -1,13 +1,11 @@
 
 import React from 'react';
-import { useGoalDetail } from './detail/useGoalDetail';
+import { useGoalDetailView } from './hooks/useGoalDetailView';
 import GoalHeader from './sections/GoalHeader';
-import GoalProgress from './sections/GoalProgress';
-import GoalTabs from './detail/GoalTabs';
+import GoalDetailContent from './detail/GoalDetailContent';
 import GoalNotFound from './detail/GoalNotFound';
 import GoalActionButton from './detail/GoalActionButton';
 import EditGoalDialog from './dialogs/EditGoalDialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface GoalDetailViewProps {
   goalId: string;
@@ -26,7 +24,7 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
     actionCount,
     habitCount,
     handleTabChange
-  } = useGoalDetail(goalId);
+  } = useGoalDetailView(goalId);
   
   if (!goal) {
     return <GoalNotFound onBack={onBack} />;
@@ -46,25 +44,17 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
         habitCount={habitCount}
       />
       
-      <ScrollArea className="flex-1 overflow-y-auto">
-        <div className="h-full">
-          {/* Goal Description and Progress */}
-          <GoalProgress goal={goal} />
-          
-          {/* Tabs for different sections */}
-          <div className="px-6 py-4 pb-20">
-            <GoalTabs 
-              activeTab={activeTab}
-              onTabChange={handleTabChange}
-              goalId={goalId}
-              milestoneCount={milestoneCount}
-              planCount={planCount}
-              taskCount={taskCount}
-              habitCount={habitCount}
-            />
-          </div>
-        </div>
-      </ScrollArea>
+      {/* Content */}
+      <GoalDetailContent
+        goal={goal}
+        activeTab={activeTab}
+        handleTabChange={handleTabChange}
+        goalId={goalId}
+        milestoneCount={milestoneCount}
+        planCount={planCount}
+        taskCount={taskCount}
+        habitCount={habitCount}
+      />
       
       {/* Edit Goal Dialog */}
       {goal && <EditGoalDialog 
