@@ -46,21 +46,23 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
         habitCount={habitCount}
       />
       
-      <ScrollArea className="flex-1">
-        {/* Goal Description and Progress */}
-        <GoalProgress goal={goal} />
-        
-        {/* Tabs for different sections */}
-        <div className="px-6 py-4 pb-20">
-          <GoalTabs 
-            activeTab={activeTab}
-            onTabChange={handleTabChange}
-            goalId={goalId}
-            milestoneCount={milestoneCount}
-            planCount={planCount}
-            taskCount={taskCount}
-            habitCount={habitCount}
-          />
+      <ScrollArea className="flex-1 overflow-y-auto">
+        <div className="h-full">
+          {/* Goal Description and Progress */}
+          <GoalProgress goal={goal} />
+          
+          {/* Tabs for different sections */}
+          <div className="px-6 py-4 pb-20">
+            <GoalTabs 
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+              goalId={goalId}
+              milestoneCount={milestoneCount}
+              planCount={planCount}
+              taskCount={taskCount}
+              habitCount={habitCount}
+            />
+          </div>
         </div>
       </ScrollArea>
       
