@@ -62,11 +62,11 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
         </TabsTrigger>
       </TabsList>
       
-      <TabsContent value="overview" className="mt-0 space-y-6">
+      <TabsContent value="overview" className="mt-0 space-y-6 overflow-y-auto">
         <GoalDetailOverview goalId={goalId} onTabChange={onTabChange} />
       </TabsContent>
       
-      <TabsContent value="milestones" className="mt-0">
+      <TabsContent value="milestones" className="mt-0 overflow-y-auto">
         <Card>
           <CardContent className="p-6">
             <MilestoneSection goalId={goalId} />
@@ -74,7 +74,7 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
         </Card>
       </TabsContent>
       
-      <TabsContent value="plans" className="mt-0">
+      <TabsContent value="plans" className="mt-0 overflow-y-auto">
         <Card>
           <CardContent className="p-6">
             <PlanSection goalId={goalId} />
@@ -82,7 +82,7 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
         </Card>
       </TabsContent>
       
-      <TabsContent value="tasks" className="mt-0">
+      <TabsContent value="tasks" className="mt-0 overflow-y-auto">
         <Card>
           <CardContent className="p-6">
             <TaskSection goalId={goalId} />
@@ -90,7 +90,7 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
         </Card>
       </TabsContent>
       
-      <TabsContent value="habits" className="mt-0">
+      <TabsContent value="habits" className="mt-0 overflow-y-auto">
         <Card>
           <CardContent className="p-6">
             <HabitSection goalId={goalId} />

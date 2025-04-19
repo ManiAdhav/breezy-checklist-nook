@@ -31,7 +31,7 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
   }
   
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col h-full overflow-hidden bg-background">
       {/* Header */}
       <GoalHeader 
         goal={goal} 
