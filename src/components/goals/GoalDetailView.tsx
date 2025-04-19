@@ -44,7 +44,7 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
         habitCount={habitCount}
       />
       
-      {/* Content - This should take up remaining height and be scrollable */}
+      {/* Content */}
       <div className="flex-1 overflow-hidden">
         <GoalDetailContent
           goal={goal}

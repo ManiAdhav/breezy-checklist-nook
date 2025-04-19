@@ -62,14 +62,14 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
         </TabsTrigger>
       </TabsList>
       
-      <div className="flex-1 overflow-y-auto">
-        <TabsContent value="overview" className="mt-0 space-y-6 h-full">
+      <div className="flex-1 overflow-auto">
+        <TabsContent value="overview" className="mt-0 h-full">
           <GoalDetailOverview goalId={goalId} onTabChange={onTabChange} />
         </TabsContent>
         
         <TabsContent value="milestones" className="mt-0 h-full">
           <Card className="h-full">
-            <CardContent className="p-6 overflow-y-auto max-h-[calc(100vh-240px)]">
+            <CardContent className="p-6 h-full overflow-auto">
               <MilestoneSection goalId={goalId} />
             </CardContent>
           </Card>
@@ -77,7 +77,7 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
         
         <TabsContent value="plans" className="mt-0 h-full">
           <Card className="h-full">
-            <CardContent className="p-6 overflow-y-auto max-h-[calc(100vh-240px)]">
+            <CardContent className="p-6 h-full overflow-auto">
               <PlanSection goalId={goalId} />
             </CardContent>
           </Card>
@@ -85,7 +85,7 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
         
         <TabsContent value="tasks" className="mt-0 h-full">
           <Card className="h-full">
-            <CardContent className="p-6 overflow-y-auto max-h-[calc(100vh-240px)]">
+            <CardContent className="p-6 h-full overflow-auto">
               <TaskSection goalId={goalId} />
             </CardContent>
           </Card>
@@ -93,7 +93,7 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
         
         <TabsContent value="habits" className="mt-0 h-full">
           <Card className="h-full">
-            <CardContent className="p-6 overflow-y-auto max-h-[calc(100vh-240px)]">
+            <CardContent className="p-6 h-full overflow-auto">
               <HabitSection goalId={goalId} />
             </CardContent>
           </Card>

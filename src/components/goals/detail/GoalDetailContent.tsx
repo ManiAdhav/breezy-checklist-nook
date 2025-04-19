@@ -27,14 +27,14 @@ const GoalDetailContent: React.FC<GoalDetailContentProps> = ({
   habitCount
 }) => {
   return (
-    <div className="h-full flex flex-col overflow-hidden">
+    <div className="h-full flex flex-col">
       {/* Goal Description and Progress - Fixed height */}
-      <div className="px-6 py-4">
+      <div className="px-6 py-4 flex-shrink-0">
         <GoalProgress goal={goal} />
       </div>
       
       {/* Tabs for different sections - Should expand and be scrollable */}
-      <div className="flex-1 overflow-hidden px-6 pb-20">
+      <div className="flex-1 px-6 pb-20 overflow-hidden">
         <GoalTabs 
           activeTab={activeTab}
           onTabChange={handleTabChange}
