@@ -27,25 +27,25 @@ const GoalDetailContent: React.FC<GoalDetailContentProps> = ({
   habitCount
 }) => {
   return (
-    <ScrollArea className="flex-1 overflow-y-auto">
-      <div className="h-full">
-        {/* Goal Description and Progress */}
+    <div className="h-full flex flex-col overflow-hidden">
+      {/* Goal Description and Progress - Fixed height */}
+      <div className="px-6 py-4">
         <GoalProgress goal={goal} />
-        
-        {/* Tabs for different sections */}
-        <div className="px-6 py-4 pb-20">
-          <GoalTabs 
-            activeTab={activeTab}
-            onTabChange={handleTabChange}
-            goalId={goalId}
-            milestoneCount={milestoneCount}
-            planCount={planCount}
-            taskCount={taskCount}
-            habitCount={habitCount}
-          />
-        </div>
       </div>
-    </ScrollArea>
+      
+      {/* Tabs for different sections - Should expand and be scrollable */}
+      <div className="flex-1 overflow-hidden px-6 pb-20">
+        <GoalTabs 
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          goalId={goalId}
+          milestoneCount={milestoneCount}
+          planCount={planCount}
+          taskCount={taskCount}
+          habitCount={habitCount}
+        />
+      </div>
+    </div>
   );
 };
 

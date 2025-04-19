@@ -44,17 +44,19 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
         habitCount={habitCount}
       />
       
-      {/* Content */}
-      <GoalDetailContent
-        goal={goal}
-        activeTab={activeTab}
-        handleTabChange={handleTabChange}
-        goalId={goalId}
-        milestoneCount={milestoneCount}
-        planCount={planCount}
-        taskCount={taskCount}
-        habitCount={habitCount}
-      />
+      {/* Content - This should take up remaining height and be scrollable */}
+      <div className="flex-1 overflow-hidden">
+        <GoalDetailContent
+          goal={goal}
+          activeTab={activeTab}
+          handleTabChange={handleTabChange}
+          goalId={goalId}
+          milestoneCount={milestoneCount}
+          planCount={planCount}
+          taskCount={taskCount}
+          habitCount={habitCount}
+        />
+      </div>
       
       {/* Edit Goal Dialog */}
       {goal && <EditGoalDialog 

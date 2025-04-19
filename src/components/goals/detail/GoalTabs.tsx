@@ -34,7 +34,7 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
   habitCount
 }) => {
   return (
-    <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
+    <Tabs value={activeTab} onValueChange={onTabChange} className="w-full h-full flex flex-col">
       <TabsList className="sticky top-0 z-10 grid grid-cols-5 mb-6 w-full bg-background">
         <TabsTrigger value="overview" className="flex items-center space-x-2">
           <Shapes className="h-4 w-4" />
@@ -62,41 +62,43 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
         </TabsTrigger>
       </TabsList>
       
-      <TabsContent value="overview" className="mt-0 space-y-6 overflow-y-auto">
-        <GoalDetailOverview goalId={goalId} onTabChange={onTabChange} />
-      </TabsContent>
-      
-      <TabsContent value="milestones" className="mt-0 overflow-y-auto">
-        <Card>
-          <CardContent className="p-6">
-            <MilestoneSection goalId={goalId} />
-          </CardContent>
-        </Card>
-      </TabsContent>
-      
-      <TabsContent value="plans" className="mt-0 overflow-y-auto">
-        <Card>
-          <CardContent className="p-6">
-            <PlanSection goalId={goalId} />
-          </CardContent>
-        </Card>
-      </TabsContent>
-      
-      <TabsContent value="tasks" className="mt-0 overflow-y-auto">
-        <Card>
-          <CardContent className="p-6">
-            <TaskSection goalId={goalId} />
-          </CardContent>
-        </Card>
-      </TabsContent>
-      
-      <TabsContent value="habits" className="mt-0 overflow-y-auto">
-        <Card>
-          <CardContent className="p-6">
-            <HabitSection goalId={goalId} />
-          </CardContent>
-        </Card>
-      </TabsContent>
+      <div className="flex-1 overflow-y-auto">
+        <TabsContent value="overview" className="mt-0 space-y-6 h-full">
+          <GoalDetailOverview goalId={goalId} onTabChange={onTabChange} />
+        </TabsContent>
+        
+        <TabsContent value="milestones" className="mt-0 h-full">
+          <Card className="h-full">
+            <CardContent className="p-6 overflow-y-auto max-h-[calc(100vh-240px)]">
+              <MilestoneSection goalId={goalId} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="plans" className="mt-0 h-full">
+          <Card className="h-full">
+            <CardContent className="p-6 overflow-y-auto max-h-[calc(100vh-240px)]">
+              <PlanSection goalId={goalId} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="tasks" className="mt-0 h-full">
+          <Card className="h-full">
+            <CardContent className="p-6 overflow-y-auto max-h-[calc(100vh-240px)]">
+              <TaskSection goalId={goalId} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="habits" className="mt-0 h-full">
+          <Card className="h-full">
+            <CardContent className="p-6 overflow-y-auto max-h-[calc(100vh-240px)]">
+              <HabitSection goalId={goalId} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </div>
     </Tabs>
   );
 };
