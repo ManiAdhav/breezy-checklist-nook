@@ -32,7 +32,7 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
   
   return (
     <div className="flex flex-col h-full overflow-hidden bg-background">
-      {/* Header */}
+      {/* Header - Fixed at top */}
       <GoalHeader 
         goal={goal} 
         onBack={onBack} 
@@ -44,8 +44,8 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
         habitCount={habitCount}
       />
       
-      {/* Content */}
-      <div className="flex-1 overflow-hidden">
+      {/* Content - Flexible container that takes remaining height */}
+      <div className="flex-1 min-h-0 overflow-hidden">
         <GoalDetailContent
           goal={goal}
           activeTab={activeTab}
