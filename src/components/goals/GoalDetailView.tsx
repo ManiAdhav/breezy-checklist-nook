@@ -32,19 +32,21 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
   
   return (
     <div className="flex flex-col h-full overflow-hidden bg-background">
-      {/* Header - Fixed at top */}
-      <GoalHeader 
-        goal={goal} 
-        onBack={onBack} 
-        onEdit={() => setIsEditGoalDialogOpen(true)}
-        milestoneCount={milestoneCount}
-        planCount={planCount}
-        taskCount={taskCount}
-        actionCount={actionCount}
-        habitCount={habitCount}
-      />
+      {/* Header - Fixed height section */}
+      <div className="flex-shrink-0">
+        <GoalHeader 
+          goal={goal} 
+          onBack={onBack} 
+          onEdit={() => setIsEditGoalDialogOpen(true)}
+          milestoneCount={milestoneCount}
+          planCount={planCount}
+          taskCount={taskCount}
+          actionCount={actionCount}
+          habitCount={habitCount}
+        />
+      </div>
       
-      {/* Content - Flexible container that takes remaining height */}
+      {/* Content - Takes all available space and enables scrolling */}
       <div className="flex-1 min-h-0 overflow-hidden">
         <GoalDetailContent
           goal={goal}

@@ -34,8 +34,12 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
   habitCount
 }) => {
   return (
-    <Tabs value={activeTab} onValueChange={onTabChange} className="w-full h-full flex flex-col min-h-0">
-      <TabsList className="sticky top-0 z-10 grid grid-cols-5 mb-6 w-full bg-background">
+    <Tabs 
+      value={activeTab} 
+      onValueChange={onTabChange} 
+      className="w-full h-full flex flex-col min-h-0 overflow-hidden"
+    >
+      <TabsList className="sticky top-0 z-10 grid grid-cols-5 mb-6 w-full bg-background flex-shrink-0">
         <TabsTrigger value="overview" className="flex items-center space-x-2">
           <Shapes className="h-4 w-4" />
           <span>Overview</span>
@@ -68,7 +72,7 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
         </TabsContent>
         
         <TabsContent value="milestones" className="mt-0 h-full">
-          <Card className="h-full flex flex-col">
+          <Card className="h-full flex flex-col max-h-full overflow-hidden">
             <CardContent className="p-6 flex-1 min-h-0 overflow-auto">
               <MilestoneSection goalId={goalId} />
             </CardContent>
@@ -76,7 +80,7 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
         </TabsContent>
         
         <TabsContent value="plans" className="mt-0 h-full">
-          <Card className="h-full flex flex-col">
+          <Card className="h-full flex flex-col max-h-full overflow-hidden">
             <CardContent className="p-6 flex-1 min-h-0 overflow-auto">
               <PlanSection goalId={goalId} />
             </CardContent>
@@ -84,7 +88,7 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
         </TabsContent>
         
         <TabsContent value="tasks" className="mt-0 h-full">
-          <Card className="h-full flex flex-col">
+          <Card className="h-full flex flex-col max-h-full overflow-hidden">
             <CardContent className="p-6 flex-1 min-h-0 overflow-auto">
               <TaskSection goalId={goalId} />
             </CardContent>
@@ -92,7 +96,7 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
         </TabsContent>
         
         <TabsContent value="habits" className="mt-0 h-full">
-          <Card className="h-full flex flex-col">
+          <Card className="h-full flex flex-col max-h-full overflow-hidden">
             <CardContent className="p-6 flex-1 min-h-0 overflow-auto">
               <HabitSection goalId={goalId} />
             </CardContent>
