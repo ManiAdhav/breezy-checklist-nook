@@ -11,7 +11,6 @@ interface GoalDetailContentProps {
   handleTabChange: (value: string) => void;
   goalId: string;
   milestoneCount: number;
-  planCount: number;
   taskCount: number;
   habitCount: number;
 }
@@ -22,7 +21,6 @@ const GoalDetailContent: React.FC<GoalDetailContentProps> = ({
   handleTabChange,
   goalId,
   milestoneCount,
-  planCount,
   taskCount,
   habitCount
 }) => {
@@ -40,7 +38,6 @@ const GoalDetailContent: React.FC<GoalDetailContentProps> = ({
           onTabChange={handleTabChange}
           goalId={goalId}
           milestoneCount={milestoneCount}
-          planCount={planCount}
           taskCount={taskCount}
           habitCount={habitCount}
         />

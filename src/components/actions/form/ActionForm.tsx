@@ -3,14 +3,12 @@ import React, { useState } from 'react';
 import { format, addDays } from 'date-fns';
 import { Task } from '@/types/task';
 import { useTask } from '@/contexts/TaskContext';
-import { useGoal } from '@/contexts/GoalContext';
 import { toast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { DialogFooter } from '@/components/ui/dialog';
 import ActionGoalSelector from './ActionGoalSelector';
-import ActionPlanSelector from './ActionPlanSelector';
 import ActionDatePicker from './ActionDatePicker';
 
 interface ActionFormProps {
@@ -21,15 +19,12 @@ interface ActionFormProps {
 const ActionForm: React.FC<ActionFormProps> = ({ onSuccess, onCancel }) => {
   const { addTask } = useTask();
   const [newActionTitle, setNewActionTitle] = useState('');
-  const [selectedPlanId, setSelectedPlanId] = useState('');
   const [selectedGoalId, setSelectedGoalId] = useState('');
   const [actionStartDate, setActionStartDate] = useState<Date>(new Date());
   const [actionEndDate, setActionEndDate] = useState<Date>(addDays(new Date(), 7));
 
   const handleGoalChange = (goalId: string) => {
     setSelectedGoalId(goalId);
-    // When the goal changes, reset the plan since plans are goal-specific
-    setSelectedPlanId('');
   };
 
   const handleAddAction = async () => {
@@ -42,11 +37,11 @@ const ActionForm: React.FC<ActionFormProps> = ({ onSuccess, onCancel }) => {
       return;
     }
 
-    // Check if either plan or goal is selected
-    if (!selectedPlanId && !selectedGoalId) {
+    // Check if goal is selected
+    if (!selectedGoalId) {
       toast({
         title: "Error",
-        description: "Please select either a plan or a goal for this action",
+        description: "Please select a goal for this action",
         variant: "destructive",
       });
       return;
@@ -57,8 +52,7 @@ const ActionForm: React.FC<ActionFormProps> = ({ onSuccess, onCancel }) => {
       completed: false,
       priority: 'medium',
       listId: 'inbox',
-      planId: selectedPlanId || undefined,
-      goalId: selectedGoalId || undefined,
+      goalId: selectedGoalId,
       startDate: actionStartDate,
       dueDate: actionEndDate,
       isAction: true,
@@ -93,12 +87,6 @@ const ActionForm: React.FC<ActionFormProps> = ({ onSuccess, onCancel }) => {
         <ActionGoalSelector 
           selectedGoalId={selectedGoalId} 
           onGoalChange={handleGoalChange} 
-        />
-        
-        <ActionPlanSelector 
-          selectedGoalId={selectedGoalId}
-          selectedPlanId={selectedPlanId} 
-          onPlanChange={setSelectedPlanId} 
         />
         
         <div className="grid grid-cols-2 gap-4">

@@ -19,7 +19,6 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
     isEditGoalDialogOpen,
     setIsEditGoalDialogOpen,
     milestoneCount,
-    planCount,
     taskCount,
     actionCount,
     habitCount,
@@ -39,7 +38,6 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
           onBack={onBack} 
           onEdit={() => setIsEditGoalDialogOpen(true)}
           milestoneCount={milestoneCount}
-          planCount={planCount}
           taskCount={taskCount}
           actionCount={actionCount}
           habitCount={habitCount}
@@ -54,7 +52,6 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
           handleTabChange={handleTabChange}
           goalId={goalId}
           milestoneCount={milestoneCount}
-          planCount={planCount}
           taskCount={taskCount}
           habitCount={habitCount}
         />

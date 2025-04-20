@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Flag, ListChecks, Repeat, Shapes, Target } from 'lucide-react';
+import { Flag, ListChecks, Repeat, Shapes } from 'lucide-react';
 import { 
   Tabs, 
   TabsContent, 
@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import MilestoneSection from '../sections/MilestoneSection';
-import PlanSection from '../sections/PlanSection';
 import TaskSection from '../sections/TaskSection';
 import HabitSection from '../sections/HabitSection';
 import GoalDetailOverview from './GoalDetailOverview';
@@ -19,7 +18,6 @@ interface GoalTabsProps {
   onTabChange: (value: string) => void;
   goalId: string;
   milestoneCount: number;
-  planCount: number;
   taskCount: number;
   habitCount: number;
 }
@@ -29,7 +27,6 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
   onTabChange,
   goalId,
   milestoneCount,
-  planCount,
   taskCount,
   habitCount
 }) => {
@@ -39,7 +36,7 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
       onValueChange={onTabChange} 
       className="w-full h-full flex flex-col min-h-0 overflow-hidden"
     >
-      <TabsList className="sticky top-0 z-10 grid grid-cols-5 mb-6 w-full bg-background flex-shrink-0">
+      <TabsList className="sticky top-0 z-10 grid grid-cols-4 mb-6 w-full bg-background flex-shrink-0">
         <TabsTrigger value="overview" className="flex items-center space-x-2">
           <Shapes className="h-4 w-4" />
           <span>Overview</span>
@@ -48,11 +45,6 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
           <Flag className="h-4 w-4" />
           <span>Milestones</span>
           {milestoneCount > 0 && <span className="ml-1 text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded-full">{milestoneCount}</span>}
-        </TabsTrigger>
-        <TabsTrigger value="plans" className="flex items-center space-x-2">
-          <Target className="h-4 w-4" />
-          <span>Plans</span>
-          {planCount > 0 && <span className="ml-1 text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100 px-1.5 py-0.5 rounded-full">{planCount}</span>}
         </TabsTrigger>
         <TabsTrigger value="tasks" className="flex items-center space-x-2">
           <ListChecks className="h-4 w-4" />
@@ -75,14 +67,6 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
           <Card className="h-full flex flex-col max-h-full overflow-hidden">
             <CardContent className="p-6 flex-1 min-h-0 overflow-auto">
               <MilestoneSection goalId={goalId} />
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="plans" className="mt-0 h-full">
-          <Card className="h-full flex flex-col max-h-full overflow-hidden">
-            <CardContent className="p-6 flex-1 min-h-0 overflow-auto">
-              <PlanSection goalId={goalId} />
             </CardContent>
           </Card>
         </TabsContent>
