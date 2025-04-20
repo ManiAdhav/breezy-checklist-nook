@@ -25,7 +25,13 @@ const CatalystSection: React.FC = () => {
     !task.completed
   ).length;
 
+  // Filter out any goals that might be titled "Get a New Job" or similar
   const goalsWithActions = threeYearGoals.filter(goal => {
+    // Skip any goal with "job" in the title (case insensitive)
+    if (goal.title && goal.title.toLowerCase().includes('job')) {
+      return false;
+    }
+    
     const goalTasks = tasks.filter(task => {
       return task.goalId === goal.id && !task.completed;
     });
@@ -78,7 +84,13 @@ const CatalystSection: React.FC = () => {
             </Button>
           </Link>
           
+          {/* Render the goal actions popovers, filtering out any "Get a New Job" or similar */}
           {goalsWithActions.map(goal => {
+            // Skip goals with "job" in the title
+            if (goal.title && goal.title.toLowerCase().includes('job')) {
+              return null;
+            }
+            
             const goalTasks = tasks.filter(task => {
               return task.goalId === goal.id && !task.completed;
             });
@@ -100,4 +112,3 @@ const CatalystSection: React.FC = () => {
 };
 
 export default CatalystSection;
-
