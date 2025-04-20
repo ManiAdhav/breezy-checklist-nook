@@ -1,5 +1,5 @@
 
-import { NinetyDayTarget, Plan } from '@/types/task';
+import { NinetyDayTarget } from '@/types/task';
 import * as GoalService from '@/api/goalService';
 import { toast } from '@/hooks/use-toast';
 
@@ -95,7 +95,6 @@ export const updateNinetyDayTarget = async (
 export const deleteNinetyDayTarget = async (
   id: string,
   setNinetyDayTargets: React.Dispatch<React.SetStateAction<NinetyDayTarget[]>>,
-  setPlans: React.Dispatch<React.SetStateAction<Plan[]>>,
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   setIsLoading(true);
@@ -104,8 +103,6 @@ export const deleteNinetyDayTarget = async (
     
     if (response.success) {
       setNinetyDayTargets(prevTargets => prevTargets.filter(target => target.id !== id));
-      
-      setPlans(prevPlans => prevPlans.filter(plan => plan.ninetyDayTargetId !== id));
       
       toast({
         title: "Target deleted",

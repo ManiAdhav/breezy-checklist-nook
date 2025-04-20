@@ -1,9 +1,9 @@
-import { NinetyDayTarget, Plan } from '@/types/task';
+
+import { NinetyDayTarget } from '@/types/task';
 import { ApiResponse } from '../types';
 import { generateId } from '@/utils/taskUtils';
 import { 
   NINETY_DAY_TARGETS_STORAGE_KEY, 
-  PLANS_STORAGE_KEY,
   getStoredData, 
   storeData
 } from './storage/index';
@@ -64,17 +64,14 @@ export const updateNinetyDayTarget = async (id: string, updates: Partial<NinetyD
 export const deleteNinetyDayTarget = async (id: string): Promise<ApiResponse<void>> => {
   try {
     const targets = await getStoredData<NinetyDayTarget>(NINETY_DAY_TARGETS_STORAGE_KEY);
-    const plans = await getStoredData<Plan>(PLANS_STORAGE_KEY);
     
     const updatedTargets = targets.filter(target => target.id !== id);
-    const updatedPlans = plans.filter(plan => plan.ninetyDayTargetId !== id);
     
     if (updatedTargets.length === targets.length) {
       return { success: false, error: '90-day target not found' };
     }
     
     await storeData(NINETY_DAY_TARGETS_STORAGE_KEY, updatedTargets);
-    await storeData(PLANS_STORAGE_KEY, updatedPlans);
     
     return { success: true };
   } catch (error) {

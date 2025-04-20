@@ -27,11 +27,7 @@ const CatalystSection: React.FC = () => {
 
   const goalsWithActions = threeYearGoals.filter(goal => {
     const goalTasks = tasks.filter(task => {
-      const plan = goal.targets
-        ?.flatMap(target => target.plans || [])
-        .find(p => p.id === task.planId);
-      
-      return plan && !task.completed;
+      return task.goalId === goal.id && !task.completed;
     });
     
     return goalTasks.length > 0;
@@ -82,20 +78,9 @@ const CatalystSection: React.FC = () => {
             </Button>
           </Link>
           
-          <Link to="/weekly" className="block">
-            <Button variant="ghost" className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/weekly' ? 'sidebar-item-active font-medium' : ''}`}>
-              <Calendar className="h-4 w-4 mr-2" />
-              <span>Plan</span>
-            </Button>
-          </Link>
-          
           {goalsWithActions.map(goal => {
             const goalTasks = tasks.filter(task => {
-              const plan = goal.targets
-                ?.flatMap(target => target.plans || [])
-                .find(p => p.id === task.planId);
-              
-              return plan && !task.completed;
+              return task.goalId === goal.id && !task.completed;
             });
             
             if (goalTasks.length === 0) return null;

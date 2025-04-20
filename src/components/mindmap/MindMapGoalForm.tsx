@@ -30,7 +30,7 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
   editingGoal,
   onSave,
 }) => {
-  const { addThreeYearGoal, updateThreeYearGoal, addNinetyDayTarget, updateNinetyDayTarget, addPlan } = useGoal();
+  const { addThreeYearGoal, updateThreeYearGoal, addNinetyDayTarget, updateNinetyDayTarget } = useGoal();
   const { visions } = useVision();
   const { addTask } = useTask();
   
@@ -171,45 +171,29 @@ const MindMapGoalForm: React.FC<MindMapGoalFormProps> = ({
       }
     }
     
-    // Create a weekly goal for this 3-year goal if we have a valid goal ID
+    // Create actions for this goal if we have a valid goal ID
     if (goalId && validActions.length > 0) {
       try {
-        // Create a plan to associate with the actions
-        const planData = {
-          title: `Weekly plan for ${title}`,
-          description: `Initial weekly plan for achieving ${title}`,
-          startDate: new Date(),
-          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
-          status: 'not_started' as GoalStatus,
-          ninetyDayTargetId: "", // This would normally be set to a real 90-day target
-          icon: "Target" as keyof typeof icons
-        };
-        
-        const planResult = await addPlan(planData);
-        const planId = planResult?.id;
-        
-        if (planId) {
-          // Now create tasks for each action
-          for (const action of validActions) {
-            await addTask({
-              title: action.text,
-              completed: false,
-              priority: 'medium',
-              listId: 'inbox',
-              planId: planId,
-              startDate: new Date(),
-              dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
-              isAction: true,
-            });
-          }
-          
-          toast({
-            title: "Actions created",
-            description: `${validActions.length} action(s) have been added to your tasks`
+        // Now create tasks for each action
+        for (const action of validActions) {
+          await addTask({
+            title: action.text,
+            completed: false,
+            priority: 'medium',
+            listId: 'inbox',
+            goalId: goalId,
+            startDate: new Date(),
+            dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
+            isAction: true,
           });
         }
+        
+        toast({
+          title: "Actions created",
+          description: `${validActions.length} action(s) have been added to your tasks`
+        });
       } catch (error) {
-        console.error("Error creating plan or actions:", error);
+        console.error("Error creating actions:", error);
         toast({
           title: "Error",
           description: "Failed to create actions",

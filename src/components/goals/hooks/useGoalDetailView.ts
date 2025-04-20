@@ -5,7 +5,7 @@ import { useTask } from '@/contexts/TaskContext';
 import { useHabit } from '@/contexts/HabitContext';
 
 export const useGoalDetailView = (goalId: string) => {
-  const { threeYearGoals, ninetyDayTargets, plans } = useGoal();
+  const { threeYearGoals, ninetyDayTargets } = useGoal();
   const { tasks } = useTask();
   const { habits } = useHabit();
   
@@ -17,11 +17,6 @@ export const useGoalDetailView = (goalId: string) => {
   // Count associated items
   const goalMilestones = ninetyDayTargets.filter(target => target.threeYearGoalId === goalId);
   const milestoneCount = goalMilestones.length;
-  
-  const goalPlans = plans.filter(plan => 
-    goalMilestones.some(milestone => milestone.id === plan.ninetyDayTargetId)
-  );
-  const planCount = goalPlans.length;
   
   const goalTasks = tasks.filter(task => task.goalId === goalId);
   const taskCount = goalTasks.length;
@@ -46,7 +41,6 @@ export const useGoalDetailView = (goalId: string) => {
     isEditGoalDialogOpen,
     setIsEditGoalDialogOpen,
     milestoneCount,
-    planCount,
     taskCount,
     actionCount,
     habitCount,

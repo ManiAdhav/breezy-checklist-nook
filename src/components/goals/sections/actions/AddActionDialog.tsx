@@ -19,13 +19,6 @@ import {
   PopoverTrigger 
 } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { Task } from '@/types/task';
@@ -42,30 +35,13 @@ const AddActionDialog: React.FC<AddActionDialogProps> = ({
   onOpenChange 
 }) => {
   const { addTask } = useTask();
-  const { threeYearGoals, plans, ninetyDayTargets } = useGoal();
+  const { threeYearGoals, ninetyDayTargets } = useGoal();
   
   const [newActionTitle, setNewActionTitle] = useState('');
-  const [selectedPlanId, setSelectedPlanId] = useState('');
   const [actionStartDate, setActionStartDate] = useState<Date>(new Date());
   const [actionEndDate, setActionEndDate] = useState<Date>(addDays(new Date(), 7));
   
   const goal = threeYearGoals.find(g => g.id === goalId);
-  
-  const getPlansForGoal = () => {
-    if (!goal) return [];
-    
-    // Get all targets for this goal
-    const targetsForGoal = ninetyDayTargets.filter(target => 
-      target.threeYearGoalId === goalId
-    );
-    
-    // Get all plans for these targets
-    const plansForTargets = plans.filter(plan => 
-      targetsForGoal.some(target => target.id === plan.ninetyDayTargetId)
-    );
-    
-    return plansForTargets;
-  };
   
   const handleAddAction = async () => {
     if (!newActionTitle.trim()) {
@@ -77,21 +53,12 @@ const AddActionDialog: React.FC<AddActionDialogProps> = ({
       return;
     }
 
-    if (!selectedPlanId) {
-      toast({
-        title: "Error",
-        description: "Please select a plan for this action",
-        variant: "destructive",
-      });
-      return;
-    }
-
     const newAction: Omit<Task, 'id' | 'createdAt' | 'updatedAt'> = {
       title: newActionTitle,
       completed: false,
       priority: 'medium',
       listId: 'inbox',
-      planId: selectedPlanId,
+      goalId: goalId,
       startDate: actionStartDate,
       dueDate: actionEndDate,
       isAction: true,
@@ -118,7 +85,6 @@ const AddActionDialog: React.FC<AddActionDialogProps> = ({
   
   const resetForm = () => {
     setNewActionTitle('');
-    setSelectedPlanId('');
     setActionStartDate(new Date());
     setActionEndDate(addDays(new Date(), 7));
     onOpenChange(false);
@@ -140,29 +106,6 @@ const AddActionDialog: React.FC<AddActionDialogProps> = ({
               onChange={(e) => setNewActionTitle(e.target.value)}
               placeholder="Enter action title"
             />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="plan-select">Associated Plan</Label>
-            <Select 
-              value={selectedPlanId} 
-              onValueChange={setSelectedPlanId}
-            >
-              <SelectTrigger id="plan-select">
-                <SelectValue placeholder="Select a plan" />
-              </SelectTrigger>
-              <SelectContent>
-                {getPlansForGoal().length === 0 ? (
-                  <div className="py-2 px-2 text-sm text-muted-foreground">
-                    No plans available for this goal
-                  </div>
-                ) : (
-                  getPlansForGoal().map(plan => (
-                    <SelectItem key={plan.id} value={plan.id}>{plan.title}</SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
           </div>
           
           <div className="grid grid-cols-2 gap-4">

@@ -13,7 +13,7 @@ interface ActionGoalGroupProps {
   goalId: string;
   goalTitle: string;
   plans: { [key: string]: Task[] };
-  getPlanDetails: (planId: string) => PlanDetails;
+  getPlanDetails: (goalId: string) => PlanDetails;
   toggleTaskCompletion: (id: string) => void;
   deleteTask: (id: string) => void;
 }
@@ -27,7 +27,7 @@ const ActionGoalGroup: React.FC<ActionGoalGroupProps> = ({
   deleteTask
 }) => {
   return (
-    <div key={goalId} className="border rounded-lg shadow-sm overflow-hidden">
+    <div className="border rounded-lg shadow-sm overflow-hidden">
       <ActionHeader title={goalTitle} />
       <div className="divide-y">
         {Object.entries(plans).map(([planId, planTasks]) => {
@@ -38,9 +38,8 @@ const ActionGoalGroup: React.FC<ActionGoalGroupProps> = ({
           return (
             <ActionPlanGroup
               key={planId}
-              planId={planId}
-              planTitle={planTitle}
-              targetTitle={targetTitle}
+              goalId={planId}
+              goalTitle={planTitle}
               tasks={planTasks}
               toggleTaskCompletion={toggleTaskCompletion}
               deleteTask={deleteTask}

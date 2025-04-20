@@ -17,7 +17,7 @@ import { useTask } from '@/contexts/TaskContext';
 import { TitleField, NotesField, PriorityField } from '@/components/tasks/form';
 
 interface WeeklyTaskFormProps {
-  planId: string;
+  goalId: string;
   date: Date;
   onClose: () => void;
 }
@@ -33,7 +33,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-const WeeklyTaskForm: React.FC<WeeklyTaskFormProps> = ({ planId, date, onClose }) => {
+const WeeklyTaskForm: React.FC<WeeklyTaskFormProps> = ({ goalId, date, onClose }) => {
   const { addTask } = useTask();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [title, setTitle] = useState('');
@@ -59,7 +59,7 @@ const WeeklyTaskForm: React.FC<WeeklyTaskFormProps> = ({ planId, date, onClose }
         priority: values.priority as Priority,
         dueDate: date,
         listId: 'inbox',
-        planId: planId,
+        goalId: goalId,
         notes: values.description || '',
       };
       

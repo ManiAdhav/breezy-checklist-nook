@@ -19,7 +19,7 @@ const ActionPlanGroup: React.FC<ActionPlanGroupProps> = ({
   deleteTask 
 }) => {
   return (
-    <div key={goalId} className="border-t">
+    <div className="border-t">
       <div className="px-4 py-2 bg-muted/20 border-b">
         <p className="text-xs font-medium">{goalTitle}</p>
       </div>

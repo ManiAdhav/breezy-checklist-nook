@@ -9,18 +9,17 @@ import { groupTasksByGoal, getPlanDetails } from './utils/taskGroupingUtils';
 
 const ActionsView: React.FC = () => {
   const { tasks, toggleTaskCompletion, deleteTask, isLoading } = useTask();
-  const { plans, ninetyDayTargets, threeYearGoals } = useGoal();
+  const { ninetyDayTargets, threeYearGoals } = useGoal();
 
   // Filter out only actions
   const actionTasks = tasks.filter(task => task.isAction);
 
   // Group tasks by goalId first, then by planId
-  const tasksByGoal = groupTasksByGoal(actionTasks, plans, ninetyDayTargets, threeYearGoals);
+  const tasksByGoal = groupTasksByGoal(actionTasks, ninetyDayTargets, threeYearGoals);
 
-  // Helper function to get plan details for each plan group
-  const getPlanDetailsHelper = (planId: string) => {
-    const { planTitle, targetTitle } = getPlanDetails(planId, plans, ninetyDayTargets, threeYearGoals);
-    return { planTitle, targetTitle };
+  // Helper function to get plan details for each goal group
+  const getPlanDetailsHelper = (goalId: string) => {
+    return getPlanDetails(goalId, ninetyDayTargets, threeYearGoals);
   };
 
   if (isLoading) {

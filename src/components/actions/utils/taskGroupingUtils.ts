@@ -1,5 +1,5 @@
 
-import { Task, Goals, NinetyDayTarget, Plan } from '@/types/task';
+import { Task, Goals, NinetyDayTarget } from '@/types/task';
 
 export interface PlanDetails {
   planTitle: string;
@@ -18,22 +18,16 @@ export interface TasksByGoal {
 }
 
 export const getPlanDetails = (
-  planId: string,
-  plans: Plan[],
+  goalId: string,
   ninetyDayTargets: NinetyDayTarget[],
   threeYearGoals: Goals[]
 ): PlanDetails => {
-  const plan = plans.find(p => p.id === planId);
-  if (!plan) return { planTitle: 'Unknown Plan', targetTitle: '', goalTitle: '', goalId: '' };
-
-  const target = ninetyDayTargets.find(t => t.id === plan.ninetyDayTargetId);
-  if (!target) return { planTitle: plan.title, targetTitle: 'Unknown Target', goalTitle: '', goalId: '' };
-
-  const goal = threeYearGoals.find(g => g.id === target.threeYearGoalId);
+  const goal = threeYearGoals.find(g => g.id === goalId);
+  const target = ninetyDayTargets.find(t => t.threeYearGoalId === goalId);
   
   return {
-    planTitle: plan.title,
-    targetTitle: target.title,
+    planTitle: target ? target.title : 'Unknown Plan',
+    targetTitle: target ? target.title : 'Unknown Target',
     goalTitle: goal ? goal.title : 'Unknown Goal',
     goalId: goal ? goal.id : ''
   };
@@ -41,14 +35,13 @@ export const getPlanDetails = (
 
 export const groupTasksByGoal = (
   tasks: Task[],
-  plans: Plan[],
   ninetyDayTargets: NinetyDayTarget[],
   threeYearGoals: Goals[]
 ): TasksByGoal => {
   const tasksByGoal: TasksByGoal = {};
   
   tasks.forEach(task => {
-    if (!task.planId) {
+    if (!task.goalId) {
       // Handle unassigned tasks
       if (!tasksByGoal['unassigned']) {
         tasksByGoal['unassigned'] = { 
@@ -60,27 +53,25 @@ export const groupTasksByGoal = (
       return;
     }
     
-    const { goalId, goalTitle, planTitle } = getPlanDetails(
-      task.planId, 
-      plans, 
-      ninetyDayTargets, 
-      threeYearGoals
-    );
+    const goalId = task.goalId;
+    const goal = threeYearGoals.find(g => g.id === goalId);
+    const goalTitle = goal ? goal.title : 'Unknown Goal';
     
-    const goalKey = goalId || 'unknown';
-    
-    if (!tasksByGoal[goalKey]) {
-      tasksByGoal[goalKey] = { 
-        goal: goalTitle || 'Unknown Goal', 
+    if (!tasksByGoal[goalId]) {
+      tasksByGoal[goalId] = { 
+        goal: goalTitle, 
         plans: {} 
       };
     }
     
-    if (!tasksByGoal[goalKey].plans[task.planId]) {
-      tasksByGoal[goalKey].plans[task.planId] = [];
+    // Use the goalId as a direct grouping key
+    const planKey = goalId;
+    
+    if (!tasksByGoal[goalId].plans[planKey]) {
+      tasksByGoal[goalId].plans[planKey] = [];
     }
     
-    tasksByGoal[goalKey].plans[task.planId].push(task);
+    tasksByGoal[goalId].plans[planKey].push(task);
   });
   
   return tasksByGoal;
