@@ -13,7 +13,6 @@ interface GoalProgressProps {
 const GoalProgress: React.FC<GoalProgressProps> = ({ goal }) => {
   const {
     goalMilestones,
-    goalPlans,
     goalTasks,
     goalHabits,
     goalActions,
@@ -54,7 +53,7 @@ const GoalProgress: React.FC<GoalProgressProps> = ({ goal }) => {
           goalMilestonesLength={goalMilestones.length}
           planCompletionPercentage={planCompletionPercentage}
           completedPlans={completedPlans}
-          goalPlansLength={goalPlans.length}
+          goalPlansLength={0} // Since plans have been removed, set length to 0
           taskCompletionPercentage={taskCompletionPercentage}
           completedTasks={completedTasks}
           goalTasksLength={goalTasks.length}
