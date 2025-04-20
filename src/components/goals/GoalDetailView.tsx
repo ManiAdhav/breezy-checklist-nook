@@ -30,7 +30,7 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
   }
   
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-background">
+    <div className="flex flex-col h-[calc(100vh-4rem)] overflow-hidden bg-background">
       {/* Header - Fixed height section */}
       <div className="flex-shrink-0">
         <GoalHeader 
@@ -45,7 +45,7 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
       </div>
       
       {/* Content - Takes all available space and enables scrolling */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-hidden">
         <GoalDetailContent
           goal={goal}
           activeTab={activeTab}

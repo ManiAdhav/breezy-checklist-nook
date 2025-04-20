@@ -59,33 +59,39 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
         </TabsTrigger>
       </TabsList>
       
-      <div className="flex-1 overflow-auto">
-        <TabsContent value="overview" className="mt-0 h-full overflow-auto">
-          <ScrollArea className="h-full">
+      <div className="flex-1 overflow-hidden h-[calc(100vh-24rem)]">
+        <TabsContent value="overview" className="h-full mt-0">
+          <ScrollArea className="h-full pr-4">
             <GoalDetailOverview goalId={goalId} onTabChange={onTabChange} />
           </ScrollArea>
         </TabsContent>
         
-        <TabsContent value="milestones" className="mt-0 h-full">
-          <Card className="h-full flex flex-col overflow-hidden">
-            <CardContent className="p-6 flex-1 overflow-auto">
-              <MilestoneSection goalId={goalId} />
+        <TabsContent value="milestones" className="h-full mt-0">
+          <Card className="h-full">
+            <CardContent className="p-6 h-full">
+              <ScrollArea className="h-full pr-4">
+                <MilestoneSection goalId={goalId} />
+              </ScrollArea>
             </CardContent>
           </Card>
         </TabsContent>
         
-        <TabsContent value="tasks" className="mt-0 h-full">
-          <Card className="h-full flex flex-col overflow-hidden">
-            <CardContent className="p-6 flex-1 overflow-auto">
-              <TaskSection goalId={goalId} />
+        <TabsContent value="tasks" className="h-full mt-0">
+          <Card className="h-full">
+            <CardContent className="p-6 h-full">
+              <ScrollArea className="h-full pr-4">
+                <TaskSection goalId={goalId} />
+              </ScrollArea>
             </CardContent>
           </Card>
         </TabsContent>
         
-        <TabsContent value="habits" className="mt-0 h-full">
-          <Card className="h-full flex flex-col overflow-hidden">
-            <CardContent className="p-6 flex-1 overflow-auto">
-              <HabitSection goalId={goalId} />
+        <TabsContent value="habits" className="h-full mt-0">
+          <Card className="h-full">
+            <CardContent className="p-6 h-full">
+              <ScrollArea className="h-full pr-4">
+                <HabitSection goalId={goalId} />
+              </ScrollArea>
             </CardContent>
           </Card>
         </TabsContent>
