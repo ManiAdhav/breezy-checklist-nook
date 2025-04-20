@@ -6,15 +6,12 @@ import { useHabit } from '@/contexts/HabitContext';
 
 export const useGoalProgress = (goal: Goals) => {
   const { tasks } = useTask();
-  const { ninetyDayTargets, plans } = useGoal();
+  const { ninetyDayTargets } = useGoal();
   const { habits, habitLogs } = useHabit();
   
   // Find all tasks, milestones, and plans associated with this goal
   const goalTasks = tasks.filter(task => task.goalId === goal.id);
   const goalMilestones = ninetyDayTargets.filter(target => target.threeYearGoalId === goal.id);
-  const goalPlans = plans.filter(plan => 
-    goalMilestones.some(milestone => milestone.id === plan.ninetyDayTargetId)
-  );
   const goalHabits = habits.filter(habit => habit.goalId === goal.id);
   const goalActions = tasks.filter(task => task.isAction && task.goalId === goal.id);
   
@@ -29,10 +26,9 @@ export const useGoalProgress = (goal: Goals) => {
     ? (completedMilestones / goalMilestones.length) * 100 
     : 0;
   
-  const completedPlans = goalPlans.filter(plan => plan.status === 'completed').length;
-  const planCompletionPercentage = goalPlans.length > 0 
-    ? (completedPlans / goalPlans.length) * 100 
-    : 0;
+  // Plans are removed, so we'll set these values to 0
+  const planCompletionPercentage = 0;
+  const completedPlans = 0;
     
   const completedActions = goalActions.filter(action => action.completed).length;
   const actionCompletionPercentage = goalActions.length > 0
@@ -61,7 +57,7 @@ export const useGoalProgress = (goal: Goals) => {
   }
   
   // Calculate overall progress - weighted average
-  // Give more weight to milestones and plans as they are higher-level items
+  // Give more weight to milestones as they are higher-level items
   const progressPercentage = goal.status === 'completed' 
     ? 100 
     : goal.status === 'abandoned' 
@@ -70,13 +66,11 @@ export const useGoalProgress = (goal: Goals) => {
           (
             taskCompletionPercentage * 1 + 
             milestoneCompletionPercentage * 2 + 
-            planCompletionPercentage * 2 +
             actionCompletionPercentage * 1.5 +
             habitCompletionPercentage * 1.5
           ) / (
             (goalTasks.length > 0 ? 1 : 0) + 
-            (goalMilestones.length > 0 ? 2 : 0) + 
-            (goalPlans.length > 0 ? 2 : 0) +
+            (goalMilestones.length > 0 ? 2 : 0) +
             (goalActions.length > 0 ? 1.5 : 0) +
             (goalHabits.length > 0 ? 1.5 : 0) || 1 // Avoid division by zero
           )
@@ -105,7 +99,6 @@ export const useGoalProgress = (goal: Goals) => {
   return {
     goalTasks,
     goalMilestones,
-    goalPlans,
     goalHabits,
     goalActions,
     completedTasks,
