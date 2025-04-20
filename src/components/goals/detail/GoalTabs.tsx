@@ -12,6 +12,7 @@ import MilestoneSection from '../sections/MilestoneSection';
 import TaskSection from '../sections/TaskSection';
 import HabitSection from '../sections/HabitSection';
 import GoalDetailOverview from './GoalDetailOverview';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface GoalTabsProps {
   activeTab: string;
@@ -34,7 +35,7 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
     <Tabs 
       value={activeTab} 
       onValueChange={onTabChange} 
-      className="w-full h-full flex flex-col min-h-0 overflow-hidden"
+      className="w-full h-full flex flex-col overflow-hidden"
     >
       <TabsList className="sticky top-0 z-10 grid grid-cols-4 mb-6 w-full bg-background flex-shrink-0">
         <TabsTrigger value="overview" className="flex items-center space-x-2">
@@ -58,30 +59,32 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
         </TabsTrigger>
       </TabsList>
       
-      <div className="flex-1 min-h-0 overflow-auto">
-        <TabsContent value="overview" className="mt-0 h-full">
-          <GoalDetailOverview goalId={goalId} onTabChange={onTabChange} />
+      <div className="flex-1 overflow-auto">
+        <TabsContent value="overview" className="mt-0 h-full overflow-auto">
+          <ScrollArea className="h-full">
+            <GoalDetailOverview goalId={goalId} onTabChange={onTabChange} />
+          </ScrollArea>
         </TabsContent>
         
         <TabsContent value="milestones" className="mt-0 h-full">
-          <Card className="h-full flex flex-col max-h-full overflow-hidden">
-            <CardContent className="p-6 flex-1 min-h-0 overflow-auto">
+          <Card className="h-full flex flex-col overflow-hidden">
+            <CardContent className="p-6 flex-1 overflow-auto">
               <MilestoneSection goalId={goalId} />
             </CardContent>
           </Card>
         </TabsContent>
         
         <TabsContent value="tasks" className="mt-0 h-full">
-          <Card className="h-full flex flex-col max-h-full overflow-hidden">
-            <CardContent className="p-6 flex-1 min-h-0 overflow-auto">
+          <Card className="h-full flex flex-col overflow-hidden">
+            <CardContent className="p-6 flex-1 overflow-auto">
               <TaskSection goalId={goalId} />
             </CardContent>
           </Card>
         </TabsContent>
         
         <TabsContent value="habits" className="mt-0 h-full">
-          <Card className="h-full flex flex-col max-h-full overflow-hidden">
-            <CardContent className="p-6 flex-1 min-h-0 overflow-auto">
+          <Card className="h-full flex flex-col overflow-hidden">
+            <CardContent className="p-6 flex-1 overflow-auto">
               <HabitSection goalId={goalId} />
             </CardContent>
           </Card>

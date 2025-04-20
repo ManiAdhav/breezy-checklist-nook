@@ -37,7 +37,7 @@ const ProgressCategories: React.FC<ProgressCategoriesProps> = ({
   goalHabitsLength
 }) => {
   return (
-    <div className="grid grid-cols-3 gap-4 mt-6 text-xs">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 text-xs">
       <div className="space-y-4">
         <ProgressCategory
           label="Milestones"

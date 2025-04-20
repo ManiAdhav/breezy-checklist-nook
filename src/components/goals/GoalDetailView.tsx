@@ -45,7 +45,7 @@ const GoalDetailView: React.FC<GoalDetailViewProps> = ({ goalId, onBack }) => {
       </div>
       
       {/* Content - Takes all available space and enables scrolling */}
-      <div className="flex-1 min-h-0 overflow-hidden">
+      <div className="flex-1 overflow-auto">
         <GoalDetailContent
           goal={goal}
           activeTab={activeTab}
