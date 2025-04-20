@@ -59,14 +59,14 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
         </TabsTrigger>
       </TabsList>
       
-      <div className="flex-1 overflow-hidden h-[calc(100vh-24rem)]">
-        <TabsContent value="overview" className="h-full mt-0">
+      <div className="flex-1 overflow-hidden">
+        <TabsContent value="overview" className="h-full mt-0 overflow-hidden">
           <ScrollArea className="h-full pr-4">
             <GoalDetailOverview goalId={goalId} onTabChange={onTabChange} />
           </ScrollArea>
         </TabsContent>
         
-        <TabsContent value="milestones" className="h-full mt-0">
+        <TabsContent value="milestones" className="h-full mt-0 overflow-hidden">
           <Card className="h-full">
             <CardContent className="p-6 h-full">
               <ScrollArea className="h-full pr-4">
@@ -76,7 +76,7 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
           </Card>
         </TabsContent>
         
-        <TabsContent value="tasks" className="h-full mt-0">
+        <TabsContent value="tasks" className="h-full mt-0 overflow-hidden">
           <Card className="h-full">
             <CardContent className="p-6 h-full">
               <ScrollArea className="h-full pr-4">
@@ -86,7 +86,7 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
           </Card>
         </TabsContent>
         
-        <TabsContent value="habits" className="h-full mt-0">
+        <TabsContent value="habits" className="h-full mt-0 overflow-hidden">
           <Card className="h-full">
             <CardContent className="p-6 h-full">
               <ScrollArea className="h-full pr-4">
