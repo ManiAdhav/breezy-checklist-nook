@@ -25,10 +25,6 @@ export const useGoalProgress = (goal: Goals) => {
   const milestoneCompletionPercentage = goalMilestones.length > 0 
     ? (completedMilestones / goalMilestones.length) * 100 
     : 0;
-  
-  // Plans are removed, so we'll set these values to 0
-  const planCompletionPercentage = 0;
-  const completedPlans = 0;
     
   const completedActions = goalActions.filter(action => action.completed).length;
   const actionCompletionPercentage = goalActions.length > 0
@@ -103,11 +99,9 @@ export const useGoalProgress = (goal: Goals) => {
     goalActions,
     completedTasks,
     completedMilestones,
-    completedPlans,
     completedActions,
     taskCompletionPercentage,
     milestoneCompletionPercentage,
-    planCompletionPercentage,
     actionCompletionPercentage,
     habitCompletionPercentage,
     progressPercentage,

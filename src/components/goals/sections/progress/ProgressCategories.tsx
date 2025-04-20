@@ -7,9 +7,9 @@ interface ProgressCategoriesProps {
   milestoneCompletionPercentage: number;
   completedMilestones: number;
   goalMilestonesLength: number;
-  planCompletionPercentage: number;
-  completedPlans: number;
-  goalPlansLength: number;
+  planCompletionPercentage?: number;
+  completedPlans?: number;
+  goalPlansLength?: number;
   taskCompletionPercentage: number;
   completedTasks: number;
   goalTasksLength: number;
@@ -48,15 +48,20 @@ const ProgressCategories: React.FC<ProgressCategoriesProps> = ({
           total={goalMilestonesLength}
           indicatorClassName="bg-purple-500"
         />
-        <ProgressCategory
-          label="Plans"
-          icon={Target}
-          color="text-blue-600"
-          value={planCompletionPercentage}
-          completed={completedPlans}
-          total={goalPlansLength}
-          indicatorClassName="bg-blue-500"
-        />
+        {/* Show Plans category only if plan props are provided */}
+        {planCompletionPercentage !== undefined && 
+          completedPlans !== undefined && 
+          goalPlansLength !== undefined && (
+          <ProgressCategory
+            label="Plans"
+            icon={Target}
+            color="text-blue-600"
+            value={planCompletionPercentage}
+            completed={completedPlans}
+            total={goalPlansLength}
+            indicatorClassName="bg-blue-500"
+          />
+        )}
       </div>
       
       <div className="space-y-4">
