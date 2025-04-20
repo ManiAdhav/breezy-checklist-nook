@@ -100,3 +100,4 @@ const CatalystSection: React.FC = () => {
 };
 
 export default CatalystSection;
+
