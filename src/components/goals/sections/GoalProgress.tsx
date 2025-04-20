@@ -18,11 +18,9 @@ const GoalProgress: React.FC<GoalProgressProps> = ({ goal }) => {
     goalActions,
     completedTasks,
     completedMilestones,
-    completedPlans,
     completedActions,
     taskCompletionPercentage,
     milestoneCompletionPercentage,
-    planCompletionPercentage,
     actionCompletionPercentage,
     habitCompletionPercentage,
     progressPercentage,
@@ -51,9 +49,6 @@ const GoalProgress: React.FC<GoalProgressProps> = ({ goal }) => {
           milestoneCompletionPercentage={milestoneCompletionPercentage}
           completedMilestones={completedMilestones}
           goalMilestonesLength={goalMilestones.length}
-          planCompletionPercentage={planCompletionPercentage}
-          completedPlans={completedPlans}
-          goalPlansLength={0} // Since plans have been removed, set length to 0
           taskCompletionPercentage={taskCompletionPercentage}
           completedTasks={completedTasks}
           goalTasksLength={goalTasks.length}
