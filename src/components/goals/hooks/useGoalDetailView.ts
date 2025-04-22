@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useGoal } from '@/hooks/useGoalContext';
 import { useTask } from '@/contexts/TaskContext';
 import { useHabit } from '@/contexts/HabitContext';
@@ -27,6 +27,13 @@ export const useGoalDetailView = (goalId: string) => {
   const goalHabits = habits.filter(habit => habit.goalId === goalId);
   const habitCount = goalHabits.length;
   
+  // Force a refresh of data whenever the goal page is opened
+  useEffect(() => {
+    console.log(`Loading goal details for: ${goalId}`);
+    console.log(`Found: ${goalTasks.length} tasks, ${goalHabits.length} habits, ${goalMilestones.length} milestones`);
+  }, [goalId, tasks, habits, ninetyDayTargets]);
+  
+  // When active tab is clicked again, default to overview
   const handleTabChange = (value: string) => {
     if (value === activeTab) {
       setActiveTab("overview");

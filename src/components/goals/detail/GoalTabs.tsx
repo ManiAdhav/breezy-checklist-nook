@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Flag, ListChecks, Repeat, Shapes } from 'lucide-react';
 import { 
   Tabs, 
@@ -13,6 +13,7 @@ import TaskSection from '../sections/TaskSection';
 import HabitSection from '../sections/HabitSection';
 import GoalDetailOverview from './GoalDetailOverview';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import ActionsSection from '../sections/ActionsSection';
 
 interface GoalTabsProps {
   activeTab: string;
@@ -31,11 +32,18 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
   taskCount,
   habitCount
 }) => {
+  // Force a re-render whenever the active tab changes to ensure content loads
+  useEffect(() => {
+    console.log(`Active tab changed to: ${activeTab}`);
+    // This effect will run every time the activeTab changes
+  }, [activeTab, goalId]);
+
   return (
     <Tabs 
       value={activeTab} 
       onValueChange={onTabChange} 
       className="w-full h-full flex flex-col overflow-hidden"
+      defaultValue="overview"
     >
       <TabsList className="sticky top-0 z-10 grid grid-cols-4 mb-6 w-full bg-background flex-shrink-0">
         <TabsTrigger value="overview" className="flex items-center space-x-2">

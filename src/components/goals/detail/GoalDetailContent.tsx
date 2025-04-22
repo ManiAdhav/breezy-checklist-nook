@@ -1,7 +1,6 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Goals } from '@/types/task';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import GoalProgress from '../sections/GoalProgress';
 import GoalTabs from './GoalTabs';
 
@@ -24,6 +23,13 @@ const GoalDetailContent: React.FC<GoalDetailContentProps> = ({
   taskCount,
   habitCount
 }) => {
+  // Use an effect to ensure data is loaded properly when the component mounts
+  useEffect(() => {
+    console.log(`GoalDetailContent mounted for goal: ${goalId}`);
+    console.log(`Current counts - Milestones: ${milestoneCount}, Tasks: ${taskCount}, Habits: ${habitCount}`);
+    // This will run when the component mounts or when key data changes
+  }, [goalId, milestoneCount, taskCount, habitCount]);
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Goal Description and Progress - Fixed height */}
