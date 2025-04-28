@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { Flag, ListChecks, Repeat, Shapes } from 'lucide-react';
+import { ListChecks, Repeat, Shapes } from 'lucide-react';
 import { 
   Tabs, 
   TabsContent, 
@@ -8,7 +8,6 @@ import {
   TabsTrigger 
 } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import MilestoneSection from '../sections/MilestoneSection';
 import TaskSection from '../sections/TaskSection';
 import HabitSection from '../sections/HabitSection';
 import GoalDetailOverview from './GoalDetailOverview';
@@ -19,7 +18,6 @@ interface GoalTabsProps {
   activeTab: string;
   onTabChange: (value: string) => void;
   goalId: string;
-  milestoneCount: number;
   taskCount: number;
   habitCount: number;
 }
@@ -28,16 +26,13 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
   activeTab,
   onTabChange,
   goalId,
-  milestoneCount,
   taskCount,
   habitCount
 }) => {
-  // Force a re-render whenever the active tab changes to ensure content loads
   useEffect(() => {
     console.log(`Active tab changed to: ${activeTab} for goal: ${goalId}`);
-    console.log(`Current counts - Milestones: ${milestoneCount}, Tasks: ${taskCount}, Habits: ${habitCount}`);
-    // This effect will run every time the activeTab changes
-  }, [activeTab, goalId, milestoneCount, taskCount, habitCount]);
+    console.log(`Current counts - Tasks: ${taskCount}, Habits: ${habitCount}`);
+  }, [activeTab, goalId, taskCount, habitCount]);
 
   return (
     <Tabs 
@@ -46,15 +41,10 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
       className="w-full h-full flex flex-col overflow-hidden"
       defaultValue="overview"
     >
-      <TabsList className="sticky top-0 z-10 grid grid-cols-4 mb-6 w-full bg-background flex-shrink-0">
+      <TabsList className="sticky top-0 z-10 grid grid-cols-3 mb-6 w-full bg-background flex-shrink-0">
         <TabsTrigger value="overview" className="flex items-center space-x-2">
           <Shapes className="h-4 w-4" />
           <span>Overview</span>
-        </TabsTrigger>
-        <TabsTrigger value="milestones" className="flex items-center space-x-2">
-          <Flag className="h-4 w-4" />
-          <span>Milestones</span>
-          {milestoneCount > 0 && <span className="ml-1 text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded-full">{milestoneCount}</span>}
         </TabsTrigger>
         <TabsTrigger value="tasks" className="flex items-center space-x-2">
           <ListChecks className="h-4 w-4" />
@@ -73,16 +63,6 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
           <ScrollArea className="h-full pr-4">
             <GoalDetailOverview goalId={goalId} onTabChange={onTabChange} />
           </ScrollArea>
-        </TabsContent>
-        
-        <TabsContent value="milestones" className="h-full mt-0 overflow-hidden block">
-          <Card className="h-full">
-            <CardContent className="p-6 h-full">
-              <ScrollArea className="h-full pr-4">
-                <MilestoneSection goalId={goalId} />
-              </ScrollArea>
-            </CardContent>
-          </Card>
         </TabsContent>
         
         <TabsContent value="tasks" className="h-full mt-0 overflow-hidden block">

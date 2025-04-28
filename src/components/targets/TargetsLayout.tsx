@@ -7,8 +7,6 @@ import { HabitProvider } from '@/contexts/habit/HabitProvider';
 import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
 import MobileSidebar from '@/components/layout/MobileSidebar';
-import MilestoneList2 from '@/components/targets/MilestoneList2';
-import FloatingActionButton from '@/components/fab/FloatingActionButton';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from "@/components/ui/toaster";
 
@@ -30,10 +28,11 @@ const TargetsLayout: React.FC<TargetsLayoutProps> = ({ user, onSignOut }) => {
                   <Sidebar />
                   <MobileSidebar />
                   <main className="flex-1 overflow-y-auto md:pl-[220px]">
-                    <MilestoneList2 />
+                    <div className="p-6">
+                      <h1 className="text-2xl font-bold mb-6">Goals & Tasks</h1>
+                    </div>
                   </main>
                 </div>
-                <FloatingActionButton />
                 <Toaster />
               </div>
             </SidebarProvider>

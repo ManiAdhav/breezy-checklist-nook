@@ -5,19 +5,14 @@ import { useTask } from '@/contexts/TaskContext';
 import { useHabit } from '@/contexts/HabitContext';
 
 export const useGoalDetailView = (goalId: string) => {
-  const { threeYearGoals, ninetyDayTargets } = useGoal();
+  const { threeYearGoals } = useGoal();
   const { tasks } = useTask();
   const { habits } = useHabit();
   
-  // Set a default active tab to ensure consistent behavior
   const [activeTab, setActiveTab] = useState("overview");
   const [isEditGoalDialogOpen, setIsEditGoalDialogOpen] = useState(false);
   
   const goal = threeYearGoals.find(g => g.id === goalId);
-  
-  // Count associated items
-  const goalMilestones = ninetyDayTargets.filter(target => target.threeYearGoalId === goalId);
-  const milestoneCount = goalMilestones.length;
   
   const goalTasks = tasks.filter(task => task.goalId === goalId);
   const taskCount = goalTasks.length;
@@ -28,13 +23,11 @@ export const useGoalDetailView = (goalId: string) => {
   const goalHabits = habits.filter(habit => habit.goalId === goalId);
   const habitCount = goalHabits.length;
   
-  // Force a refresh of data whenever the goal page is opened or data changes
   useEffect(() => {
     console.log(`Loading goal details for: ${goalId}`);
-    console.log(`Found: ${goalTasks.length} tasks, ${goalHabits.length} habits, ${goalMilestones.length} milestones`);
-  }, [goalId, tasks, habits, ninetyDayTargets, goalTasks.length, goalHabits.length, goalMilestones.length]);
+    console.log(`Found: ${goalTasks.length} tasks, ${goalHabits.length} habits`);
+  }, [goalId, tasks, habits, goalTasks.length, goalHabits.length]);
   
-  // When active tab is clicked again, default to overview
   const handleTabChange = (value: string) => {
     if (value === activeTab) {
       setActiveTab("overview");
@@ -48,7 +41,6 @@ export const useGoalDetailView = (goalId: string) => {
     activeTab,
     isEditGoalDialogOpen,
     setIsEditGoalDialogOpen,
-    milestoneCount,
     taskCount,
     actionCount,
     habitCount,
