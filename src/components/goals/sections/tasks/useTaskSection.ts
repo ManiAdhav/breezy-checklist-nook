@@ -1,14 +1,23 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Task, Priority } from '@/types/task';
+import { useTask } from '@/contexts/TaskContext';
 
 export function useTaskSection(goalId: string) {
+  const { tasks: allTasks, addTask, updateTask, deleteTask, toggleTaskCompletion: toggleGlobalTaskCompletion } = useTask();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDueDate, setTaskDueDate] = useState<Date>(new Date());
   const [taskPriority, setTaskPriority] = useState<Priority>('medium');
+  
+  // Load tasks from the global context when the component mounts or goalId changes
+  useEffect(() => {
+    const filteredTasks = allTasks.filter(task => task.goalId === goalId);
+    console.log(`Loading ${filteredTasks.length} tasks for goal ${goalId}`);
+    setTasks(filteredTasks);
+  }, [allTasks, goalId]);
   
   const getPriorityClasses = (priority: Priority) => {
     switch (priority) {
@@ -24,14 +33,8 @@ export function useTaskSection(goalId: string) {
   };
   
   const toggleTaskStatus = (id: string) => {
-    setTasks(prev => 
-      prev.map(task => {
-        if (task.id === id) {
-          return { ...task, completed: !task.completed };
-        }
-        return task;
-      })
-    );
+    // Use the global task context to toggle task completion
+    toggleGlobalTaskCompletion(id);
   };
   
   const moveTask = (id: string, direction: 'up' | 'down') => {
@@ -47,6 +50,8 @@ export function useTaskSection(goalId: string) {
     const newTasks = [...tasks];
     [newTasks[index], newTasks[newIndex]] = [newTasks[newIndex], newTasks[index]];
     setTasks(newTasks);
+    
+    // Update task order in database later if needed
   };
 
   const openCreateTaskDialog = () => {
@@ -71,39 +76,29 @@ export function useTaskSection(goalId: string) {
     }
 
     if (editingTask) {
-      // Update existing task
-      setTasks(prevTasks => 
-        prevTasks.map(task => 
-          task.id === editingTask.id 
-            ? { 
-                ...task, 
-                title: taskTitle, 
-                dueDate: taskDueDate, 
-                priority: taskPriority 
-              }
-            : task
-        )
-      );
+      // Update existing task using global context
+      updateTask(editingTask.id, { 
+        title: taskTitle, 
+        dueDate: taskDueDate, 
+        priority: taskPriority 
+      });
     } else {
-      // Create new task
-      const newTask: Task = {
-        id: `t${Date.now()}`,
+      // Create new task using global context
+      addTask({
         title: taskTitle,
         dueDate: taskDueDate,
         completed: false,
         priority: taskPriority,
-        listId: '', // Required by Task type
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        listId: 'inbox',
         goalId: goalId
-      };
-      setTasks(prevTasks => [...prevTasks, newTask]);
+      });
     }
     setIsTaskDialogOpen(false);
   };
 
   const handleDeleteTask = (id: string) => {
-    setTasks(prevTasks => prevTasks.filter(task => task.id !== id));
+    // Use the global task context to delete the task
+    deleteTask(id);
   };
 
   return {

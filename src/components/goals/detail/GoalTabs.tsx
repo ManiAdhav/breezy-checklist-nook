@@ -34,9 +34,10 @@ const GoalTabs: React.FC<GoalTabsProps> = ({
 }) => {
   // Force a re-render whenever the active tab changes to ensure content loads
   useEffect(() => {
-    console.log(`Active tab changed to: ${activeTab}`);
+    console.log(`Active tab changed to: ${activeTab} for goal: ${goalId}`);
+    console.log(`Current counts - Milestones: ${milestoneCount}, Tasks: ${taskCount}, Habits: ${habitCount}`);
     // This effect will run every time the activeTab changes
-  }, [activeTab, goalId]);
+  }, [activeTab, goalId, milestoneCount, taskCount, habitCount]);
 
   return (
     <Tabs 
