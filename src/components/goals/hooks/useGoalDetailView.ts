@@ -9,6 +9,7 @@ export const useGoalDetailView = (goalId: string) => {
   const { tasks } = useTask();
   const { habits } = useHabit();
   
+  // Set a default active tab to ensure consistent behavior
   const [activeTab, setActiveTab] = useState("overview");
   const [isEditGoalDialogOpen, setIsEditGoalDialogOpen] = useState(false);
   
@@ -27,11 +28,11 @@ export const useGoalDetailView = (goalId: string) => {
   const goalHabits = habits.filter(habit => habit.goalId === goalId);
   const habitCount = goalHabits.length;
   
-  // Force a refresh of data whenever the goal page is opened
+  // Force a refresh of data whenever the goal page is opened or data changes
   useEffect(() => {
     console.log(`Loading goal details for: ${goalId}`);
     console.log(`Found: ${goalTasks.length} tasks, ${goalHabits.length} habits, ${goalMilestones.length} milestones`);
-  }, [goalId, tasks, habits, ninetyDayTargets]);
+  }, [goalId, tasks, habits, ninetyDayTargets, goalTasks.length, goalHabits.length, goalMilestones.length]);
   
   // When active tab is clicked again, default to overview
   const handleTabChange = (value: string) => {

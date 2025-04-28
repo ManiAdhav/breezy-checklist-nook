@@ -12,8 +12,10 @@ export function useTaskSection(goalId: string) {
   const [taskDueDate, setTaskDueDate] = useState<Date>(new Date());
   const [taskPriority, setTaskPriority] = useState<Priority>('medium');
   
-  // Load tasks from the global context when the component mounts or goalId changes
+  // Load tasks from the global context whenever allTasks changes or goalId changes
   useEffect(() => {
+    if (!goalId || !allTasks) return;
+    
     const filteredTasks = allTasks.filter(task => task.goalId === goalId);
     console.log(`Loading ${filteredTasks.length} tasks for goal ${goalId}`);
     setTasks(filteredTasks);
@@ -33,6 +35,7 @@ export function useTaskSection(goalId: string) {
   };
   
   const toggleTaskStatus = (id: string) => {
+    console.log(`Toggling completion for task ${id}`);
     // Use the global task context to toggle task completion
     toggleGlobalTaskCompletion(id);
   };
@@ -75,6 +78,8 @@ export function useTaskSection(goalId: string) {
       return;
     }
 
+    console.log(`Saving task for goal ${goalId}: ${taskTitle}`);
+    
     if (editingTask) {
       // Update existing task using global context
       updateTask(editingTask.id, { 
@@ -97,6 +102,7 @@ export function useTaskSection(goalId: string) {
   };
 
   const handleDeleteTask = (id: string) => {
+    console.log(`Deleting task ${id}`);
     // Use the global task context to delete the task
     deleteTask(id);
   };

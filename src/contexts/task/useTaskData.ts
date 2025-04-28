@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { fetchData } from '@/utils/dataSync';
 import { toast } from '@/hooks/use-toast';
