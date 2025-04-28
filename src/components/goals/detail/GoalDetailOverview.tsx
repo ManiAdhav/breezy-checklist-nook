@@ -1,11 +1,10 @@
 
 import React from 'react';
-import { ListChecks, Repeat, Flag } from 'lucide-react';
+import { ListChecks, Repeat } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from "@/components/ui/card";
 import ActionsSection from '../sections/ActionsSection';
 import HabitSection from '../sections/HabitSection';
-import MilestoneSection from '../sections/MilestoneSection';
 import TaskSection from '../sections/TaskSection';
 
 interface GoalDetailOverviewProps {
@@ -55,26 +54,8 @@ const GoalDetailOverview: React.FC<GoalDetailOverviewProps> = ({ goalId, onTabCh
             <HabitSection goalId={goalId} limit={3} />
           </div>
           
-          {/* Milestones Section Summary */}
-          <div className="border rounded-lg p-4 bg-card/50">
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="text-lg font-medium flex items-center">
-                <Flag className="h-5 w-5 mr-2 text-purple-500" />
-                Milestones
-              </h3>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => onTabChange("milestones")}
-              >
-                View All
-              </Button>
-            </div>
-            <MilestoneSection goalId={goalId} limit={3} />
-          </div>
-          
           {/* Tasks Section Summary */}
-          <div className="border rounded-lg p-4 bg-card/50">
+          <div className="border rounded-lg p-4 bg-card/50 md:col-span-2">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-lg font-medium flex items-center">
                 <ListChecks className="h-5 w-5 mr-2 text-yellow-500" />

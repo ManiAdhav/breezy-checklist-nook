@@ -3,7 +3,7 @@ import React from 'react';
 import { TaskProvider } from '@/contexts/TaskContext';
 import { GoalProvider } from '@/contexts/GoalContext';
 import { VisionProvider } from '@/contexts/VisionContext';
-import { HabitProvider } from '@/contexts/habit/HabitProvider';
+import { HabitProvider } from '@/contexts/HabitContext';
 import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
 import MobileSidebar from '@/components/layout/MobileSidebar';

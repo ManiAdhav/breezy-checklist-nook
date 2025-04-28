@@ -9,7 +9,6 @@ interface GoalDetailContentProps {
   activeTab: string;
   handleTabChange: (value: string) => void;
   goalId: string;
-  milestoneCount: number;
   taskCount: number;
   habitCount: number;
 }
@@ -19,16 +18,15 @@ const GoalDetailContent: React.FC<GoalDetailContentProps> = ({
   activeTab,
   handleTabChange,
   goalId,
-  milestoneCount,
   taskCount,
   habitCount
 }) => {
   // Use an effect to ensure data is loaded properly when the component mounts
   useEffect(() => {
     console.log(`GoalDetailContent mounted for goal: ${goalId}`);
-    console.log(`Current counts - Milestones: ${milestoneCount}, Tasks: ${taskCount}, Habits: ${habitCount}`);
+    console.log(`Current counts - Tasks: ${taskCount}, Habits: ${habitCount}`);
     // This will run when the component mounts or when key data changes
-  }, [goalId, milestoneCount, taskCount, habitCount]);
+  }, [goalId, taskCount, habitCount]);
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -43,7 +41,6 @@ const GoalDetailContent: React.FC<GoalDetailContentProps> = ({
           activeTab={activeTab}
           onTabChange={handleTabChange}
           goalId={goalId}
-          milestoneCount={milestoneCount}
           taskCount={taskCount}
           habitCount={habitCount}
         />
