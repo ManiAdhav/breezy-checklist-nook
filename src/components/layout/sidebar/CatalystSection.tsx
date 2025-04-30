@@ -1,107 +1,71 @@
 
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  ChevronDown, 
-  ChevronRight, 
-  Target, 
-  Calendar, 
-  Lightbulb, 
-  ListChecks 
-} from 'lucide-react';
+import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { ChevronRight, Target, Compass, Brain, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useTask } from '@/contexts/TaskContext';
-import { useGoal } from '@/contexts/GoalContext';
-import GoalActionsPopover from './GoalActionsPopover';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
-const CatalystSection: React.FC = () => {
-  const [showGoals, setShowGoals] = useState(true);
-  const { threeYearGoals } = useGoal();
-  const { tasks } = useTask();
+const CatalystSection = () => {
+  const [isOpen, setIsOpen] = React.useState(true);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const actionTasksCount = tasks.filter(task => 
-    task.isAction && 
-    !task.completed
-  ).length;
-
-  // Filter out any goals that might be titled "Get a New Job" or similar
-  const goalsWithActions = threeYearGoals.filter(goal => {
-    // Skip any goal with "job" in the title (case insensitive)
-    if (goal.title && goal.title.toLowerCase().includes('job')) {
-      return false;
-    }
-    
-    const goalTasks = tasks.filter(task => {
-      return task.goalId === goal.id && !task.completed;
-    });
-    
-    return goalTasks.length > 0;
-  });
+  const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div>
-      <div className="flex items-center px-2 py-1 text-xs font-medium text-foreground cursor-pointer mt-2 hover:bg-accent/30 rounded-md" onClick={() => setShowGoals(!showGoals)}>
-        {showGoals ? <ChevronDown className="h-3.5 w-3.5 mr-1" /> : <ChevronRight className="h-3.5 w-3.5 mr-1" />}
-        <span>Catalyst</span>
-      </div>
-      
-      {showGoals && (
-        <div className="ml-1 space-y-0.5">
-          <Link to="/vision" className="block">
-            <Button variant="ghost" className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/vision' ? 'sidebar-item-active' : ''}`}>
-              <Lightbulb className="h-4 w-4 mr-2" />
-              <span>Vision</span>
-            </Button>
-          </Link>
-          
-          <Link to="/goals" className="block">
-            <Button variant="ghost" className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/goals' ? 'sidebar-item-active' : ''}`}>
-              <Target className="h-4 w-4 mr-2" />
-              <span>Goals</span>
-            </Button>
-          </Link>
-
-          <Link to="/actions" className="block">
-            <Button 
-              variant="ghost" 
-              className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/actions' ? 'sidebar-item-active' : ''}`}
-            >
-              <ListChecks className="h-4 w-4 mr-2 text-blue-500" />
-              <span className="font-medium mr-auto">Actions</span>
-              {actionTasksCount > 0 && (
-                <span className="text-[9px] bg-secondary rounded-full px-1 py-0.5 min-w-4 text-center">
-                  {actionTasksCount}
-                </span>
-              )}
-            </Button>
-          </Link>
-          
-          {/* Milestone button has been removed */}
-          
-          {/* Render the goal actions popovers, filtering out any "Get a New Job" or similar */}
-          {goalsWithActions.map(goal => {
-            // Skip goals with "job" in the title
-            if (goal.title && goal.title.toLowerCase().includes('job')) {
-              return null;
-            }
-            
-            const goalTasks = tasks.filter(task => {
-              return task.goalId === goal.id && !task.completed;
-            });
-            
-            if (goalTasks.length === 0) return null;
-            
-            return (
-              <GoalActionsPopover 
-                key={goal.id} 
-                goal={goal} 
-                goalTasks={goalTasks} 
-              />
-            );
-          })}
-        </div>
-      )}
-    </div>
+    <Collapsible
+      open={isOpen}
+      onOpenChange={setIsOpen}
+      className="w-full"
+    >
+      <CollapsibleTrigger asChild>
+        <Button
+          variant="ghost"
+          className="flex items-center justify-between w-full px-2 py-1.5 h-auto text-sm font-medium text-muted-foreground hover:text-foreground"
+        >
+          <span>Nunil</span>
+          <ChevronRight className={`h-4 w-4 transition-transform ${isOpen ? 'transform rotate-90' : ''}`} />
+        </Button>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="space-y-1 pt-1">
+        <Button
+          variant="ghost"
+          size="sm"
+          className={`w-full justify-start pl-6 ${isActive('/goals') ? 'bg-primary/10 font-medium text-primary' : 'text-muted-foreground'} hover:bg-primary/10 hover:text-primary`}
+          onClick={() => navigate('/goals')}
+        >
+          <Target className="h-4 w-4 mr-2" />
+          Goals
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className={`w-full justify-start pl-6 ${isActive('/vision') ? 'bg-primary/10 font-medium text-primary' : 'text-muted-foreground'} hover:bg-primary/10 hover:text-primary`}
+          onClick={() => navigate('/vision')}
+        >
+          <Compass className="h-4 w-4 mr-2" />
+          Vision
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className={`w-full justify-start pl-6 ${isActive('/mindmap') ? 'bg-primary/10 font-medium text-primary' : 'text-muted-foreground'} hover:bg-primary/10 hover:text-primary`}
+          onClick={() => navigate('/mindmap')}
+        >
+          <Brain className="h-4 w-4 mr-2" />
+          Mind Map
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className={`w-full justify-start pl-6 ${isActive('/weekly') ? 'bg-primary/10 font-medium text-primary' : 'text-muted-foreground'} hover:bg-primary/10 hover:text-primary`}
+          onClick={() => navigate('/weekly')}
+        >
+          <Calendar className="h-4 w-4 mr-2" />
+          Weekly
+        </Button>
+      </CollapsibleContent>
+    </Collapsible>
   );
 };
 

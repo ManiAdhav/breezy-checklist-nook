@@ -29,7 +29,7 @@ const TargetsLayout: React.FC<TargetsLayoutProps> = ({ user, onSignOut }) => {
                   <MobileSidebar />
                   <main className="flex-1 overflow-y-auto md:pl-[220px]">
                     <div className="p-6">
-                      <h1 className="text-2xl font-bold mb-6">Goals & Tasks</h1>
+                      <h1 className="text-2xl font-bold mb-6">Nunil Goals & Tasks</h1>
                     </div>
                   </main>
                 </div>
