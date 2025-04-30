@@ -6,7 +6,6 @@ import {
   ChevronRight, 
   Target, 
   Calendar, 
-  Archive, 
   Lightbulb, 
   ListChecks 
 } from 'lucide-react';
@@ -77,12 +76,7 @@ const CatalystSection: React.FC = () => {
             </Button>
           </Link>
           
-          <Link to="/milestones" className="block">
-            <Button variant="ghost" className={`w-full justify-start h-7 px-2 py-0.5 text-xs sidebar-item ${location.pathname === '/milestones' ? 'sidebar-item-active' : ''}`}>
-              <Archive className="h-4 w-4 mr-2" />
-              <span>Milestone</span>
-            </Button>
-          </Link>
+          {/* Milestone button has been removed */}
           
           {/* Render the goal actions popovers, filtering out any "Get a New Job" or similar */}
           {goalsWithActions.map(goal => {

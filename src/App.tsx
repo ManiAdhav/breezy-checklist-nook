@@ -4,7 +4,6 @@ import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
 import Index from './pages/Index';
 import GoalsPage from './pages/GoalsPage';
 import GoalDetailView from './components/goals/GoalDetailView';
-import MilestonePage from './pages/MilestonePage';
 import VisionPage from './pages/VisionPage';
 import MindMapPage from './pages/MindMapPage';
 import CalendarPage from './pages/CalendarPage';
@@ -36,7 +35,6 @@ function App() {
               <Route path="/" element={<Index />} />
               <Route path="/goals" element={<GoalsPage />} />
               <Route path="/goals/:id" element={<GoalDetailViewWrapper />} />
-              <Route path="/milestones" element={<MilestonePage />} />
               <Route path="/vision" element={<VisionPage />} />
               <Route path="/mindmap" element={<MindMapPage />} />
               <Route path="/calendar" element={<CalendarPage />} />
