@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react';
 import { fetchData } from '@/utils/dataSync';
 import { toast } from '@/hooks/use-toast';
@@ -19,6 +20,8 @@ export const useTaskData = (
           fetchData('tasks', 'tasks') as Promise<Task[]>,
           fetchData('lists', 'customLists') as Promise<List[]>
         ]);
+        
+        console.log(`Fetched raw tasks data:`, tasksData.length);
         
         // Process tasks date fields
         const processedTasks = tasksData.map(task => ({
@@ -64,10 +67,21 @@ export const useTaskData = (
     const refreshInterval = setInterval(() => {
       console.log('Refreshing task and list data...');
       fetchTaskData();
-    }, 300000); // Refresh every 5 minutes instead of every minute to reduce load
+    }, 300000); // Refresh every 5 minutes
+    
+    // Add a visibility change listener to refresh data when tab becomes visible again
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('Tab became visible, refreshing task data...');
+        fetchTaskData();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
     
     return () => {
       clearInterval(refreshInterval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [setTasks, setCustomLists, setIsLoading]);
 };

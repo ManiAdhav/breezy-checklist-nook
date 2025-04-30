@@ -38,6 +38,7 @@ export const fetchData = async <T>(tableName: string, storageKey: string): Promi
         .eq('entry_type', storageKey);
       
       if (!entriesError && entriesData && entriesData.length > 0) {
+        // Convert the data format to our list format
         const parsedData: T[] = [];
         
         for (const entry of entriesData) {
@@ -54,26 +55,34 @@ export const fetchData = async <T>(tableName: string, storageKey: string): Promi
         console.log(`Retrieved ${parsedData.length} ${storageKey} from user_entries`);
         
         if (parsedData.length > 0) {
-          // Update localStorage as backup
+          // Store to localStorage as backup
           localStorage.setItem(storageKey, JSON.stringify(parsedData));
           return parsedData;
         }
       }
     }
     
-    // Fall back to localStorage
-    const localData = localStorage.getItem(storageKey);
-    if (localData) {
-      try {
+    // Fall back to localStorage with improved error checking
+    try {
+      const localData = localStorage.getItem(storageKey);
+      console.log(`Checking localStorage for ${storageKey}, found data:`, !!localData);
+      
+      if (localData) {
         const parsedData = JSON.parse(localData);
-        console.log(`Retrieved ${Array.isArray(parsedData) ? parsedData.length : 0} ${storageKey} from localStorage`);
-        return Array.isArray(parsedData) ? parsedData : [parsedData];
-      } catch (e) {
-        console.error(`Error parsing ${storageKey} from localStorage:`, e);
+        if (Array.isArray(parsedData)) {
+          console.log(`Retrieved ${parsedData.length} ${storageKey} items from localStorage`);
+          return parsedData;
+        } else if (parsedData) {
+          // Handle case where data is not an array
+          console.log(`Retrieved non-array ${storageKey} from localStorage, converting to array`);
+          return [parsedData] as T[];
+        }
       }
+    } catch (e) {
+      console.error(`Error parsing ${storageKey} from localStorage:`, e);
     }
     
-    console.log(`No ${storageKey} data found`);
+    console.log(`No ${storageKey} data found, returning empty array`);
     return [];
   } catch (error) {
     console.error(`Error fetching ${storageKey} data:`, error);
