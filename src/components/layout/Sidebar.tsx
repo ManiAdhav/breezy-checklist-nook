@@ -10,9 +10,8 @@ import HabitsSection from './sidebar/HabitsSection';
 import SidebarList from './sidebar/SidebarList';
 import AddListDialog from './sidebar/AddListDialog';
 import CalendarLink from './sidebar/CalendarLink';
-import { Card } from '@/components/ui/card';
 import { useSidebar } from '@/components/ui/sidebar';
-import { Menu, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 
@@ -95,12 +94,13 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
-      <div className={`${sidebarPosition} ${transitionClass} w-[220px] h-screen bg-sidebar fixed top-0 left-0 z-10 border-r border-border overflow-hidden`}>
+      <div className={`${sidebarPosition} ${transitionClass} w-[220px] h-screen bg-white fixed top-0 left-0 z-10 border-r border-border/40 overflow-hidden`}>
         <div className="flex justify-end p-2 md:hidden">
           <Button 
             variant="ghost" 
             size="icon"
             onClick={toggleSidebar}
+            className="text-muted-foreground hover:text-primary hover:bg-primary/10"
           >
             <X className="h-5 w-5" />
           </Button>
@@ -108,11 +108,11 @@ const Sidebar: React.FC = () => {
         <div className="flex flex-col h-full overflow-hidden">
           <div className="flex-1 overflow-y-auto py-4 px-3">
             <TasksSection />
-            <Separator className="my-2 bg-gray-200" />
+            <Separator className="my-2 bg-gray-100" />
             <CatalystSection />
-            <Separator className="my-2 bg-gray-200" />
+            <Separator className="my-2 bg-gray-100" />
             <HabitsSection />
-            <Separator className="my-2 bg-gray-200" />
+            <Separator className="my-2 bg-gray-100" />
             <TagsSection />
             <CalendarLink />
             <nav className="space-y-0.5 mt-2"></nav>

@@ -36,14 +36,14 @@ const FloatingActionButtonControls: React.FC<FloatingActionButtonControlsProps> 
   const isCommandMode = inputValue.includes('/') && !selectedGoalTitle;
   
   return (
-    <div className="w-full flex items-center p-2 relative">
+    <div className="w-full flex items-center p-3 relative">
       <Input
         ref={inputRef}
         type="text"
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}
-        className={`w-full border-none focus:ring-0 h-10 text-sm ${isCommandMode ? 'bg-gray-100' : ''}`}
+        className={`w-full border-none focus:ring-0 h-11 rounded-lg ${isCommandMode ? 'bg-secondary/50' : ''}`}
         placeholder={isCalendarPage 
           ? "Add a task for this date... (Type / to use commands)" 
           : "Add a task... (Type / to use commands)"}
@@ -56,11 +56,11 @@ const FloatingActionButtonControls: React.FC<FloatingActionButtonControlsProps> 
         onClick={handleSave}
         className={`
           ml-2 rounded-full p-2 transition-all duration-300
-          ${inputValue.trim() && !showCommandMenu ? 'bg-primary text-white hover:bg-primary/90' : 'bg-gray-100 text-gray-400'}
+          ${inputValue.trim() && !showCommandMenu ? 'bg-primary text-white hover:bg-primary/90' : 'bg-secondary text-muted-foreground'}
         `}
         disabled={!inputValue.trim() || showCommandMenu}
       >
-        <Save className="w-4 h-4" />
+        <Save className="w-5 h-5" />
       </button>
       
       {showCommandMenu && (

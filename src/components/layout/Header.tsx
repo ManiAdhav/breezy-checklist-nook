@@ -32,9 +32,9 @@ const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
   };
 
   return (
-    <header className="h-16 border-b border-border flex items-center px-6 bg-background/95 backdrop-blur-sm sticky top-0 z-10 justify-between">
+    <header className="h-16 border-b border-border/40 flex items-center px-6 bg-background/95 backdrop-blur-sm sticky top-0 z-10 justify-between">
       <div className="flex items-center">
-        <h1 className="text-xl font-medium tracking-tight mr-8">
+        <h1 className="text-xl font-medium tracking-tight mr-8 text-primary">
           Catalyst
         </h1>
         
@@ -62,21 +62,21 @@ const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
         <Button 
           variant="ghost" 
           size="icon" 
-          className="rounded-full h-9 w-9 transition-all hover:bg-secondary"
+          className="rounded-full h-9 w-9 transition-all hover:bg-primary/10 hover:text-primary"
         >
           <PlusCircle className="h-5 w-5" />
         </Button>
         <Button 
           variant="ghost" 
           size="icon" 
-          className="rounded-full h-9 w-9 transition-all hover:bg-secondary"
+          className="rounded-full h-9 w-9 transition-all hover:bg-primary/10 hover:text-primary"
         >
           <Bell className="h-5 w-5" />
         </Button>
         <Button 
           variant="ghost" 
           size="icon" 
-          className="rounded-full h-9 w-9 transition-all hover:bg-secondary"
+          className="rounded-full h-9 w-9 transition-all hover:bg-primary/10 hover:text-primary"
         >
           <Settings className="h-5 w-5" />
         </Button>
@@ -85,7 +85,7 @@ const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="rounded-full h-9 w-9 transition-all hover:bg-secondary overflow-hidden ml-1"
+              className="rounded-full h-9 w-9 transition-all hover:bg-primary/10 overflow-hidden ml-1"
             >
               {user?.user_metadata?.avatar_url ? (
                 <img 

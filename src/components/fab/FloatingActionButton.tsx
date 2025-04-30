@@ -127,8 +127,8 @@ const FloatingActionButton: React.FC = () => {
         className={`
           transition-all duration-300 overflow-hidden
           ${isExpanded 
-            ? 'w-full rounded-md bg-white shadow-[0_2px_10px_rgba(0,0,0,0.1)]' 
-            : 'w-12 h-12 rounded-full bg-[#F5F5F5] hover:bg-[#EEEEEE] shadow-[0_2px_5px_rgba(0,0,0,0.08)]'}
+            ? 'w-full rounded-xl bg-white shadow-medium border border-border/40' 
+            : 'w-12 h-12 rounded-full bg-primary text-white hover:bg-primary/90 shadow-medium hover:shadow-hard'}
           flex items-center 
         `}
       >
@@ -149,10 +149,10 @@ const FloatingActionButton: React.FC = () => {
         ) : (
           <button
             onClick={() => setIsExpanded(true)}
-            className="w-full h-full flex items-center justify-center hover:bg-gray-200 transition-colors rounded-full"
+            className="w-full h-full flex items-center justify-center hover:bg-primary/90 transition-colors rounded-full"
             aria-label="Add new task"
           >
-            <Plus className="w-5 h-5 text-[#333333]" />
+            <Plus className="w-5 h-5 text-white" />
           </button>
         )}
       </div>

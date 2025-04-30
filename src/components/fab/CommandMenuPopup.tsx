@@ -29,21 +29,23 @@ const CommandMenuPopup: React.FC<CommandMenuPopupProps> = ({
   
   return (
     <div 
-      className="absolute z-50 w-full bottom-full mb-2 bg-white rounded-md shadow-lg border"
+      className="absolute z-50 w-full bottom-full mb-2 bg-white rounded-xl shadow-medium border border-border/40"
       ref={commandRef}
     >
-      <Command className="rounded-lg border shadow-md">
+      <Command className="rounded-lg">
         <div className="flex items-center border-b px-3 py-2">
           <Search className="w-4 h-4 mr-2 text-muted-foreground" />
           <CommandInput 
             placeholder="Search goals..." 
             value={searchTerm}
-            className="h-7 border-none focus:ring-0 bg-transparent"
+            className="h-9 border-none focus:ring-0 bg-transparent"
           />
         </div>
-        <CommandList className="max-h-[200px] overflow-auto">
+        <CommandList className="max-h-[240px] overflow-auto">
           <CommandEmpty>
-            No matching goals found
+            <div className="py-4 text-center text-sm text-muted-foreground">
+              No matching goals found
+            </div>
           </CommandEmpty>
           
           <CommandGroup heading="Goals">
@@ -51,7 +53,7 @@ const CommandMenuPopup: React.FC<CommandMenuPopupProps> = ({
               <CommandItem 
                 key={goal.id}
                 onSelect={() => onGoalSelect(goal.id, goal.title)}
-                className="cursor-pointer flex items-center px-3 py-2 hover:bg-slate-50"
+                className="cursor-pointer flex items-center px-3 py-2.5 hover:bg-primary/5"
               >
                 <Target className="w-4 h-4 mr-2 text-primary" />
                 <span className="flex-1 truncate">{goal.title}</span>

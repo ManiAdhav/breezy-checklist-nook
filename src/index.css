@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
@@ -6,7 +7,7 @@
 
 @layer base {
   :root {
-    --background: 260 30% 98%;
+    --background: 0 0% 99%;
     --foreground: 224 71% 4%;
 
     --card: 0 0% 100%;
@@ -15,35 +16,37 @@
     --popover: 0 0% 100%;
     --popover-foreground: 224 71% 4%;
 
-    --primary: 252 56% 57%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary color: #d88888 (HSL: 0, 52%, 69%) */
+    --primary: 0 52% 69%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 260 30% 95%;
+    --secondary: 0 20% 96%;
     --secondary-foreground: 224 71% 4%;
 
     --muted: 220 14% 96%;
     --muted-foreground: 220 8% 46%;
 
-    --accent: 260 30% 95%;
+    --accent: 0 20% 96%;
     --accent-foreground: 224 71% 4%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 252 56% 57%;
+    --ring: 0 52% 69%;
 
-    --radius: 1rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 252 56% 57%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 0 0% 100%;
-    --sidebar-primary-foreground: 252 56% 57%;
-    --sidebar-accent: 252 47% 65%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 252 47% 65%;
-    --sidebar-ring: 0 0% 100%;
+    /* Sidebar colors */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 224 71% 4%;
+    --sidebar-primary: 0 52% 69%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 40% 90%;
+    --sidebar-accent-foreground: 0 52% 69%;
+    --sidebar-border: 0 20% 90%;
+    --sidebar-ring: 0 52% 69%;
   }
 
   * {
@@ -95,7 +98,7 @@
   }
 
   .sidebar-item {
-    @apply flex items-center gap-3 rounded-md text-foreground hover:bg-accent/40 hover:text-foreground transition-colors duration-200;
+    @apply flex items-center gap-3 rounded-md text-foreground hover:bg-primary/10 hover:text-primary transition-colors duration-200;
   }
 
   .sidebar-item span {
@@ -103,7 +106,7 @@
   }
 
   .sidebar-item-active {
-    @apply bg-accent/50 text-foreground font-medium;
+    @apply bg-primary/15 text-primary font-medium;
   }
   
   .page-transition {
@@ -129,6 +132,23 @@
   .progress-value {
     @apply h-full bg-primary rounded-full;
   }
+  
+  /* New styles for modernized UI */
+  .modern-card {
+    @apply bg-white border border-border rounded-lg p-6 shadow-soft hover:shadow-medium transition-shadow duration-300;
+  }
+  
+  .floating-button {
+    @apply flex items-center justify-center p-3 bg-primary text-primary-foreground rounded-full shadow-medium hover:shadow-hard transition-shadow hover:bg-primary/90;
+  }
+  
+  .tag-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary;
+  }
+  
+  .input-modern {
+    @apply border-0 bg-secondary focus:ring-2 focus:ring-primary/30 rounded-lg shadow-sm transition-all;
+  }
 }
 
 /* Task item transitions */
@@ -149,4 +169,18 @@
   opacity: 0;
   transform: translateY(-10px);
   transition: opacity 200ms, transform 200ms;
+}
+
+/* Modern UI animation for buttons */
+.btn-hover-effect {
+  @apply relative overflow-hidden;
+}
+
+.btn-hover-effect::after {
+  content: '';
+  @apply absolute inset-0 bg-white/20 opacity-0 transition-opacity duration-300;
+}
+
+.btn-hover-effect:hover::after {
+  @apply opacity-100;
 }
