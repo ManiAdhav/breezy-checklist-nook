@@ -21,6 +21,7 @@ export const fetchData = async <T>(tableName: string, storageKey: string): Promi
     
     if (!tableError && tableData && tableData.length > 0) {
       console.log(`Retrieved ${tableData.length} ${tableName} from Supabase table`);
+      console.log(`${tableName} data from table:`, tableData);
       
       // Update localStorage as backup
       localStorage.setItem(storageKey, JSON.stringify(tableData));
@@ -28,6 +29,9 @@ export const fetchData = async <T>(tableName: string, storageKey: string): Promi
       return tableData as T[];
     } else {
       console.log(`No data in ${tableName} table or table doesn't exist. Checking user_entries...`);
+      if (tableError) {
+        console.error(`Error fetching from ${tableName}:`, tableError);
+      }
     }
     
     // If no data in the main table or it doesn't exist, check user_entries
@@ -53,12 +57,15 @@ export const fetchData = async <T>(tableName: string, storageKey: string): Promi
       }
       
       console.log(`Retrieved ${parsedData.length} ${storageKey} from user_entries`);
+      console.log(`${storageKey} data from user_entries:`, parsedData);
       
       if (parsedData.length > 0) {
         // Store to localStorage as backup
         localStorage.setItem(storageKey, JSON.stringify(parsedData));
         return parsedData;
       }
+    } else if (entriesError) {
+      console.error(`Error checking user_entries for ${storageKey}:`, entriesError);
     }
     
     // Only fall back to localStorage if we couldn't get anything from Supabase
@@ -70,10 +77,12 @@ export const fetchData = async <T>(tableName: string, storageKey: string): Promi
         const parsedData = JSON.parse(localData);
         if (Array.isArray(parsedData)) {
           console.log(`Retrieved ${parsedData.length} ${storageKey} items from localStorage as fallback`);
+          console.log(`${storageKey} data from localStorage:`, parsedData);
           return parsedData;
         } else if (parsedData) {
           // Handle case where data is not an array
           console.log(`Retrieved non-array ${storageKey} from localStorage as fallback, converting to array`);
+          console.log(`${storageKey} data from localStorage (non-array):`, parsedData);
           return [parsedData] as T[];
         }
       }
@@ -108,6 +117,7 @@ export const saveData = async <T extends { id: string }>(
 ): Promise<void> => {
   try {
     console.log(`Saving ${data.length} items to ${tableName}...`);
+    console.log(`${tableName} data being saved:`, JSON.stringify(data, null, 2));
     
     // Always save to localStorage first for immediate availability
     localStorage.setItem(storageKey, JSON.stringify(data));

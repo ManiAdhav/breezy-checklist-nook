@@ -9,6 +9,8 @@ import Sidebar from '@/components/layout/Sidebar';
 import MobileSidebar from '@/components/layout/MobileSidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from "@/components/ui/toaster";
+import TaskList from '@/components/tasks/TaskList';
+import { Button } from '@/components/ui/button';
 
 interface TargetsLayoutProps {
   user: any | null;
@@ -30,6 +32,9 @@ const TargetsLayout: React.FC<TargetsLayoutProps> = ({ user, onSignOut }) => {
                   <main className="flex-1 overflow-y-auto md:pl-[220px]">
                     <div className="p-6">
                       <h1 className="text-2xl font-bold mb-6">Nunil Goals & Tasks</h1>
+                      <div className="mt-6">
+                        <TaskList />
+                      </div>
                     </div>
                   </main>
                 </div>

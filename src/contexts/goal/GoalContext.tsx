@@ -37,6 +37,8 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ]);
 
         console.log(`Fetched ${goalsData.length} goals and ${targetsData.length} targets from Supabase`);
+        console.log('Goals data:', JSON.stringify(goalsData, null, 2));
+        console.log('Targets data:', JSON.stringify(targetsData, null, 2));
 
         // Parse dates (convert string dates back to Date objects)
         const processedGoals = goalsData.map(goal => ({
@@ -74,7 +76,7 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const refreshInterval = setInterval(() => {
       console.log('Refreshing goals and targets data...');
       loadGoalData();
-    }, 60000); // Refresh every minute
+    }, 30000); // Refresh every 30 seconds
     
     // Add a visibility change listener for goals data
     const handleVisibilityChange = () => {

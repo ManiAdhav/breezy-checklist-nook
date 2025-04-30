@@ -22,6 +22,7 @@ export const useTaskData = (
         ]);
         
         console.log(`Fetched ${tasksData.length} tasks from Supabase`);
+        console.log('Tasks data:', JSON.stringify(tasksData, null, 2));
         
         // Process tasks date fields
         const processedTasks = tasksData.map(task => ({
@@ -48,6 +49,7 @@ export const useTaskData = (
         setTasks(processedTasks);
         
         console.log(`Loaded ${listsData.length} custom lists from Supabase`);
+        console.log('Lists data:', JSON.stringify(listsData, null, 2));
         setCustomLists(listsData);
       } catch (error) {
         console.error('Error loading task data:', error);
@@ -68,7 +70,7 @@ export const useTaskData = (
     const refreshInterval = setInterval(() => {
       console.log('Refreshing task and list data from Supabase...');
       fetchTaskData();
-    }, 60000); // Refresh every minute for more up-to-date data
+    }, 30000); // Refresh every 30 seconds for more up-to-date data
     
     // Add a visibility change listener to refresh data when tab becomes visible again
     const handleVisibilityChange = () => {
