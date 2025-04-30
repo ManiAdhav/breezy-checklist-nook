@@ -21,7 +21,7 @@ export const useTaskData = (
           fetchData('lists', 'customLists') as Promise<List[]>
         ]);
         
-        console.log(`Fetched raw tasks data:`, tasksData.length);
+        console.log(`Fetched ${tasksData.length} tasks from Supabase`);
         
         // Process tasks date fields
         const processedTasks = tasksData.map(task => ({
@@ -44,16 +44,16 @@ export const useTaskData = (
             : undefined
         }));
         
-        console.log(`Loaded ${processedTasks.length} tasks successfully from Supabase:`, processedTasks);
+        console.log(`Processed ${processedTasks.length} tasks successfully from Supabase`);
         setTasks(processedTasks);
         
-        console.log(`Loaded ${listsData.length} custom lists successfully from Supabase:`, listsData);
+        console.log(`Loaded ${listsData.length} custom lists from Supabase`);
         setCustomLists(listsData);
       } catch (error) {
         console.error('Error loading task data:', error);
         toast({
           title: "Error",
-          description: "Failed to load tasks and lists from Supabase. Using cached data if available.",
+          description: "Failed to load tasks and lists from Supabase.",
           variant: "destructive",
         });
       } finally {
@@ -61,13 +61,14 @@ export const useTaskData = (
       }
     };
 
+    // Immediately fetch data when component mounts
     fetchTaskData();
     
     // Set up a refresh interval to periodically fetch data
     const refreshInterval = setInterval(() => {
       console.log('Refreshing task and list data from Supabase...');
       fetchTaskData();
-    }, 300000); // Refresh every 5 minutes
+    }, 60000); // Refresh every minute for more up-to-date data
     
     // Add a visibility change listener to refresh data when tab becomes visible again
     const handleVisibilityChange = () => {

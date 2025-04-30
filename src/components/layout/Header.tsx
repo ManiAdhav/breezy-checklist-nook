@@ -12,12 +12,22 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
-  const { setSearchQuery, searchQuery } = useTask();
+  const [searchInput, setSearchInput] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  
+  // Get TaskContext safely
+  let taskContext;
+  try {
+    taskContext = useTask();
+  } catch (error) {
+    console.warn('TaskContext not available in Header');
+    // Continue without TaskContext
+  }
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (setSearchQuery) {
-      setSearchQuery(e.target.value);
+    setSearchInput(e.target.value);
+    if (taskContext?.setSearchQuery) {
+      taskContext.setSearchQuery(e.target.value);
     }
   };
 
@@ -40,7 +50,7 @@ const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
             type="text"
             placeholder="Search tasks..."
             className="border-0 bg-transparent h-9 focus-visible:ring-0 focus-visible:ring-offset-0"
-            value={searchQuery || ''}
+            value={searchInput}
             onChange={handleSearchChange}
             onFocus={() => setIsSearchFocused(true)}
             onBlur={() => setIsSearchFocused(false)}

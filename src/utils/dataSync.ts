@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
@@ -9,11 +10,11 @@ import { toast } from '@/hooks/use-toast';
  */
 export const fetchData = async <T>(tableName: string, storageKey: string): Promise<T[]> => {
   try {
-    console.log(`Fetching ${tableName} data...`);
+    console.log(`Fetching ${tableName} data from Supabase...`);
     const { data: session } = await supabase.auth.getSession();
     
-    // Always try to get data from Supabase first, regardless of authentication status
-    // Try to get data from the main table if it exists
+    // Try to get data from Supabase directly
+    console.log(`Attempting to fetch from ${tableName} table directly...`);
     const { data: tableData, error: tableError } = await supabase
       .from(tableName)
       .select('*');
@@ -25,6 +26,8 @@ export const fetchData = async <T>(tableName: string, storageKey: string): Promi
       localStorage.setItem(storageKey, JSON.stringify(tableData));
       
       return tableData as T[];
+    } else {
+      console.log(`No data in ${tableName} table or table doesn't exist. Checking user_entries...`);
     }
     
     // If no data in the main table or it doesn't exist, check user_entries
@@ -35,7 +38,7 @@ export const fetchData = async <T>(tableName: string, storageKey: string): Promi
       .eq('entry_type', storageKey);
     
     if (!entriesError && entriesData && entriesData.length > 0) {
-      // Convert the data format to our list format
+      // Convert the data format to our expected format
       const parsedData: T[] = [];
       
       for (const entry of entriesData) {
@@ -61,7 +64,7 @@ export const fetchData = async <T>(tableName: string, storageKey: string): Promi
     // Only fall back to localStorage if we couldn't get anything from Supabase
     try {
       const localData = localStorage.getItem(storageKey);
-      console.log(`No Supabase data found. Checking localStorage for ${storageKey}, found data:`, !!localData);
+      console.log(`No Supabase data found. Checking localStorage for ${storageKey}...`);
       
       if (localData) {
         const parsedData = JSON.parse(localData);
