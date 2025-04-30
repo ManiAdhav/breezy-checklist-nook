@@ -12,7 +12,7 @@ export const useTaskData = (
   useEffect(() => {
     const fetchTaskData = async () => {
       setIsLoading(true);
-      console.log('Fetching tasks and lists data...');
+      console.log('Fetching tasks and lists data from Supabase...');
       
       try {
         // Type assertion to ensure type safety
@@ -44,16 +44,16 @@ export const useTaskData = (
             : undefined
         }));
         
-        console.log(`Loaded ${processedTasks.length} tasks successfully:`, processedTasks);
+        console.log(`Loaded ${processedTasks.length} tasks successfully from Supabase:`, processedTasks);
         setTasks(processedTasks);
         
-        console.log(`Loaded ${listsData.length} custom lists successfully:`, listsData);
+        console.log(`Loaded ${listsData.length} custom lists successfully from Supabase:`, listsData);
         setCustomLists(listsData);
       } catch (error) {
         console.error('Error loading task data:', error);
         toast({
           title: "Error",
-          description: "Failed to load tasks and lists. Using cached data if available.",
+          description: "Failed to load tasks and lists from Supabase. Using cached data if available.",
           variant: "destructive",
         });
       } finally {
@@ -65,14 +65,14 @@ export const useTaskData = (
     
     // Set up a refresh interval to periodically fetch data
     const refreshInterval = setInterval(() => {
-      console.log('Refreshing task and list data...');
+      console.log('Refreshing task and list data from Supabase...');
       fetchTaskData();
     }, 300000); // Refresh every 5 minutes
     
     // Add a visibility change listener to refresh data when tab becomes visible again
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        console.log('Tab became visible, refreshing task data...');
+        console.log('Tab became visible, refreshing task data from Supabase...');
         fetchTaskData();
       }
     };

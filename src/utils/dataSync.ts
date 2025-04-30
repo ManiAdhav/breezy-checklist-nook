@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
@@ -13,68 +12,65 @@ export const fetchData = async <T>(tableName: string, storageKey: string): Promi
     console.log(`Fetching ${tableName} data...`);
     const { data: session } = await supabase.auth.getSession();
     
-    if (session?.session) {
-      console.log(`User authenticated, fetching ${tableName} from Supabase`);
+    // Always try to get data from Supabase first, regardless of authentication status
+    // Try to get data from the main table if it exists
+    const { data: tableData, error: tableError } = await supabase
+      .from(tableName)
+      .select('*');
+    
+    if (!tableError && tableData && tableData.length > 0) {
+      console.log(`Retrieved ${tableData.length} ${tableName} from Supabase table`);
       
-      // Try to get data from the main table if it exists
-      const { data: tableData, error: tableError } = await supabase
-        .from(tableName)
-        .select('*');
+      // Update localStorage as backup
+      localStorage.setItem(storageKey, JSON.stringify(tableData));
       
-      if (!tableError && tableData && tableData.length > 0) {
-        console.log(`Retrieved ${tableData.length} ${tableName} from Supabase table`);
-        
-        // Update localStorage as backup
-        localStorage.setItem(storageKey, JSON.stringify(tableData));
-        
-        return tableData as T[];
+      return tableData as T[];
+    }
+    
+    // If no data in the main table or it doesn't exist, check user_entries
+    console.log(`Checking user_entries for ${storageKey}...`);
+    const { data: entriesData, error: entriesError } = await supabase
+      .from('user_entries')
+      .select('*')
+      .eq('entry_type', storageKey);
+    
+    if (!entriesError && entriesData && entriesData.length > 0) {
+      // Convert the data format to our list format
+      const parsedData: T[] = [];
+      
+      for (const entry of entriesData) {
+        try {
+          const item = JSON.parse(entry.content);
+          if (item) {
+            parsedData.push(item as T);
+          }
+        } catch (e) {
+          console.error(`Error parsing ${storageKey} entry:`, e);
+        }
       }
       
-      // If no data in the main table or it doesn't exist, check user_entries
-      console.log(`Checking user_entries for ${storageKey}...`);
-      const { data: entriesData, error: entriesError } = await supabase
-        .from('user_entries')
-        .select('*')
-        .eq('entry_type', storageKey);
+      console.log(`Retrieved ${parsedData.length} ${storageKey} from user_entries`);
       
-      if (!entriesError && entriesData && entriesData.length > 0) {
-        // Convert the data format to our list format
-        const parsedData: T[] = [];
-        
-        for (const entry of entriesData) {
-          try {
-            const item = JSON.parse(entry.content);
-            if (item) {
-              parsedData.push(item as T);
-            }
-          } catch (e) {
-            console.error(`Error parsing ${storageKey} entry:`, e);
-          }
-        }
-        
-        console.log(`Retrieved ${parsedData.length} ${storageKey} from user_entries`);
-        
-        if (parsedData.length > 0) {
-          // Store to localStorage as backup
-          localStorage.setItem(storageKey, JSON.stringify(parsedData));
-          return parsedData;
-        }
+      if (parsedData.length > 0) {
+        // Store to localStorage as backup
+        localStorage.setItem(storageKey, JSON.stringify(parsedData));
+        return parsedData;
       }
     }
     
-    // Fall back to localStorage with improved error checking
+    // Only fall back to localStorage if we couldn't get anything from Supabase
     try {
       const localData = localStorage.getItem(storageKey);
-      console.log(`Checking localStorage for ${storageKey}, found data:`, !!localData);
+      console.log(`No Supabase data found. Checking localStorage for ${storageKey}, found data:`, !!localData);
       
       if (localData) {
         const parsedData = JSON.parse(localData);
         if (Array.isArray(parsedData)) {
-          console.log(`Retrieved ${parsedData.length} ${storageKey} items from localStorage`);
+          console.log(`Retrieved ${parsedData.length} ${storageKey} items from localStorage as fallback`);
           return parsedData;
         } else if (parsedData) {
           // Handle case where data is not an array
-          console.log(`Retrieved non-array ${storageKey} from localStorage, converting to array`);
+          console.log(`Retrieved non-array ${storageKey} from localStorage as fallback, converting to array`);
           return [parsedData] as T[];
         }
       }
