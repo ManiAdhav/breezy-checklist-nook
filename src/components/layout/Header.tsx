@@ -16,7 +16,9 @@ const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+    if (setSearchQuery) {
+      setSearchQuery(e.target.value);
+    }
   };
 
   return (
@@ -38,7 +40,7 @@ const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
             type="text"
             placeholder="Search tasks..."
             className="border-0 bg-transparent h-9 focus-visible:ring-0 focus-visible:ring-offset-0"
-            value={searchQuery}
+            value={searchQuery || ''}
             onChange={handleSearchChange}
             onFocus={() => setIsSearchFocused(true)}
             onBlur={() => setIsSearchFocused(false)}
@@ -102,9 +104,11 @@ const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
               </div>
             </div>
             <div className="p-2">
-              <Button variant="outline" size="sm" className="w-full" onClick={onSignOut}>
-                Log out
-              </Button>
+              {onSignOut && (
+                <Button variant="outline" size="sm" className="w-full" onClick={onSignOut}>
+                  Log out
+                </Button>
+              )}
             </div>
           </PopoverContent>
         </Popover>
