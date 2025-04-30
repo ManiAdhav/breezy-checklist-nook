@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Edit2, Trash2, ChevronRight, ChevronDown, Plus, Tag as TagIcon } from 'lucide-react';
 import { useTask } from '@/contexts/TaskContext';
@@ -69,7 +70,7 @@ const TagsSection: React.FC = () => {
           className="flex items-center justify-between py-1 cursor-pointer"
           onClick={() => setExpanded(!expanded)}
         >
-          <div className="flex items-center text-sm font-medium text-muted-foreground">
+          <div className="flex items-center text-sm font-medium text-black">
             {expanded ? <ChevronDown className="h-4 w-4 mr-1" /> : <ChevronRight className="h-4 w-4 mr-1" />}
             Tags
           </div>
